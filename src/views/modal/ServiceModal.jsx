@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { Autocomplete, Box, Card, CardMedia, Input, InputLabel, TextField } from '@mui/material';
-import LabelFloat from '../floatLabel/LabelFloat';
+
 
 export default function ServicesModal(props) {
   const [image, setImage] = useState('')
@@ -44,7 +44,7 @@ const top100Films = [
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Service</Modal.Title>
+            <Modal.Title>Service {props.id}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             <Form onSubmit={onSubmit}>

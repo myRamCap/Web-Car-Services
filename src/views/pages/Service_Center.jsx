@@ -1,5 +1,5 @@
 import React from 'react'
-import ServiceCenterDataTable from '../components/dataTables/ServiceCenterDataTable'
+import ServiceCenterDataTable from '../../components/dataTables/ServiceCenterDataTable'
 
 export default function Service_Center() {
   return (

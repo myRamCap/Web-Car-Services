@@ -1,5 +1,5 @@
 import React from 'react'
-import BookingDataTable from '../components/dataTables/BookingDataTable'
+import BookingDataTable from '../../components/dataTables/BookingDataTable'
 
 export default function Bookings() {
   return (

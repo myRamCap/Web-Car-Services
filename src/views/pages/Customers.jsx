@@ -1,6 +1,5 @@
 import React from 'react'
-import DataFake from '../components/DataFake'
-import CustomerDataTable from '../components/dataTables/CustomerDataTable'
+import CustomerDataTable from '../../components/dataTables/CustomerDataTable'
 
 export default function Customers() {
   return (

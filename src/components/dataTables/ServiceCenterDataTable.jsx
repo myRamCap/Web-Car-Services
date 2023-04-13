@@ -3,8 +3,10 @@ import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import { color } from '@mui/system';
 import { Link } from '@mui/material';
+import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
 
 export default function ServiceCenterDataTable() {
+  const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
 
   const columns = [
@@ -31,12 +33,12 @@ export default function ServiceCenterDataTable() {
       icon: () => <div className="btn btn-primary">Add New</div> ,
       tooltip: 'Add User',
       isFreeAction: true,
-      onClick: (event) => alert("You want to add a new row")
+      onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Save User',
-      onClick: (event) => alert("You edit")
+      onClick: (event) => setShowModal(true)
     }
   ]
 
@@ -72,6 +74,7 @@ export default function ServiceCenterDataTable() {
         actions={action}
         options={options}
       />
+      <ServiceCenterModal show={showModal} close={() => setShowModal(false)} id={1}/> 
     </div>
   )
 }

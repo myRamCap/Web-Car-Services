@@ -1,5 +1,5 @@
-import React from 'react'
-import UsersDataTable from '../components/dataTables/UsersDataTable'
+import React from 'react' 
+import UsersDataTable from '../../components/dataTables/UsersDataTable'
 
 export default function Users() {
   return (

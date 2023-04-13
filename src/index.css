@@ -746,30 +746,4 @@ tbody tr:hover {
  }
 
 
- /* Label Float */
- .float-label {
-  position: relative;
-  margin-bottom: 12px;
-}
-
- .label {
-  font-size: 12px;
-  font-weight: normal;
-  position: absolute;
-  pointer-events: none;
-  left: 12px;
-  top: 12px;
-  transition: 0.2s ease all;
-}
-
-  .label-float {
-  background: white;
-  width: auto;
-  top: -10px;
-  padding: 0 1px;
-  font-size: 12px;
-}
-
- /* end Label Float */
-
  

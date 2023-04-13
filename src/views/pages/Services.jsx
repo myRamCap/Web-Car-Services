@@ -1,5 +1,5 @@
 import React from 'react'
-import ServicesDataTable from '../components/dataTables/ServicesDataTable';
+import ServicesDataTable from '../../components/dataTables/ServicesDataTable';
  
 export default function Workout() {
   // const header = [

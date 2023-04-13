@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
-import ServicesModal from '../modal/ServicesModal';
+import ServicesModal from '../../views/modal/ServiceModal';
 
 export default function ServicesDataTable() {
   const [showModal, setShowModal] = useState(false)
@@ -33,7 +33,7 @@ export default function ServicesDataTable() {
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Save User',
-      onClick: (event) => alert("You edit")
+      onClick: (event) => setShowModal(true)
     }
   ]
 
@@ -69,7 +69,7 @@ export default function ServicesDataTable() {
         actions={action}
         options={options}
       />
-      <ServicesModal show={showModal} close={() => setShowModal(false)}/> 
+      <ServicesModal show={showModal} close={() => setShowModal(false)} id={1}/> 
     </div>
   )
 }
