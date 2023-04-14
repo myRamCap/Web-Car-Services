@@ -13,6 +13,8 @@ import Service_Center from "./views/pages/Service_Center"
 import Bookings from "./views/pages/Bookings"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
+import GoogleMaps from "./views/GoogleMaps"
+import Testing from "./views/pages/Testing"
 
 const router = createBrowserRouter([
     {
@@ -52,6 +54,10 @@ const router = createBrowserRouter([
                 path: '/customer',
                 element: <Customers />
             },
+            {
+                path: '/servicecenter/test',
+                element: <Testing />
+            },
             
         ]
     },
@@ -77,7 +83,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/data',
-        element: <DataFake />
+        element: <GoogleMaps />
     },
 
 ]) 
