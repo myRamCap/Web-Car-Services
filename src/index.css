@@ -746,4 +746,14 @@ tbody tr:hover {
  }
 
 
+
+ /* services modal */
+.fileUpload {
+  margin: 10px 0 !important;
+}
+
+.datePicker {
+  width: 100% !important;
+}
+ /* end services modal */
  
