@@ -21,19 +21,19 @@ export default function CustomerDataTable() {
     { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
   ]
 
-  const action = [
-    {
-      icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
-      isFreeAction: true,
-      onClick: (event) => alert("You want to add a new row")
-    },
-    {
-      icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
-      onClick: (event) => alert("You edit")
-    }
-  ]
+  // const action = [
+  //   {
+  //     icon: () => <div className="btn btn-primary">Add New</div> ,
+  //     tooltip: 'Add User',
+  //     isFreeAction: true,
+  //     onClick: (event) => alert("You want to add a new row")
+  //   },
+  //   {
+  //     icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
+  //     tooltip: 'Save User',
+  //     onClick: (event) => alert("You edit")
+  //   }
+  // ]
 
   const options = {
     paginationAlignment,
@@ -65,7 +65,7 @@ export default function CustomerDataTable() {
         title=""
         columns={columns}
         data={data}
-        actions={action}
+        // actions={action}
         options={options}
       />
     </div>
