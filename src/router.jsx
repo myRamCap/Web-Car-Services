@@ -15,6 +15,7 @@ import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
 import GoogleMaps from "./views/GoogleMaps"
 import Testing from "./views/pages/Testing"
+import Services_Logo from "./views/pages/Services_Logo"
 
 const router = createBrowserRouter([
     {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
             {
                 path: '/servicecenter/test',
                 element: <Testing />
+            },
+            {
+                path: '/serviceslogo',
+                element: <Services_Logo />
             },
             
         ]

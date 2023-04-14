@@ -33,6 +33,15 @@ export default function Navbar() {
                 <span className="tooltip">Dashboard</span>
             </li>
             <li>
+                <Link className={splitLocation[1] === "serviceslogo" ? "isActive" : ""} to="/serviceslogo">
+                    <i>
+                        <box-icon name='image-alt' color={splitLocation[1] === "serviceslogo" ? 'white' : ''} />
+                    </i>
+                    <span className="link_name">Services Logo</span>
+                </Link>
+                <span className="tooltip">Services Logo</span>
+            </li>
+            <li>
                 <Link className={splitLocation[1] === "services" ? "isActive" : ""} to="/services"> 
                     <i>
                         <box-icon name='cog' color={splitLocation[1] === "services" ? 'white' : ''} />
