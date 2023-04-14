@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
+import UserModal from '../../views/modal/UserModal';
 
 export default function UsersDataTable() {
+  const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
 
   const columns = [
@@ -26,12 +28,12 @@ export default function UsersDataTable() {
       icon: () => <div className="btn btn-primary">Add New</div> ,
       tooltip: 'Add User',
       isFreeAction: true,
-      onClick: (event) => alert("You want to add a new row")
+      onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Save User',
-      onClick: (event) => alert("You edit")
+      onClick: (event) => setShowModal(true)
     }
   ]
 
@@ -67,6 +69,7 @@ export default function UsersDataTable() {
         actions={action}
         options={options}
       />
+      <UserModal show={showModal} close={() => setShowModal(false)} id={1}/>
     </div>
   )
 }
