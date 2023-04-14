@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import { color } from '@mui/system';
-import { Link } from '@mui/material';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ServiceCenterDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+  const navigate = useNavigate()
+
+  const handleClickSC = () => {
+    console.log(rowData.Name)
+    // navigate('//servicecenter/test', {state: { id: data.id, email: data.email }})
+  }
 
   const columns = [
-    { field: "Name", title: "Name", render:rowData=><Link href={'servicecenter/dealer'}>{rowData.Name}</Link>},
+    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/test' state={rowData.Name}>{rowData.Name}</Link>},
     { field: "Category", title: "Category" },
     { field: "Brgy", title: "Barangay" },
     { field: "Municipality", title: "Municipality" },
@@ -74,7 +80,7 @@ export default function ServiceCenterDataTable() {
         actions={action}
         options={options}
       />
-      <ServiceCenterModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServiceCenterModal show={showModal} close={() => {setShowModal(false)}} id={1} /> 
     </div>
   )
 }
