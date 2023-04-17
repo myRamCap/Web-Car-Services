@@ -52,29 +52,10 @@ const top100Films = [
               <Row>
                 <Col xs={12} md={6}>
                     <Col xs={12} md={12}>
-                    {/* <Form.Label>Name</Form.Label> */}
-                    {/* <Form.Control type="text" autoFocus onChange={ev => setProduct({...product, sku: ev.target.value})} /> */}
-                    <Autocomplete
-                        id="free-solo-2-demo"
-                        disableClearable
-                        onChange={handleChange}
-                        options={top100Films}
-                        getOptionLabel={(options) => options.title}
-                        isOptionEqualToValue={(option, value) => option.title === value.title}
-                        renderInput={(params) => (
-                            <TextField
-                            {...params}
-                            label="Search Service"
-                            InputProps={{
-                                ...params.InputProps,
-                                type: 'search',
-                            }}
-                            />
-                        )}
-                        />
+                    <TextField type="text" id="title" label="Title" variant="outlined" fullWidth/>
                     </Col>
                     <Col xs={12} md={12} className="mt-5">
-                        <TextField type="text" id="description" label="Description" variant="outlined" fullWidth/>
+                      <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" />
                     </Col>
                 </Col>
 
