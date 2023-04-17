@@ -13,9 +13,10 @@ import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
-import GoogleMaps from "./views/GoogleMaps" 
 import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
+import GoogleMaps from "./components/googleMap/GoogleMaps"
+import SelectLoc from "./components/googleMap/SelectLoc"
 
 const router = createBrowserRouter([
     {
@@ -88,7 +89,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/data',
-        element: <GoogleMaps />
+        element: <SelectLoc />
     },
 
 ]) 
