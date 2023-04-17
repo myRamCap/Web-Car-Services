@@ -13,9 +13,9 @@ import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
-import GoogleMaps from "./views/GoogleMaps"
-import Testing from "./views/pages/Testing"    
+import GoogleMaps from "./views/GoogleMaps" 
 import ServiceLogo from "./views/pages/ServiceLogo"
+import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
 
 const router = createBrowserRouter([
     {
@@ -56,8 +56,8 @@ const router = createBrowserRouter([
                 element: <Customers />
             },
             {
-                path: '/servicecenter/test',
-                element: <Testing />
+                path: '/servicecenter/services',
+                element: <ServiceCenterTabs />
             },
             {
                 path: '/serviceslogo',

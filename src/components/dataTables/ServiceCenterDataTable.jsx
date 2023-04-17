@@ -16,7 +16,7 @@ export default function ServiceCenterDataTable() {
   }
 
   const columns = [
-    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/test' state={rowData.Name}>{rowData.Name}</Link>},
+    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/services' state={rowData.Name}>{rowData.Name}</Link>},
     { field: "Category", title: "Category" },
     { field: "Brgy", title: "Barangay" },
     { field: "Municipality", title: "Municipality" },
