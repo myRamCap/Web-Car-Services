@@ -1,9 +1,11 @@
 import React from 'react'
+import ServiceCenterServicesDataTable from '../../components/dataTables/ServiceCenterServicesDataTable'
 
 export default function ServiceCenterServices() {
   return (
-    <div>
-        keti ka gawang services
+    <div id="services">
+      <ServiceCenterServicesDataTable />
+      
     </div>
   )
 }
