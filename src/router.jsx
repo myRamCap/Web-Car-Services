@@ -9,13 +9,13 @@ import Workout from "./views/pages/Services"
 import DataFake from "./components/DataFake"
 import DataTable from "./components/dataTables/ServicesDataTable"
 import Vehicles from "./views/pages/Vehicles"
-import Service_Center from "./views/pages/Service_Center"
+import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
 import GoogleMaps from "./views/GoogleMaps"
-import Testing from "./views/pages/Testing"
-import Services_Logo from "./views/pages/Services_Logo"
+import Testing from "./views/pages/Testing"    
+import ServiceLogo from "./views/pages/ServiceLogo"
 
 const router = createBrowserRouter([
     {
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/servicecenter',
-                element: <Service_Center />
+                element: <ServiceCenter />
             },
             {
                 path: '/bookings',
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/serviceslogo',
-                element: <Services_Logo />
+                element: <ServiceLogo />
             },
             
         ]
