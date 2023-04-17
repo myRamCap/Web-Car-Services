@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.10.6",
     "@material-table/core": "^6.1.15",
     "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.126",
     "@mui/material": "^5.11.16",
     "@mui/x-date-pickers": "^6.1.0",
     "@react-google-maps/api": "^2.18.1",
