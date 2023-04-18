@@ -131,7 +131,7 @@ export default function OTP({route,navigate}) {
             </div>
             <div className="timer">Time: {minutes}:{seconds}</div>
             <button className="validate">Verify</button>
-            <p className="resend">You don't receive the code ?<a ref={resendRef} onClick={onResend} className="resend-action isDisabled">resend</a></p>
+            <p className="resend">Did not received email verification?<a ref={resendRef} onClick={onResend} className="resend-action isDisabled">send again</a></p>
         </form>
 
          {/* <ModalOTP show={showModal} close={() => setShowModal(false)} /> */}

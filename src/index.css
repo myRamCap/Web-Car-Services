@@ -752,8 +752,19 @@ tbody tr:hover {
   margin: 10px 0 !important;
 }
 
+.globe-icon {
+  margin: 10px 0 !important;
+}
+
 .datePicker {
   width: 100% !important;
 }
  /* end services modal */
  
+
+ /* Goole Map */
+ .gm-button {
+  z-index: 999;
+ }
+ 
+ /* end Goole Map */

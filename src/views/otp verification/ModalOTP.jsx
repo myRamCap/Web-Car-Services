@@ -41,11 +41,28 @@ export default function ModalOTP(props) {
           <Modal.Title>Change Password</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
-            {/* <OTP /> */}
-            form
-            input Password
-            retype password
-        </Modal.Body>
+            <Form onSubmit={onSubmit}>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row>
+                <Col xs={12} md={6}>
+                    <Col xs={12} md={12}>
+                      <TextField type="text" id="password" label="Password" variant="outlined" fullWidth/>
+                    </Col>
+                    <Col xs={12} md={12} className="mt-5">
+                        <TextField type="text" id="confirmpassword" label="Confirm Password" variant="outlined" fullWidth/>
+                    </Col>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row >
+                <Col xs={12} md={12}>
+                  <Button variant="success"  type="submit">Save Changes</Button>
+                </Col>
+              </Row>
+            </Form.Group>
+          </Form>
+            </Modal.Body>
       </Modal>
     </div>
   )

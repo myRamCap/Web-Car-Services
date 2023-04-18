@@ -4,18 +4,24 @@ import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { Autocomplete, FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import { Autocomplete, FormControlLabel, IconButton, Radio, RadioGroup, TextField } from '@mui/material';
 import Province from '../../data/JSON/refProvince.json'
 import City from '../../data/JSON/refCityMun.json'
 import Barangay from '../../data/JSON/refBrgy.json'
+import { Delete } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import MapsModal from './MapsModal';
 
 
 export default function ServiceCenterModal(props) {
+  const [showModal, setShowModal] = useState(false)
   const [country, setCountry] = useState('Philippines')
   const [municipality, setMunicipality] = useState([])
   const [brgy, setBrgy] = useState([])
   const [valCityMun, setValCityMun] = useState(null);
   const [valBrgy, setValBrgy] = useState(null);
+  const longi = localStorage.longi ? localStorage.longi : ''
+  const lati = localStorage.lati ? localStorage.lati : ''
 
   const handleChangeProvince = (event, newValue) => {
     const filterCity = City.RECORDS.filter((data) => data.provCode === newValue.provCode)
@@ -65,6 +71,10 @@ export default function ServiceCenterModal(props) {
     // setValBrgy(null);
     // setValCityMun(null);
    
+  }
+
+  const onclickMap = (ev) => {
+    setShowModal(true)
   }
 
   useEffect(() => {
@@ -189,10 +199,17 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="longitude" label="Longitude" variant="outlined" fullWidth/>
+                  <TextField type="text" id="longitude" label="Longitude" value={longi} variant="outlined" fullWidth/>
                 </Col>
-                <Col xs={12} md={6}> 
-                  <TextField type="text" id="latitude" label="Latitude" variant="outlined" fullWidth/>
+                <Col xs={12} md={5}> 
+                  <TextField type="text" id="latitude" label="Latitude" value={lati}  variant="outlined" fullWidth/>
+                </Col>
+                <Col xs={12} md={1} > 
+                  {/* <Link to="/data"> */}
+                    <IconButton className="globe-icon" onClick={onclickMap}>
+                      <box-icon name='globe' className="globe-icon"></box-icon>
+                    </IconButton>
+                  {/* </Link> */}
                 </Col>
               </Row>
             </Form.Group>
@@ -202,9 +219,7 @@ export default function ServiceCenterModal(props) {
                   <TextField type="text" id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
                 </Col>
                 <Col xs={12} md={6}> 
-                    {/* <Input type="file" id="image" /> */}
                     <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" />
-
                 </Col>
               </Row>
             </Form.Group>
@@ -218,6 +233,8 @@ export default function ServiceCenterModal(props) {
           </Form>
             </Modal.Body>
         </Modal>
+
+        <MapsModal show={showModal} close={() => {setShowModal(false)}} id={1} /> 
     </div>
   )
 }
