@@ -3,7 +3,7 @@ import ServiceCenterServicesDataTable from '../../components/dataTables/ServiceC
 
 export default function ServiceCenterServices() {
   return (
-    <div id="services">
+    <div id="servicecenterservices">
       <ServiceCenterServicesDataTable />
       
     </div>
