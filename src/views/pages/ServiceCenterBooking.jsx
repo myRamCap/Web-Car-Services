@@ -3,7 +3,7 @@ import ServiceCenterBookingDataTable from '../../components/dataTables/ServiceCe
 
 export default function ServiceCenterBooking() {
   return (
-    <div id="bookings" >
+    <div id="servicecenterbookings" >
       <ServiceCenterBookingDataTable />
     </div>
   )
