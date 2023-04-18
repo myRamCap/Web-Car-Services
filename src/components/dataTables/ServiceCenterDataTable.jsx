@@ -3,9 +3,11 @@ import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import { color } from '@mui/system';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-export default function ServiceCenterDataTable() {
+export default function ServiceCenterDataTable(props) {
+  // const location = useLocation()
+  // console.log(location.state)
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const navigate = useNavigate()
@@ -39,7 +41,11 @@ export default function ServiceCenterDataTable() {
       icon: () => <div className="btn btn-primary">Add New</div> ,
       tooltip: 'Add User',
       isFreeAction: true,
-      onClick: (event) => setShowModal(true)
+      onClick: ((event) => {
+        setShowModal(true)
+        localStorage.removeItem('lati')
+        localStorage.removeItem('longi')
+      })
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
