@@ -17,6 +17,7 @@ import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
 import GoogleMaps from "./components/googleMap/GoogleMaps"
 import SelectLoc from "./components/googleMap/SelectLoc"
+import ModalOTP from "./views/otp verification/ModalOTP"
 
 const router = createBrowserRouter([
     {
@@ -85,7 +86,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/table',
-        element: <DataTable />
+        element: <ModalOTP />
     },
     {
         path: '/data',
