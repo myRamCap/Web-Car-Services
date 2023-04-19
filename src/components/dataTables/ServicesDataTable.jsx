@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServicesModal from '../../views/modal/ServiceModal';
+import axiosClient from '../../axios-client';
 
 export default function ServicesDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+  const [services, setServices] = useState([])
+
+  useEffect(() => {
+    getServices()
+  }, [])
+
+  const getServices = () => {
+    // loading here
+    axiosClient.get('/services')
+      .then(({data}) => {
+        // console.log(data)
+        setServices(data)
+      })
+  }
   
   const columns = [
-    { field: "Name", title: "Name" },
-    { field: "Details", title: "Details" },
-    { field: "Date_Created", title: "Date Created" }
+    { field: "id", title: "ID", hidden: true, },
+    // { field: "image", title: "Image" },
+    { field: "image", title: "Image", width: 100, render: (rowData) => {
+      const styles = { width: 80 };
+      return <img src={rowData.image} style={styles} />;
+    },
+  },
+    { field: "name", title: "Name" },
+    { field: "details", title: "Details" },
+    { field: "created_at", title: "Date Created" }
    ];
 
    const data = [
@@ -36,6 +58,8 @@ export default function ServicesDataTable() {
       onClick: (event) => setShowModal(true)
     }
   ]
+  
+  console.log(services.data)
 
   const options = {
     paginationAlignment,
@@ -65,7 +89,7 @@ export default function ServicesDataTable() {
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={services.data}
         actions={action}
         options={options}
       />
