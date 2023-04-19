@@ -2,10 +2,28 @@ import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import BookingsModal from '../../views/modal/BookingsModal';
+import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded';
+import { Button, Popover, Typography } from '@mui/material';
+
+ 
 
 export default function BookingDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+ 
 
   const columns = [
     { field: "Name", title: "Name" },
@@ -39,6 +57,11 @@ export default function BookingDataTable() {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Save User',
       onClick: (event) => setShowModal(true)
+    },
+    {
+      icon: () => 
+      <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
+      tooltip: 'Note'
     }
   ]
 
@@ -67,6 +90,19 @@ export default function BookingDataTable() {
 
   return (
     <div>
+          <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Typography sx={{ p: 2 }}>Sangkap yukung Kape kabang manaya ku!</Typography>
+      </Popover>
+
       <MaterialTable
         title=""
         columns={columns}
