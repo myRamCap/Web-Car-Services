@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../../assets/images/Logo-RC.png'
 import PeopleIcon from '@mui/icons-material/People';
 
 
@@ -14,8 +15,9 @@ export default function Navbar() {
     <div className={`sidebar ${active ? 'active' : ''}`}>
         <div className="logo_content">
             <div className="logo">
+            <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} />
                 <div className="logo_name">
-                    CAR SERVICES
+                   
                 </div>
             </div>
             <i onClick={toggle} >
@@ -79,6 +81,16 @@ export default function Navbar() {
                     <span className="link_name">Bookings</span>
                 </Link>
                 <span className="tooltip">Bookings</span>
+            </li>
+            <li>
+                <Link className={splitLocation[1] === "notification" ? "isActive" : ""} to="/notification">
+                    <i>
+                        <box-icon name='notification' color={splitLocation[1] === "notification" ? 'white' : ''} />
+                    </i>
+                    
+                    <span className="link_name">Notifications</span>
+                </Link>
+                <span className="tooltip">Notifications</span>
             </li>
             <li>
                 <Link className={splitLocation[1] === "users" ? "isActive" : ""} to="/users">

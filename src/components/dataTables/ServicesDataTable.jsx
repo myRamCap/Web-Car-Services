@@ -54,7 +54,7 @@ export default function ServicesDataTable() {
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
+      tooltip: 'Edit User',
       onClick: (event) => setShowModal(true)
     }
   ]
