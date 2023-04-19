@@ -83,6 +83,16 @@ export default function Navbar() {
                 <span className="tooltip">Bookings</span>
             </li>
             <li>
+                <Link className={splitLocation[1] === "notification" ? "isActive" : ""} to="/notification">
+                    <i>
+                        <box-icon name='notification' color={splitLocation[1] === "notification" ? 'white' : ''} />
+                    </i>
+                    
+                    <span className="link_name">Notifications</span>
+                </Link>
+                <span className="tooltip">Notifications</span>
+            </li>
+            <li>
                 <Link className={splitLocation[1] === "users" ? "isActive" : ""} to="/users">
                     <i>
                         <box-icon name='user-circle' color={splitLocation[1] === "users" ? 'white' : ''} />
