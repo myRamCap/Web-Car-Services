@@ -11,7 +11,8 @@ export default function ServiceLogoDataTable() {
         { field: "Name", title: "Image", width: 100, render: (rowData) => {
             const styles = { width: 40, borderRadius: "50%" };
             return <img src={rowData.imageUrl} style={styles} />;
-        },},
+          },
+        },
         { field: "Details", title: "Name" },
         { field: "Date_Created", title: "Date Created" }
     ];

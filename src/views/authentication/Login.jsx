@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Wave from '../../assets/images/wave.png'
 import RC from '../../assets/images/Logo-RC.png'
 import Avatar from '../../assets/images/avatar.svg'
-import axiosClient from '../../axios-client'
-import ModalOTP from '../otp verification/ModalOTP'
-import Loader from '../../components/loader/Loader'
+import axiosClient from '../../axios-client' 
 import Spinner from '../../components/loader/Spinner'
  
 
@@ -66,6 +64,7 @@ export default function Login() {
             .then(({data}) => {
                 navigate('/otp', {state: { id: data.id, email: data.email }})
                 setSpinner(false)
+                // console.log(data)
             })
             .catch(err => {
                 setSpinner(false)

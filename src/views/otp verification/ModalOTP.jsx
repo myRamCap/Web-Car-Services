@@ -6,6 +6,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import OTP from './OTP';
+import { TextField } from '@mui/material';
  
 
 export default function ModalOTP(props) {
@@ -38,19 +39,17 @@ export default function ModalOTP(props) {
  
       <Modal show={props.show} onHide={props.close} backdrop="static" >
         <Modal.Header closeButton>
-          <Modal.Title>Change Password</Modal.Title>
+          <Modal.Title>Change Password </Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
             <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Row>
-                <Col xs={12} md={6}>
-                    <Col xs={12} md={12}>
-                      <TextField type="text" id="password" label="Password" variant="outlined" fullWidth/>
-                    </Col>
-                    <Col xs={12} md={12} className="mt-5">
-                        <TextField type="text" id="confirmpassword" label="Confirm Password" variant="outlined" fullWidth/>
-                    </Col>
+              <Row> 
+                <Col xs={12} md={12}>
+                  <TextField type="text" id="password" label="Password" variant="outlined" fullWidth/>
+                </Col>
+                <Col xs={12} md={12} className="mt-3">
+                    <TextField type="text" id="confirmpassword" label="Confirm Password" variant="outlined" fullWidth/>
                 </Col>
               </Row>
             </Form.Group>

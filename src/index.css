@@ -490,6 +490,13 @@ body {
 
  
 /* OTP */
+
+#otp .otp_alert {
+  color: #ff4040;
+  text-align: start;
+  padding-top: 25px;
+}
+
 #otp {
     display: grid;
     place-items: center;
@@ -554,8 +561,7 @@ body {
   }
 
   #otp .timer {
-    color: #fff;
-    margin-top: 30px;
+    color: #fff; 
     font-size: 15px;
     text-align: center;
   }
@@ -571,7 +577,7 @@ body {
     text-decoration: none;
     cursor: pointer;
     margin-left: 6px;
-    color: rgb(255, 255, 255);
+    color: #38d39f;
     font-weight: 600;
   }
 
@@ -768,3 +774,4 @@ tbody tr:hover {
  }
  
  /* end Goole Map */
+ 

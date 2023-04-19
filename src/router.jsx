@@ -18,7 +18,10 @@ import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
 import GoogleMaps from "./components/googleMap/GoogleMaps"
 import SelectLoc from "./components/googleMap/SelectLoc"
-import ModalOTP from "./views/otp verification/ModalOTP"
+import ModalOTP from "./views/otp verification/ModalOTP" 
+import Spinner from "./components/loader/Spinner"
+import Loader2 from "./components/loader/Loader2"
+import OTP2 from "./views/otp verification/OTP2"
 
 const router = createBrowserRouter([
     {
@@ -69,13 +72,18 @@ const router = createBrowserRouter([
             {
                 path: '/serviceslogo',
                 element: <ServiceLogo />
-            },
+            }
             
         ]
     },
+    
     {
         path: '/login',
         element: <Login />
+    },
+    {
+        path: '/changepwd',
+        element: <ModalOTP />
     },
     {
         path: '/otp',
@@ -87,11 +95,7 @@ const router = createBrowserRouter([
     },
     {
         path: '/loader',
-        element: <Loader />
-    },
-    {
-        path: '/table',
-        element: <ModalOTP />
+        element: <Loader2 />
     },
     {
         path: '/data',
