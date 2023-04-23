@@ -2,15 +2,28 @@ import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/images/Logo-RC.png'
 import PeopleIcon from '@mui/icons-material/People';
+import axiosClient from '../../axios-client';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 
 export default function Navbar() {
-    // const {user, token, notification, setUser, setToken} = useStateContext()
+    const {setUser, setToken} = useStateContext()
     const location = useLocation();
     const { pathname } = location;
     const splitLocation = pathname.split("/");
     const [active, setActive] = useState(true)
     const toggle = () => setActive (!active);
+
+    const onLogout = (ev) => {
+        ev.preventDefault()
+
+        axiosClient.post('/logout')
+        .then(() => {
+            setUser({})
+            setToken(null)
+        })
+    }
+
   return (
     <div className={`sidebar ${active ? 'active' : ''}`}>
         <div className="logo_content">
@@ -119,7 +132,7 @@ export default function Navbar() {
             </li>
             <li>
                 
-                <a href="#">
+                <a href="" onClick={onLogout}>
                     <i>
                         <box-icon name='log-out'/>
                     </i>

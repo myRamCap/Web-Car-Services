@@ -22,6 +22,8 @@ import ModalOTP from "./views/otp verification/ModalOTP"
 import Spinner from "./components/loader/Spinner"
 import Loader2 from "./components/loader/Loader2"
 import OTP2 from "./views/otp verification/OTP2"
+import GuestLayout from "./components/GuestLayout"
+import NotFound from "./views/NotFound"
 
 const router = createBrowserRouter([
     {
@@ -76,31 +78,43 @@ const router = createBrowserRouter([
             
         ]
     },
+    {
+        path: '/',
+        element: <GuestLayout />,
+        children: [
+            {
+                path: '/login',
+                element: <Login />
+            },
+            {
+                path: '/changepwd',
+                element: <ModalOTP />
+            },
+            {
+                path: '/otp',
+                element: <OTP />
+            },
+            {
+                path: '/changepassword',
+                element: <ChangePassword />
+            },
+            {
+                path: '/loader',
+                element: <Loader2 />
+            },
+            {
+                path: '/data',
+                element: <SelectLoc />
+            },
+        ]
+
+    },
+    {
+        path: '*',
+        element: <NotFound />
+    }
     
-    {
-        path: '/login',
-        element: <Login />
-    },
-    {
-        path: '/changepwd',
-        element: <ModalOTP />
-    },
-    {
-        path: '/otp',
-        element: <OTP />
-    },
-    {
-        path: '/changepassword',
-        element: <ChangePassword />
-    },
-    {
-        path: '/loader',
-        element: <Loader2 />
-    },
-    {
-        path: '/data',
-        element: <SelectLoc />
-    },
+    
 
 ]) 
 
