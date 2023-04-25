@@ -8,22 +8,23 @@ export default function NotificationDataTable() {
     const paginationAlignment = useState("center")
 
     const columns = [
-        { field: "Name", title: "Image", width: 100, render: (rowData) => {
-            const styles = { width: 40, borderRadius: "50%" };
+        { field: "Title", title: "Image", width: 100, render: (rowData) => {
+            const styles = { width: 80, borderRadius: "50%" };
             return <img src={rowData.imageUrl} style={styles} />;
         },},
-        { field: "Details", title: "Name" },
+        { field: "Title", title: "Title" },
+        { field: "Content", title: "Content" },
         { field: "Date_Created", title: "Date Created" }
     ];
 
     const data = [
-        { Name: "Oil Change", Details: "Oil Change", Date_Created: "2023-04-03", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "New Tires", Details: "New Tires", Date_Created: "2023-04-05", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "Tire Rotation", Details: "Tire Rotation", Date_Created: "2023-04-06", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "Auto Detailing", Details: "Auto Detailing", Date_Created: "2023-04-04", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "Window Tinting", Details: "Window Tinting", Date_Created: "2023-04-06", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "New Car Purchase", Details: "New Car Purchase", Date_Created: "2023-04-01", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
-        { Name: "Manufacturer Recall", Details: "Manufacturer Recall", Date_Created: "2023-04-07", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-03", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-05", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-06", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-04", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-06", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-01", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
+        { Title: "Sale", Content: "Promo", Date_Created: "2023-04-07", imageUrl: "https://hips.hearstapps.com/hmg-prod/images/2019-honda-civic-sedan-1558453497.jpg?resize=480:*" },
     ];
 
     const action = [
