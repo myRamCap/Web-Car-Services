@@ -115,12 +115,12 @@ export default function ServicesLogoModal(props) {
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
-            <div className="sevices_logo_errors">
-              {Object.keys(errors).map(key => (
-                <p key={key}>{errors[key][0]}</p>
-              ))}
-            </div>
-          }
+              <div className="sevices_logo_errors">
+                {Object.keys(errors).map(key => (
+                  <p key={key}>{errors[key][0]}</p>
+                ))}
+              </div>
+            }
             <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>

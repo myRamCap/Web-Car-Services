@@ -10,10 +10,15 @@ export default function ServicesDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [services, setServices] = useState([])
-
-  useEffect(() => {
-    getServices()
-  }, [])
+  const [servicesInfo, setServicesInfo] = useState([
+    {
+      id: "",
+      name: "",
+      details: "",
+      image_id: "",
+      image_url: "",
+    }
+  ])
 
   const getServices = () => {
     // loading here
@@ -25,9 +30,9 @@ export default function ServicesDataTable() {
   
   const columns = [
     { field: "id", title: "ID", hidden: true, },
-    { field: "image", title: "Image", width: 100, render: (rowData) => {
-        const styles = { width: 80 };
-        return <img src={rowData.image} style={styles} />;
+    { field: "image", title: "Image", width: 100, sorting: false, render: (rowData) => {
+        const styles = { width: 50 };
+        return <img src={rowData.image_url} style={styles} />;
       },
     },
     { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })},
@@ -45,7 +50,17 @@ export default function ServicesDataTable() {
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      onClick: (event,rowData) => {
+        setServicesInfo({
+          ...servicesInfo,
+          id: rowData.id,
+          name: rowData.name,
+          details: rowData.details,
+          image_id: rowData.image_id,
+          image_url: rowData.image_url,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -73,7 +88,7 @@ export default function ServicesDataTable() {
   }
 
   useEffect(() => {
-    // getServicesLogo()
+    getServices()
     if (location.state){
       getServices()
       setShowModal(false)
@@ -81,6 +96,11 @@ export default function ServicesDataTable() {
     }
   }, [location.state])
 
+  const handleClose = () => {
+    setShowModal(false)
+    setServicesInfo([])
+  }
+  
   return (
     <div>
       <MaterialTable
@@ -90,7 +110,7 @@ export default function ServicesDataTable() {
         actions={action}
         options={options}
       />
-      <ServicesModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServicesModal show={showModal} close={handleClose} Data={servicesInfo} /> 
     </div>
   )
 }
