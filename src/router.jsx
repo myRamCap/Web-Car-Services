@@ -69,7 +69,7 @@ const router = createBrowserRouter([
                 element: <Customers />
             },
             {
-                path: '/servicecenter/services',
+                path: '/servicecenter/details',
                 element: <ServiceCenterTabs />
             },
             {

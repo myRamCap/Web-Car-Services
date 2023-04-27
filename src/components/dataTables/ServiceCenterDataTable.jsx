@@ -18,7 +18,7 @@ export default function ServiceCenterDataTable(props) {
   }
 
   const columns = [
-    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/services' state={rowData.Name}>{rowData.Name}</Link>},
+    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.Name}>{rowData.Name}</Link>},
     { field: "Category", title: "Category" },
     { field: "Brgy", title: "Barangay" },
     { field: "Municipality", title: "Municipality" },
@@ -79,7 +79,6 @@ export default function ServiceCenterDataTable(props) {
 
   return (
     <div>
-     
       <MaterialTable
         title=""
         columns={columns}

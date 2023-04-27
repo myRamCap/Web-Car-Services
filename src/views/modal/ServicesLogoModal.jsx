@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router';
 export default function ServicesLogoModal(props) {
   const [errors, setErrors] = useState(null)
   const navigate = useNavigate() 
-  const id = props.Data.id ?? null
+  const id = props.Data?.id ?? null
   const [servicesLogo, setServicesLogo] = useState({
     id: null,
     title: "",

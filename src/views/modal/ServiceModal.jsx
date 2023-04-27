@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export default function ServicesModal(props) {
   const navigate = useNavigate()
   const [errors, setErrors] = useState(null)
-  const id = props.Data.id ?? null
+  const id = props.Data?.id ?? null;
   const [serviceLogo, setServiceLogo] = useState([])
   const [service, setService] = useState({
     id: null,
@@ -21,7 +21,7 @@ export default function ServicesModal(props) {
     image_id: "",
     image_url: "",
   })
-  
+
   useEffect(() => {
     getServiceLogo()
   }, [])
@@ -57,7 +57,7 @@ export default function ServicesModal(props) {
                 title: 'Success',
                 text: "Your data has been successfully saved!",
           }).then(() => {
-            navigate('/serviceslogo' , {state:  'success' })
+            navigate('/services' , {state:  'success' })
           })
         })
         .catch(err => {

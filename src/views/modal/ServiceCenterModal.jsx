@@ -8,10 +8,7 @@ import { Autocomplete, FormControlLabel, IconButton, Radio, RadioGroup, TextFiel
 import Province from '../../data/JSON/refProvince.json'
 import City from '../../data/JSON/refCityMun.json'
 import Barangay from '../../data/JSON/refBrgy.json'
-import { Delete } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
 import MapsModal from './MapsModal';
-
 
 export default function ServiceCenterModal(props) {
   const [showModal, setShowModal] = useState(false)
@@ -22,14 +19,34 @@ export default function ServiceCenterModal(props) {
   const [valBrgy, setValBrgy] = useState(null);
   const longi = localStorage.longi ? localStorage.longi : ''
   const lati = localStorage.lati ? localStorage.lati : ''
+  const [serviceCenter, setServiceCenter] = useState({
+    name: "",
+    category: "",
+    country: "",
+    house_number: "",
+    barangay: "",
+    municipality: "",
+    province: "",
+    longitude: "",
+    latitude: "",
+    branch_manager: "",
+    image: "",
+  })
 
   const handleChangeProvince = (event, newValue) => {
     const filterCity = City.RECORDS.filter((data) => data.provCode === newValue.provCode)
     setMunicipality(filterCity)
     setValCityMun(null);
     setValBrgy(null);
+    // console.log(newValue)
+    setServiceCenter({
+      ...serviceCenter,
+      province: newValue.provDesc,
+      details: newValue.description,
+      image_id: newValue.id,
+    })
   }
-
+ 
   const handleChangeMunicipality = (event, newValue) => {
     setValCityMun(newValue);
     const filterBrgy = Barangay.RECORDS.filter((data) => data.citymunCode === newValue.citymunCode)
@@ -70,6 +87,7 @@ export default function ServiceCenterModal(props) {
     ev.preventDefault()
     // setValBrgy(null);
     // setValCityMun(null);
+    console.log(serviceCenter)
    
   }
 
@@ -83,10 +101,6 @@ export default function ServiceCenterModal(props) {
       setValCityMun(null);
     }
   })
-
- 
- 
- 
 
   return (
     <div id="servicesModal">
@@ -113,18 +127,18 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="name" label="Name" variant="outlined" fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, name: ev.target.value})} id="name" label="Name" variant="outlined" fullWidth/>
                 </Col>
 
                 <Col xs={12} md={6}> 
-                  <TextField type="text" id="country" label="Country" variant="outlined" value={country} disabled fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, country: ev.target.value})} id="country" label="Country" variant="outlined" value={country} disabled fullWidth/>
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="street" label="House Number / Street" variant="outlined" fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} id="street" label="House Number / Street" variant="outlined" fullWidth/>
                 </Col>
 
                 <Col xs={12} md={6}> 
