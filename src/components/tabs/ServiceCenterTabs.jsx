@@ -5,6 +5,8 @@ import { useLocation } from 'react-router-dom'
 import ServiceCenterBooking from '../../views/pages/ServiceCenterBooking'
 import ServiceCenterTimeSlot from '../../views/pages/ServiceCenterTimeSlot'
 import ServiceCenterServices from '../../views/pages/ServiceCenterServices'
+import { Link } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function ServiceCenterTabs() {
     const location = useLocation()
@@ -15,10 +17,14 @@ export default function ServiceCenterTabs() {
     }
 
   return (
+    
     <div id="services">
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <h1 className='pb-2'>{location.state}</h1>
-        </div> 
+            <h1 className='pb-5'>{location.state}</h1>
+        </div>
+        <Link to="/servicecenter">
+        <button className="btn btn-secondary"><ArrowBackIcon /> Back  </button>
+        </Link>
         <Box sx={{width: '100%', typography: 'body1'}} className="pt-3">
             <TabContext value={value}>
                 <Box sx={{borderBottom: 1, borderColor: 'divider'}}>

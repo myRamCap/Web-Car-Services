@@ -3,9 +3,11 @@ import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import { color } from '@mui/system';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-export default function ServiceCenterDataTable() {
+export default function ServiceCenterDataTable(props) {
+  // const location = useLocation()
+  // console.log(location.state)
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const navigate = useNavigate()
@@ -16,7 +18,7 @@ export default function ServiceCenterDataTable() {
   }
 
   const columns = [
-    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/services' state={rowData.Name}>{rowData.Name}</Link>},
+    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.Name}>{rowData.Name}</Link>},
     { field: "Category", title: "Category" },
     { field: "Brgy", title: "Barangay" },
     { field: "Municipality", title: "Municipality" },
@@ -39,11 +41,15 @@ export default function ServiceCenterDataTable() {
       icon: () => <div className="btn btn-primary">Add New</div> ,
       tooltip: 'Add User',
       isFreeAction: true,
-      onClick: (event) => setShowModal(true)
+      onClick: ((event) => {
+        setShowModal(true)
+        localStorage.removeItem('lati')
+        localStorage.removeItem('longi')
+      })
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
+      tooltip: 'Edit User',
       onClick: (event) => setShowModal(true)
     }
   ]

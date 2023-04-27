@@ -11,11 +11,20 @@ import DataTable from "./components/dataTables/ServicesDataTable"
 import Vehicles from "./views/pages/Vehicles"
 import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
+import Notification from "./views/pages/Notification"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
-import GoogleMaps from "./views/GoogleMaps" 
 import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
+import GoogleMaps from "./components/googleMap/GoogleMaps"
+import SelectLoc from "./components/googleMap/SelectLoc"
+import ModalOTP from "./views/otp verification/ModalOTP" 
+import Spinner from "./components/loader/Spinner"
+import Loader2 from "./components/loader/Loader2"
+import OTP2 from "./views/otp verification/OTP2"
+import GuestLayout from "./components/GuestLayout"
+import NotFound from "./views/NotFound"
+import LineGraph from "./views/graph/LineGraph"
 
 const router = createBrowserRouter([
     {
@@ -48,6 +57,10 @@ const router = createBrowserRouter([
                 element: <Bookings />
             },
             {
+                path: '/notification',
+                element: <Notification />
+            },
+            {
                 path: '/users',
                 element: <Users />
             },
@@ -56,40 +69,57 @@ const router = createBrowserRouter([
                 element: <Customers />
             },
             {
-                path: '/servicecenter/services',
+                path: '/servicecenter/details',
                 element: <ServiceCenterTabs />
             },
             {
                 path: '/serviceslogo',
                 element: <ServiceLogo />
-            },
+            } 
             
         ]
     },
     {
-        path: '/login',
-        element: <Login />
+        path: '/',
+        element: <GuestLayout />,
+        children: [
+            {
+                path: '/login',
+                element: <Login />
+            },
+            {
+                path: '/changepwd',
+                element: <ModalOTP />
+            },
+            {
+                path: '/otp',
+                element: <OTP />
+            },
+            {
+                path: '/changepassword',
+                element: <ChangePassword />
+            },
+            {
+                path: '/loader',
+                element: <Loader2 />
+            },
+            {
+                path: '/data',
+                element: <SelectLoc />
+            },
+        ]
+
     },
     {
-        path: '/otp',
-        element: <OTP />
+        path: '*',
+        element: <NotFound />
     },
     {
-        path: '/changepassword',
-        element: <ChangePassword />
-    },
-    {
-        path: '/loader',
-        element: <Loader />
-    },
-    {
-        path: '/table',
-        element: <DataTable />
-    },
-    {
-        path: '/data',
-        element: <GoogleMaps />
-    },
+        path: 'graph',
+        element: <LineGraph />
+    }
+    
+    
 
 ]) 
 

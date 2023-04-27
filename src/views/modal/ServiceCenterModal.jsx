@@ -4,26 +4,49 @@ import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { Autocomplete, FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import { Autocomplete, FormControlLabel, IconButton, Radio, RadioGroup, TextField } from '@mui/material';
 import Province from '../../data/JSON/refProvince.json'
 import City from '../../data/JSON/refCityMun.json'
 import Barangay from '../../data/JSON/refBrgy.json'
-
+import MapsModal from './MapsModal';
 
 export default function ServiceCenterModal(props) {
+  const [showModal, setShowModal] = useState(false)
   const [country, setCountry] = useState('Philippines')
   const [municipality, setMunicipality] = useState([])
   const [brgy, setBrgy] = useState([])
   const [valCityMun, setValCityMun] = useState(null);
   const [valBrgy, setValBrgy] = useState(null);
+  const longi = localStorage.longi ? localStorage.longi : ''
+  const lati = localStorage.lati ? localStorage.lati : ''
+  const [serviceCenter, setServiceCenter] = useState({
+    name: "",
+    category: "",
+    country: "",
+    house_number: "",
+    barangay: "",
+    municipality: "",
+    province: "",
+    longitude: "",
+    latitude: "",
+    branch_manager: "",
+    image: "",
+  })
 
   const handleChangeProvince = (event, newValue) => {
     const filterCity = City.RECORDS.filter((data) => data.provCode === newValue.provCode)
     setMunicipality(filterCity)
     setValCityMun(null);
     setValBrgy(null);
+    // console.log(newValue)
+    setServiceCenter({
+      ...serviceCenter,
+      province: newValue.provDesc,
+      details: newValue.description,
+      image_id: newValue.id,
+    })
   }
-
+ 
   const handleChangeMunicipality = (event, newValue) => {
     setValCityMun(newValue);
     const filterBrgy = Barangay.RECORDS.filter((data) => data.citymunCode === newValue.citymunCode)
@@ -64,7 +87,12 @@ export default function ServiceCenterModal(props) {
     ev.preventDefault()
     // setValBrgy(null);
     // setValCityMun(null);
+    console.log(serviceCenter)
    
+  }
+
+  const onclickMap = (ev) => {
+    setShowModal(true)
   }
 
   useEffect(() => {
@@ -74,15 +102,11 @@ export default function ServiceCenterModal(props) {
     }
   })
 
- 
- 
- 
-
   return (
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Service Center</Modal.Title>
+            <Modal.Title>Create Service Center</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             <Form onSubmit={onSubmit}>
@@ -103,18 +127,18 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="name" label="Name" variant="outlined" fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, name: ev.target.value})} id="name" label="Name" variant="outlined" fullWidth/>
                 </Col>
 
                 <Col xs={12} md={6}> 
-                  <TextField type="text" id="country" label="Country" variant="outlined" value={country} disabled fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, country: ev.target.value})} id="country" label="Country" variant="outlined" value={country} disabled fullWidth/>
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="street" label="House Number / Street" variant="outlined" fullWidth/>
+                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} id="street" label="House Number / Street" variant="outlined" fullWidth/>
                 </Col>
 
                 <Col xs={12} md={6}> 
@@ -189,10 +213,17 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="longitude" label="Longitude" variant="outlined" fullWidth/>
+                  <TextField type="text" id="longitude" label="Longitude" value={longi} variant="outlined" fullWidth/>
                 </Col>
-                <Col xs={12} md={6}> 
-                  <TextField type="text" id="latitude" label="Latitude" variant="outlined" fullWidth/>
+                <Col xs={12} md={5}> 
+                  <TextField type="text" id="latitude" label="Latitude" value={lati}  variant="outlined" fullWidth/>
+                </Col>
+                <Col xs={12} md={1} > 
+                  {/* <Link to="/data"> */}
+                    <IconButton className="globe-icon" onClick={onclickMap}>
+                      <box-icon name='globe' className="globe-icon"></box-icon>
+                    </IconButton>
+                  {/* </Link> */}
                 </Col>
               </Row>
             </Form.Group>
@@ -202,9 +233,7 @@ export default function ServiceCenterModal(props) {
                   <TextField type="text" id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
                 </Col>
                 <Col xs={12} md={6}> 
-                    {/* <Input type="file" id="image" /> */}
                     <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" />
-
                 </Col>
               </Row>
             </Form.Group>
@@ -218,6 +247,8 @@ export default function ServiceCenterModal(props) {
           </Form>
             </Modal.Body>
         </Modal>
+
+        <MapsModal show={showModal} close={() => {setShowModal(false)}} id={1} /> 
     </div>
   )
 }

@@ -1,21 +1,50 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
-import PeopleIcon from '@mui/icons-material/People';
-
+import logo from '../../assets/images/Logo-RC.png'
+import axiosClient from '../../axios-client';
+import { useStateContext } from '../../contexts/ContextProvider';
+import Swal from 'sweetalert2'
 
 export default function Navbar() {
-    // const {user, token, notification, setUser, setToken} = useStateContext()
+    const {setUser, setToken} = useStateContext()
     const location = useLocation();
     const { pathname } = location;
     const splitLocation = pathname.split("/");
     const [active, setActive] = useState(true)
     const toggle = () => setActive (!active);
+
+    const onLogout = (ev) => {
+        ev.preventDefault()
+        Swal.fire({
+            title: 'Are you sure you want to Logout?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#32be8f',
+            confirmButtonText: 'Yes, Logout!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                'Logout Successfully!',
+                'you will now be redirected to the Login page',
+                'success'
+                ).then(() => {
+                axiosClient.post('/logout')
+                .then(() => {
+                    setUser({})
+                    setToken(null)
+                })
+                })
+            }
+        })
+    }
+
   return (
     <div className={`sidebar ${active ? 'active' : ''}`}>
         <div className="logo_content">
             <div className="logo">
+            {/* <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} /> */}
                 <div className="logo_name">
-                    CAR SERVICES
+                    <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} />
                 </div>
             </div>
             <i onClick={toggle} >
@@ -81,6 +110,16 @@ export default function Navbar() {
                 <span className="tooltip">Bookings</span>
             </li>
             <li>
+                <Link className={splitLocation[1] === "notification" ? "isActive" : ""} to="/notification">
+                    <i>
+                        <box-icon name='notification' color={splitLocation[1] === "notification" ? 'white' : ''} />
+                    </i>
+                    
+                    <span className="link_name">Notifications</span>
+                </Link>
+                <span className="tooltip">Notifications</span>
+            </li>
+            <li>
                 <Link className={splitLocation[1] === "users" ? "isActive" : ""} to="/users">
                     <i>
                         <box-icon name='user-circle' color={splitLocation[1] === "users" ? 'white' : ''} />
@@ -107,7 +146,7 @@ export default function Navbar() {
             </li>
             <li>
                 
-                <a href="#">
+                <a href="" onClick={onLogout}>
                     <i>
                         <box-icon name='log-out'/>
                     </i>

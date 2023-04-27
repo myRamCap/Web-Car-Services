@@ -1,51 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import OTP from './OTP';
+import { TextField } from '@mui/material';
+import axiosClient from '../../axios-client';
+import { useStateContext } from '../../contexts/ContextProvider';
+import Swal from 'sweetalert2'
  
 
 export default function ModalOTP(props) {
+    const inputPassRef = useRef()
+    const inputConfirmPassRef = useRef()
+    const {setUser,setToken} = useStateContext()
     
-     const [open, setShow] = useState();
-      const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
- 
-    
-    const [product, setProduct] = useState({
-      sku: '',
-      name: '',
-      description: '',
-      price: '',
-      popularity: '',
-      image: '',
-    })
-     
     const onSubmit = (ev) => {
       ev.preventDefault()
-
-    //   console.log(product)
+      const payload = {
+        email: props.email,
+        password: inputPassRef.current.value,
+        password_confirmation: inputConfirmPassRef.current.value
+      }
+      axiosClient.post(`/changepwd/${props.id}`, payload)
+        .then(({data}) => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+          }).then(() => {
+            setUser(data.user)
+            setToken(data.token)
+          })
+          
+        })
+        .catch(err => {
+          const response = err.response
+          if (response && response.status === 422) {
+            setErrors(response.data.errors)
+          }
+        })
     }
-
- 
 
   return (
     <div id="modal">
-      {/* <input type="submit" className="btn" value="Login" onClick={handleShow}/> */}
- 
       <Modal show={props.show} onHide={props.close} backdrop="static" >
         <Modal.Header closeButton>
-          <Modal.Title>Change Password</Modal.Title>
+          <Modal.Title>New Password</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
-            {/* <OTP /> */}
-            form
-            input Password
-            retype password
-        </Modal.Body>
+            <Form onSubmit={onSubmit}>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row> 
+                <Col xs={12} md={12}>
+                  <TextField inputRef={inputPassRef}  type="text"   label="Password" variant="outlined" fullWidth/>
+                </Col>
+                <Col xs={12} md={12} className="mt-3">
+                    <TextField inputRef={inputConfirmPassRef}  type="text"  label="Confirm Password" variant="outlined" fullWidth/>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row >
+                <Col xs={12} md={12}>
+                  <Button variant="success"  type="submit">Save Changes</Button>
+                </Col>
+              </Row>
+            </Form.Group>
+          </Form>
+            </Modal.Body>
       </Modal>
     </div>
   )

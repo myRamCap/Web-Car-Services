@@ -3,11 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import Wave from '../../assets/images/wave.png'
 import RC from '../../assets/images/Logo-RC.png'
 import Avatar from '../../assets/images/avatar.svg'
-import axiosClient from '../../axios-client'
-import ModalOTP from '../otp verification/ModalOTP'
-import Loader from '../../components/loader/Loader'
+import axiosClient from '../../axios-client' 
 import Spinner from '../../components/loader/Spinner'
- 
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export default function Login() {
     const [spinner, setSpinner] = useState(false)
@@ -19,6 +18,7 @@ export default function Login() {
     const inputPassRef = useRef()
     const [errors, setErrors] = useState(null)
     const navigate = useNavigate()
+    const MySwal = withReactContent(Swal) 
 
     const emailHandleChange = (e) => {
         if (emailRef == "") {
@@ -65,7 +65,7 @@ export default function Login() {
         axiosClient.post('/login', payload)
             .then(({data}) => {
                 navigate('/otp', {state: { id: data.id, email: data.email }})
-                setSpinner(false)
+                setSpinner(false) 
             })
             .catch(err => {
                 setSpinner(false)
@@ -73,7 +73,13 @@ export default function Login() {
                 if (response && response.status === 422) {
                     if (response.data.errors) {
                         setErrors(response.data.errors)
-                    }else {
+                    }else if(response.data.blocked) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: `Your account has been temporarily locked due to 3 consecutive ` + response.data.description + ` attempts. Please try again in ` + response.data.time + ` minutes or contact your Corporate Manager.`, 
+                        })
+                    }else{
                         setErrors({
                             email: [response.data.message]
                         })

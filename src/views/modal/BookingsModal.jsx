@@ -78,7 +78,7 @@ export default function BookingsModal(props) {
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Service Center</Modal.Title>
+            <Modal.Title>Create Booking</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             <Form onSubmit={onSubmit}>

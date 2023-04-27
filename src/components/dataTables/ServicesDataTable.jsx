@@ -1,26 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServicesModal from '../../views/modal/ServiceModal';
+import axiosClient from '../../axios-client';
+import { useLocation } from 'react-router-dom';
 
 export default function ServicesDataTable() {
+  const location = useLocation()
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+  const [services, setServices] = useState([])
+  const [servicesInfo, setServicesInfo] = useState([
+    {
+      id: "",
+      name: "",
+      details: "",
+      image_id: "",
+      image_url: "",
+    }
+  ])
+
+  const getServices = () => {
+    // loading here
+    axiosClient.get('/services')
+      .then(({data}) => {
+        setServices(data)
+      })
+  }
   
   const columns = [
-    { field: "Name", title: "Name" },
-    { field: "Details", title: "Details" },
-    { field: "Date_Created", title: "Date Created" }
-   ];
-
-   const data = [
-    { Name: "Oil Change", Details: "Oil Change", Date_Created: "2023-04-03" },
-    { Name: "New Tires", Details: "New Tires", Date_Created: "2023-04-05" },
-    { Name: "Tire Rotation", Details: "Tire Rotation", Date_Created: "2023-04-06" },
-    { Name: "Auto Detailing", Details: "Auto Detailing", Date_Created: "2023-04-04" },
-    { Name: "Window Tinting", Details: "Window Tinting", Date_Created: "2023-04-06" },
-    { Name: "New Car Purchase", Details: "New Car Purchase", Date_Created: "2023-04-01 " },
-    { Name: "Manufacturer Recall", Details: "Manufacturer Recall", Date_Created: "2023-04-07" },
+    { field: "id", title: "ID", hidden: true, },
+    { field: "image", title: "Image", width: 100, sorting: false, render: (rowData) => {
+        const styles = { width: 50 };
+        return <img src={rowData.image_url} style={styles} />;
+      },
+    },
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })},
+    { field: "details", title: "Details", customSort: (a, b) => a.details.localeCompare(b.details, undefined, { sensitivity: 'base' }) },
+    { field: "created_at", title: "Date Created", customSort: (a, b) => a.created_at.localeCompare(b.created_at, undefined, { sensitivity: 'base' }) }
    ];
 
    const action = [
@@ -32,8 +49,18 @@ export default function ServicesDataTable() {
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
-      onClick: (event) => setShowModal(true)
+      tooltip: 'Edit User',
+      onClick: (event,rowData) => {
+        setServicesInfo({
+          ...servicesInfo,
+          id: rowData.id,
+          name: rowData.name,
+          details: rowData.details,
+          image_id: rowData.image_id,
+          image_url: rowData.image_url,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -60,16 +87,30 @@ export default function ServicesDataTable() {
     },
   }
 
+  useEffect(() => {
+    getServices()
+    if (location.state){
+      getServices()
+      setShowModal(false)
+      location.state = null
+    }
+  }, [location.state])
+
+  const handleClose = () => {
+    setShowModal(false)
+    setServicesInfo([])
+  }
+  
   return (
     <div>
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={services.data}
         actions={action}
         options={options}
       />
-      <ServicesModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServicesModal show={showModal} close={handleClose} Data={servicesInfo} /> 
     </div>
   )
 }

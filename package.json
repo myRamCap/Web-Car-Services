@@ -1,5 +1,6 @@
 {
   "name": "admin-panel",
+  "homepage": "https://portal.myramcap.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@faker-js/faker": "^7.6.0",
     "@material-table/core": "^6.1.15",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.126",
@@ -20,12 +22,16 @@
     "axios": "^1.3.4",
     "bootstrap": "^5.2.3",
     "boxicons": "^2.1.4",
+    "chart.js": "^4.2.1",
     "dayjs": "^1.11.7",
     "mui-datatables": "^4.3.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.2",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.10.0"
+    "react-router-dom": "^6.10.0",
+    "sweetalert2": "^11.7.3",
+    "sweetalert2-react-content": "^5.0.7"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
