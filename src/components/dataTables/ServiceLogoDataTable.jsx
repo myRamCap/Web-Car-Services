@@ -1,32 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServicesLogoModal from '../../views/modal/ServicesLogoModal';
+import axiosClient from '../../axios-client';
+import { useLocation } from 'react-router-dom';
+import NoImage from '../../assets/images/No-Image.png';
 
 export default function ServiceLogoDataTable() {
+    
     const [showModal, setShowModal] = useState(false)
     const paginationAlignment = useState("center")
+    const [servicesLogo, setServicesLogo] = useState([])
+    const location = useLocation()
+    const [serviceLogoID, setServiceLogoID] = useState([
+      {
+        id: "",
+        title: "",
+        description: "",
+        image: null,
+        image_url: null,
+      }
+    ])
+
+    const getServicesLogo = () => {
+      axiosClient.get('/serviceslogo')
+        .then(({data}) => {
+          setServicesLogo(data)
+        })
+    } 
 
     const columns = [
-        { field: "Name", title: "Image", width: 100, render: (rowData) => {
-            const styles = { width: 40, borderRadius: "50%" };
-            return <img src={rowData.imageUrl} style={styles} />;
-          },
+      { field: "id", title: "ID", hidden: true, },
+      { field: "image", title: "Image", width: 100, sorting: false, render: (rowData) => {
+          const styles = { width: 50 };
+          return <img src={rowData.image_url ?? NoImage} style={styles} />;
         },
-        { field: "Details", title: "Name" },
-        { field: "Date_Created", title: "Date Created" }
-    ];
-
-    const data = [
-        { Name: "Oil Change", Details: "Oil Change", Date_Created: "2023-04-03", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "New Tires", Details: "New Tires", Date_Created: "2023-04-05", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "Tire Rotation", Details: "Tire Rotation", Date_Created: "2023-04-06", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "Auto Detailing", Details: "Auto Detailing", Date_Created: "2023-04-04", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "Window Tinting", Details: "Window Tinting", Date_Created: "2023-04-06", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "New Car Purchase", Details: "New Car Purchase", Date_Created: "2023-04-01", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-        { Name: "Manufacturer Recall", Details: "Manufacturer Recall", Date_Created: "2023-04-07", imageUrl: "https://avatars0.githubusercontent.com/u/7895451?s=460&v=4" },
-    ];
-
+      },
+      { field: "title", title: "Title", customSort: (a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }) },
+      { field: "description", title: "Description", customSort: (a, b) => a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }) },
+      { field: "created_at", title: "Date Created", customSort: (a, b) => a.created_at.localeCompare(b.created_at, undefined, { sensitivity: 'base' }) }
+     ];
+ 
     const action = [
         {
           icon: () => <div className="btn btn-primary">Add New</div> ,
@@ -37,7 +51,17 @@ export default function ServiceLogoDataTable() {
         {
           icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
           tooltip: 'Edit User',
-          onClick: (event) => setShowModal(true)
+          onClick: (event,rowData) => {
+            setServiceLogoID({
+              ...serviceLogoID,
+              id: rowData.id,
+              title: rowData.title,
+              description: rowData.description,
+              image: rowData.image,
+              image_url: rowData.image_url,
+            })
+            setShowModal(true)
+          }
         }
     ]
 
@@ -54,6 +78,7 @@ export default function ServiceLogoDataTable() {
         rowStyle: {
           fontSize: 14,
         },
+        filtering: false,
         headerStyle: {
           whiteSpace: 'nowrap',
           flexDirection: 'row',
@@ -63,17 +88,31 @@ export default function ServiceLogoDataTable() {
           fontSize: 16,
         },
       }
+ 
+      useEffect(() => {
+        getServicesLogo()
+        if (location.state){
+          getServicesLogo()
+          setShowModal(false)
+          location.state = null
+        }
+      }, [location.state])
+
+      const handleClose = () => {
+        setShowModal(false)
+        setServiceLogoID([])
+      }
 
   return (
-    <div>
+    <div> 
         <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={servicesLogo.data}
         actions={action}
         options={options}
       />
-      <ServicesLogoModal show={showModal} close={() => setShowModal(false)} id={1}/>
+      <ServicesLogoModal show={showModal} close={handleClose} Data={serviceLogoID}/>
     </div>
   )
 }

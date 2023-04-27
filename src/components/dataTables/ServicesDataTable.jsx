@@ -3,8 +3,10 @@ import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServicesModal from '../../views/modal/ServiceModal';
 import axiosClient from '../../axios-client';
+import { useLocation } from 'react-router-dom';
 
 export default function ServicesDataTable() {
+  const location = useLocation()
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [services, setServices] = useState([])
@@ -17,32 +19,20 @@ export default function ServicesDataTable() {
     // loading here
     axiosClient.get('/services')
       .then(({data}) => {
-        // console.log(data)
         setServices(data)
       })
   }
   
   const columns = [
     { field: "id", title: "ID", hidden: true, },
-    // { field: "image", title: "Image" },
     { field: "image", title: "Image", width: 100, render: (rowData) => {
-      const styles = { width: 80 };
-      return <img src={rowData.image} style={styles} />;
+        const styles = { width: 80 };
+        return <img src={rowData.image} style={styles} />;
+      },
     },
-  },
-    { field: "name", title: "Name" },
-    { field: "details", title: "Details" },
-    { field: "created_at", title: "Date Created" }
-   ];
-
-   const data = [
-    { Name: "Oil Change", Details: "Oil Change", Date_Created: "2023-04-03" },
-    { Name: "New Tires", Details: "New Tires", Date_Created: "2023-04-05" },
-    { Name: "Tire Rotation", Details: "Tire Rotation", Date_Created: "2023-04-06" },
-    { Name: "Auto Detailing", Details: "Auto Detailing", Date_Created: "2023-04-04" },
-    { Name: "Window Tinting", Details: "Window Tinting", Date_Created: "2023-04-06" },
-    { Name: "New Car Purchase", Details: "New Car Purchase", Date_Created: "2023-04-01 " },
-    { Name: "Manufacturer Recall", Details: "Manufacturer Recall", Date_Created: "2023-04-07" },
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })},
+    { field: "details", title: "Details", customSort: (a, b) => a.details.localeCompare(b.details, undefined, { sensitivity: 'base' }) },
+    { field: "created_at", title: "Date Created", customSort: (a, b) => a.created_at.localeCompare(b.created_at, undefined, { sensitivity: 'base' }) }
    ];
 
    const action = [
@@ -58,8 +48,6 @@ export default function ServicesDataTable() {
       onClick: (event) => setShowModal(true)
     }
   ]
-  
-  console.log(services.data)
 
   const options = {
     paginationAlignment,
@@ -83,6 +71,15 @@ export default function ServicesDataTable() {
       fontSize: 16,
     },
   }
+
+  useEffect(() => {
+    // getServicesLogo()
+    if (location.state){
+      getServices()
+      setShowModal(false)
+      location.state = null
+    }
+  }, [location.state])
 
   return (
     <div>

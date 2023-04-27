@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/images/Logo-RC.png'
-import PeopleIcon from '@mui/icons-material/People';
 import axiosClient from '../../axios-client';
 import { useStateContext } from '../../contexts/ContextProvider';
-
+import Swal from 'sweetalert2'
 
 export default function Navbar() {
     const {setUser, setToken} = useStateContext()
@@ -16,11 +15,26 @@ export default function Navbar() {
 
     const onLogout = (ev) => {
         ev.preventDefault()
-
-        axiosClient.post('/logout')
-        .then(() => {
-            setUser({})
-            setToken(null)
+        Swal.fire({
+            title: 'Are you sure you want to Logout?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#32be8f',
+            confirmButtonText: 'Yes, Logout!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                'Logout Successfully!',
+                'you will now be redirected to the Login page',
+                'success'
+                ).then(() => {
+                axiosClient.post('/logout')
+                .then(() => {
+                    setUser({})
+                    setToken(null)
+                })
+                })
+            }
         })
     }
 
@@ -28,9 +42,9 @@ export default function Navbar() {
     <div className={`sidebar ${active ? 'active' : ''}`}>
         <div className="logo_content">
             <div className="logo">
-            <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} />
+            {/* <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} /> */}
                 <div className="logo_name">
-                   
+                    <img src={logo} alt="Logo" style={{ width: '200px', height: '150px' }} />
                 </div>
             </div>
             <i onClick={toggle} >

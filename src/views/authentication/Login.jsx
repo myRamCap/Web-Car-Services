@@ -64,9 +64,8 @@ export default function Login() {
 
         axiosClient.post('/login', payload)
             .then(({data}) => {
-                // navigate('/otp', {state: { id: data.id, email: data.email }})
-                setSpinner(false)
-                // console.log(data)
+                navigate('/otp', {state: { id: data.id, email: data.email }})
+                setSpinner(false) 
             })
             .catch(err => {
                 setSpinner(false)
@@ -78,7 +77,7 @@ export default function Login() {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: `Your account has been temporarily locked due to 3 consecutive request OTP attempts. Please try again in ` + response.data.time + ` minutes or contact your Corporate Manager.`, 
+                            text: `Your account has been temporarily locked due to 3 consecutive ` + response.data.description + ` attempts. Please try again in ` + response.data.time + ` minutes or contact your Corporate Manager.`, 
                         })
                     }else{
                         setErrors({

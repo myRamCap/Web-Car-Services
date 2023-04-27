@@ -24,6 +24,7 @@ import Loader2 from "./components/loader/Loader2"
 import OTP2 from "./views/otp verification/OTP2"
 import GuestLayout from "./components/GuestLayout"
 import NotFound from "./views/NotFound"
+import LineGraph from "./views/graph/LineGraph"
 
 const router = createBrowserRouter([
     {
@@ -74,7 +75,7 @@ const router = createBrowserRouter([
             {
                 path: '/serviceslogo',
                 element: <ServiceLogo />
-            }
+            } 
             
         ]
     },
@@ -112,6 +113,10 @@ const router = createBrowserRouter([
     {
         path: '*',
         element: <NotFound />
+    },
+    {
+        path: 'graph',
+        element: <LineGraph />
     }
     
     

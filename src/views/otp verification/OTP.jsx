@@ -27,6 +27,7 @@ export default function OTP({route,navigate}) {
     const otp5 = useRef()
     const otp6 = useRef() 
     const MySwal = withReactContent(Swal)
+    const {setUser,setToken} = useStateContext()
 
     const onKeyPress = (ev) => {
         if (!/[0-9]/.test(ev.key)) {
@@ -44,9 +45,17 @@ export default function OTP({route,navigate}) {
 
         axiosClient.post('/verifyotp', verification)
             .then(({data}) => {
-                console.log(data.id)
-                setShowModal(true)
-                setUserID(data.id)
+                console.log(data.user)
+                if (data.user) {
+                    setUser(data.user)
+                    setToken(data.token)
+                } else {
+                    // console.log('login no')
+                    setShowModal(true)
+                    setUserID(data.id)
+                }
+                   
+                
             })
             .catch(err => {
                 
@@ -59,7 +68,6 @@ export default function OTP({route,navigate}) {
                         setErrors({
                             email: [response.data.message]
                         })
-                        // Navigate('/changepassword')
                     }
                 }
             })
@@ -69,7 +77,6 @@ export default function OTP({route,navigate}) {
 
         ev.preventDefault()
 
-        
         setLoading(true)
         resendRef.current.classList.add('isDisabled');
         // setRunTimer(true);
