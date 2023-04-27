@@ -79,6 +79,7 @@ export default function ServiceCenterDataTable(props) {
 
   return (
     <div>
+     
       <MaterialTable
         title=""
         columns={columns}

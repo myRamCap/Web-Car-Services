@@ -92,7 +92,7 @@ export default function ServiceCenterModal(props) {
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Service Center</Modal.Title>
+            <Modal.Title>Create Service Center</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             <Form onSubmit={onSubmit}>
