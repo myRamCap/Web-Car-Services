@@ -73,6 +73,8 @@ export default function ServiceCenterModal(props) {
     setServiceCenter({
       ...serviceCenter,
       province: newValue.provDesc,
+      municipality: null,
+      barangay: null,
     })
   }
  
@@ -85,6 +87,7 @@ export default function ServiceCenterModal(props) {
     setServiceCenter({
       ...serviceCenter,
       municipality: newValue.citymunDesc,
+      barangay: null,
     })
   }
 
@@ -261,17 +264,17 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} id="street" label="House Number / Street" variant="outlined" fullWidth/>
+                  <TextField type="text" value={serviceCenter.house_number} onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} id="street" label="House Number / Street" variant="outlined" fullWidth/>
                 </Col>
 
                 <Col xs={12} md={6}> 
                   <Autocomplete
                     disableClearable
-                    value={serviceCenter.province}
-                    options={optionsProvince.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                     onChange={handleChangeProvince}
+                    options={optionsProvince.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    value={serviceCenter.province ?? ""}
                     getOptionLabel={(options) => options.provDesc ? options.provDesc.toString() : serviceCenter.province}  
-                    isOptionEqualToValue={(option, value) => option.provDesc === value.provDesc}
+                    isOptionEqualToValue={(option, value) => option.provDesc ?? ""  === serviceCenter.province  }
                     renderInput={(params) => (
                         <TextField
                         {...params}
@@ -294,8 +297,8 @@ export default function ServiceCenterModal(props) {
                     onChange={handleChangeMunicipality}
                     options={optionsCityMun.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                     value={serviceCenter.municipality ?? valCityMun  }
-                    getOptionLabel={(options) =>  options.citymunDesc ? options.citymunDesc.toString() : serviceCenter.municipality ?? null}  
-                    isOptionEqualToValue={(option, value) => option.citymunDesc === value.citymunDesc}
+                    getOptionLabel={(options) =>  options.citymunDesc ? options.citymunDesc.toString() : serviceCenter.municipality}  
+                    isOptionEqualToValue={(option, value) => option.citymunDesc ?? "" === serviceCenter.municipality}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -315,8 +318,8 @@ export default function ServiceCenterModal(props) {
                     onChange={handleChangeBrgy}
                     options={optionsBarangay.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                     value={serviceCenter.barangay ?? valBrgy}
-                    getOptionLabel={(options) => options.brgyDesc ? options.brgyDesc.toString() : serviceCenter.barangay ?? null}
-                    // isOptionEqualToValue={(option, value) => option.brgyDesc === value.brgyDesc}
+                    getOptionLabel={(options) => options.brgyDesc ? options.brgyDesc.toString() : serviceCenter.barangay}
+                    isOptionEqualToValue={(option, value) => option.brgyDesc ?? "" === serviceCenter.barangay}
                     renderInput={(params) => (
                       <TextField
                         {...params}
