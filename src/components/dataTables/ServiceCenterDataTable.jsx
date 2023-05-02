@@ -1,39 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import { color } from '@mui/system';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axiosClient from '../../axios-client';
 
 export default function ServiceCenterDataTable(props) {
   // const location = useLocation()
   // console.log(location.state)
+  const location = useLocation()
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
-  const navigate = useNavigate()
+  const [serviceCenter, setServiceCenter] = useState([])
+  const [serviceCenterInfo, setServiceCenterInfo] = useState([
+    {
+      id: null,
+      name: "",
+      Category: "",
+      country: "",
+      house_number: "",
+      barangay: "",
+      municipality: "",
+      province: "",
+      longitude: "",
+      latitude: "",
+      branch_manager_id: "",
+      image: "",
+    }
+  ])
 
-  const handleClickSC = () => {
-    console.log(rowData.Name)
-    // navigate('//servicecenter/test', {state: { id: data.id, email: data.email }})
+  const getServiceCenter = () => {
+    // loading here
+    axiosClient.get('/servicecenter')
+      .then(({data}) => {
+        setServiceCenter(data)
+      })
   }
 
   const columns = [
-    { field: "Name", title: "Name", render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.Name}>{rowData.Name}</Link>},
-    { field: "Category", title: "Category" },
-    { field: "Brgy", title: "Barangay" },
-    { field: "Municipality", title: "Municipality" },
-    { field: "Province", title: "Province" },
-    { field: "Date_Created", title: "Date Created" },
-   ];
-
-   const data = [
-    { Name: "Ramcap 1 Dealers", Category: "Dealership", Brgy: "Cristo rey", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-03" },
-    { Name: "Ramcap 2 Dealers", Category: "Non Dealership", Brgy: "Sta Lucia", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-05" },
-    { Name: "Ramcap 3 Dealers", Category: "Dealership", Brgy: "Patling", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-06" },
-    { Name: "Ramcap 1 Dealers", Category: "Non Dealership", Brgy: "Aranguren", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-04" },
-    { Name: "Ramcap 4 Dealers", Category: "Dealership", Brgy: "Lawy", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-06" },
-    { Name: "Ramcap 5 Dealers", Category: "Non Dealership", Brgy: "Bueno", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-01 " },
-    { Name: "Ramcap 1 Dealers", Category: "Dealership", Brgy: "Kamatis", Municipality: "Capas", Province: "Tarlac", Date_Created: "2023-04-07" },
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.name}>{rowData.name}</Link>},
+    { field: "category", title: "Category", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
+    { field: "barangay", title: "Barangay", customSort: (a, b) => a.barangay.localeCompare(b.barangay, undefined, { sensitivity: 'base' }) },
+    { field: "municipality", title: "Municipality", customSort: (a, b) => a.municipality.localeCompare(b.municipality, undefined, { sensitivity: 'base' }) },
+    { field: "province", title: "Province", customSort: (a, b) => a.province.localeCompare(b.province, undefined, { sensitivity: 'base' }) },
+    { field: "created_at", title: "Date Created" },
    ];
 
    const action = [
@@ -50,7 +61,25 @@ export default function ServiceCenterDataTable(props) {
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      onClick: (event,rowData) => {
+         
+        setServiceCenterInfo({
+          ...serviceCenterInfo,
+          id: rowData.id,
+          name: rowData.name,
+          category: rowData.category,
+          country: rowData.country,
+          house_number: rowData.house_number,
+          barangay: rowData.barangay,
+          municipality: rowData.municipality,
+          province: rowData.province,
+          longitude: rowData.longitude,
+          latitude: rowData.latitude,
+          branch_manager_id: rowData.branch_manager_id,
+          image: rowData.image,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -77,16 +106,30 @@ export default function ServiceCenterDataTable(props) {
     },
   }
 
+  useEffect(() => {
+    getServiceCenter()
+    if (location.state == 'success'){
+      getServiceCenter()
+      setShowModal(false)
+      location.state = null
+    }
+  }, [location.state])
+
+  const handleClose = () => {
+    setShowModal(false)
+    // setServiceLogoID([])
+  }
+
   return (
     <div>
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={serviceCenter.data}
         actions={action}
         options={options}
       />
-      <ServiceCenterModal show={showModal} close={() => {setShowModal(false)}} id={1} /> 
+      <ServiceCenterModal show={showModal} close={handleClose} Data={serviceCenterInfo} /> 
     </div>
   )
 }

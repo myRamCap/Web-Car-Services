@@ -6,36 +6,35 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { Autocomplete, Box, Card, CardMedia, Input, InputLabel, TextField } from '@mui/material';
 import GoogleMaps from '../../components/googleMap/GoogleMaps';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function MapsModal(props) {
+  const navigate = useNavigate()
   const [image, setImage] = useState('')
   const onSubmit = (ev) => {
       alert('randy')
       ev.preventDefault()
 
-      console.log(product)
+      // console.log(product)
   }
 
   const handleChange = (event, newValue) => {
     // console.log(newValue.year)
   //  if (newValue != null) {
-       console.log(newValue.year)
+      //  console.log(newValue.year)
        setImage(newValue.image);
     //  }
   }
 
   const handleSave = () => {
-    props.close
-    console.log(props.close)
+    // props.close
+    // console.log(props.close)
+    // console.log(localStorage.latitude)
     localStorage.setItem('lati', localStorage.latitude)
     localStorage.setItem('longi', localStorage.longitude)
-    
+    navigate('/servicecenter',  {state:  'coordinates' })
   }
-
- 
-
- 
 
  
 

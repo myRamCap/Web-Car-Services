@@ -35,6 +35,7 @@ export default function ServicesLogoModal(props) {
     }
   }, [id])
 
+ 
   const onImageChoose = (ev) => {
     const file = ev.target.files[0]
     const reader = new FileReader()
@@ -43,11 +44,11 @@ export default function ServicesLogoModal(props) {
         ...servicesLogo,
         image: file.name,
         image_url: reader.result,
-      })
+      }) 
     }
     reader.readAsDataURL(file)
   }
-
+ 
   const onSubmit = (ev) => {
       ev.preventDefault()
       const payload = {...servicesLogo}

@@ -711,3 +711,7 @@ tbody tr:hover {
 .sevices_logo_errors {
   color: red; 
 }
+
+.sc-image {
+  cursor: pointer;
+}
