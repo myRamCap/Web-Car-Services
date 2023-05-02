@@ -143,12 +143,12 @@ export default function ServicesModal(props) {
                                 ...params.InputProps,
                                 type: 'search',
                             }}
-                            value={service.name}
-                            onChange={(event) =>
-                              setService({
-                                ...service,
-                                name: event.target.value,
-                              })}
+                            // value={service.name}
+                            // onChange={(event) =>
+                            //   setService({
+                            //     ...service,
+                            //     name: event.target.value,
+                            //   })}
                             />
                         )}
                         />

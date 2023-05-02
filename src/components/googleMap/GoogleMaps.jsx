@@ -48,8 +48,8 @@ export default function GoogleMaps() {
     // ev.preventDefault()
     setLatitude(ev.latLng.lat())
     setLongitude(ev.latLng.lng())
-    console.log("longitude = ", ev.latLng.lng());
-    console.log("latitide = ", ev.latLng.lat());
+    // console.log("longitude = ", ev.latLng.lng());
+    // console.log("latitide = ", ev.latLng.lat());
     localStorage.setItem('latitude', ev.latLng.lat())
     localStorage.setItem('longitude', ev.latLng.lng())
   }
