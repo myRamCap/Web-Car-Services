@@ -69,7 +69,6 @@ export default function ServiceCenterModal(props) {
     setMunicipality(filterCity)
     setValCityMun(null);
     setValBrgy(null);
-    // console.log(newValue)
     setServiceCenter({
       ...serviceCenter,
       province: newValue.provDesc,
@@ -83,7 +82,6 @@ export default function ServiceCenterModal(props) {
     const filterBrgy = Barangay.RECORDS.filter((data) => data.citymunCode === newValue.citymunCode)
     setBrgy(filterBrgy) 
     setValBrgy(null);
-    // console.log(newValue)
     setServiceCenter({
       ...serviceCenter,
       municipality: newValue.citymunDesc,
@@ -161,7 +159,6 @@ export default function ServiceCenterModal(props) {
 
   const handleImageClose = () => {
     setShowImageModal(false)
-    // setServicesInfo([])
   }
 
   const onRadioChange = (event, newValue) => {
@@ -212,7 +209,6 @@ export default function ServiceCenterModal(props) {
         longitude: longi,
         latitude: lati,
       })
-      // getServices()
       setShowModal(false)
       location.state = null
     }
@@ -242,7 +238,6 @@ export default function ServiceCenterModal(props) {
                     name="category"
                     onChange={onRadioChange}
                     value={serviceCenter.category ?? null}
-                    // defaultValue="delearship"
                   >
                     <FormControlLabel value="delearship" control={<Radio />} label="DEALERSHIP"/>
                     <FormControlLabel value="nondelearship" control={<Radio />} label="NON-DEALERSHIP"/>
