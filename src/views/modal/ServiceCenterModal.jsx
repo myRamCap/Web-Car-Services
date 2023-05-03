@@ -42,8 +42,8 @@ export default function ServiceCenterModal(props) {
     latitude: "",
     branch_manager_id: "",
     image: "",
-  })
-
+  }) 
+  
   useEffect(() => {
     if (id) {
       setServiceCenter({
@@ -124,17 +124,18 @@ export default function ServiceCenterModal(props) {
   const onSubmit = (ev) => {
     ev.preventDefault()
     const payload = {...serviceCenter}
-    // console.log(payload)
-    axiosClient.post('/servicecenter', payload)
-    .then(({}) => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: "Your data has been successfully saved!",
-      }).then(() => {
-        navigate('/servicecenter' , {state:  'success' })
+ 
+    if (id) {
+      axiosClient.put(`/servicecenter/${id}`, payload)
+      .then(({}) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: "Your data has been successfully updated!",
+        }).then(() => {
+          navigate('/servicecenter' , {state:  'success' })
+        })
       })
-    })
     .catch(err => {
       const response = err.response
       if (response && response.status === 422) {
@@ -142,6 +143,27 @@ export default function ServiceCenterModal(props) {
         setErrors(response.data.errors)
       }
     }) 
+
+    } else {
+      axiosClient.post('/servicecenter', payload)
+      .then(({}) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: "Your data has been successfully saved!",
+        }).then(() => {
+          navigate('/servicecenter' , {state:  'success' })
+        })
+      })
+      .catch(err => {
+        const response = err.response
+        if (response && response.status === 422) {
+          console.log(response.data.errors)
+          setErrors(response.data.errors)
+        }
+      }) 
+    }
+    
   }
 
   const onclickMap = (ev) => {
@@ -182,8 +204,6 @@ export default function ServiceCenterModal(props) {
 
   useEffect(() => {
     if (props.show == false) {
-      setValBrgy(null);
-      setValCityMun(null);
       setServiceCenter({
         ...serviceCenter,
         id: null,
@@ -199,10 +219,13 @@ export default function ServiceCenterModal(props) {
         branch_manager_id: "",
         image: "",
       })
+      setValBrgy(null);
+      setValCityMun(null);
+      setErrors(null)
     }
   }, [props.show])
+
   useEffect(() => {
-    
     if (location.state == 'coordinates'){
       setServiceCenter({
         ...serviceCenter,

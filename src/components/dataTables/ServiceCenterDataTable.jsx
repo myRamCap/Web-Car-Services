@@ -39,7 +39,7 @@ export default function ServiceCenterDataTable(props) {
   }
 
   const columns = [
-    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.name}>{rowData.name}</Link>},
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to={`/servicecenter/details/${rowData.id}`} state={{SCName:rowData.name}}>{rowData.name}</Link>},
     { field: "category", title: "Category", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
     { field: "barangay", title: "Barangay", customSort: (a, b) => a.barangay.localeCompare(b.barangay, undefined, { sensitivity: 'base' }) },
     { field: "municipality", title: "Municipality", customSort: (a, b) => a.municipality.localeCompare(b.municipality, undefined, { sensitivity: 'base' }) },
@@ -62,7 +62,6 @@ export default function ServiceCenterDataTable(props) {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Edit User',
       onClick: (event,rowData) => {
-         
         setServiceCenterInfo({
           ...serviceCenterInfo,
           id: rowData.id,
@@ -117,7 +116,7 @@ export default function ServiceCenterDataTable(props) {
 
   const handleClose = () => {
     setShowModal(false)
-    // setServiceLogoID([])
+    setServiceCenterInfo([])
   }
 
   return (

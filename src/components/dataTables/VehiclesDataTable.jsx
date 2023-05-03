@@ -1,45 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import VehicleModal from '../../views/modal/VehiclesModal';
 import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded'; 
-import { Button, Popover, Typography } from '@mui/material';
+import { Popover, Typography } from '@mui/material';
+import axiosClient from '../../axios-client';
+import { useLocation } from 'react-router-dom';
 
 export default function VehiclesDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [vehicle, setVehicle] = useState([])
+  const location = useLocation()
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+  const [vehicleInfo, setVehicleInfo] = useState([
+    {
+      id: null,
+      customer_name: "",
+      vehicle_name: "",
+      chassis_number: "",
+      contact_number: "",
+      make: "",
+      model: "",
+      year: "",
+      image: "",
+      notes: "",
+    }
+  ])
+
+  const getVehicle = () => {
+    axiosClient.get('/vehicles')
+    .then(({data}) => {
+      setVehicle(data)
+    })
+  }
 
   const columns = [
-    { field: "Name", title: "Customer Name" },
-    { field: "Chassis_Number", title: "Chassis Number" },
-    { field: "Contact_Number", title: "Contact Number" },
-    { field: "Model", title: "Model" },
-    { field: "Year", title: "Year" },
-    { field: "Date_Created", title: "Date Created" },
+    { field: "customer_name", title: "Customer Name" },
+    { field: "chassis_number", title: "Chassis Number" },
+    { field: "contact_number", title: "Contact Number" },
+    { field: "model", title: "Model" },
+    { field: "year", title: "Year" },
+    { field: "created_at", title: "Date Created" },
    ];
-
-  const data = [
-    { Name: "Joe James", Chassis_Number: "ABC12345", Contact_Number: "123456789", Model: "Civic", Year: "2022", Date_Created: "2023-04-03" },
-    { Name: "John Walsh", Chassis_Number: "DEF67890", Contact_Number: "987654321", Model: "Fortuner", Year: "2020", Date_Created: "2023-04-05" },
-    { Name: "Bob Herm", Chassis_Number: "GHI111213", Contact_Number: "1231445862", Model: "City", Year: "2021", Date_Created: "2023-04-06" },
-    { Name: "James Houston", Chassis_Number: "JKL141516", Contact_Number: "9753863362", Model: "Dodge", Year: "2023", Date_Created: "2023-04-04" },
-    { Name: "Joe James", Chassis_Number: "MNO171819", Contact_Number: "6491017362", Model: "Montero", Year: "2022", Date_Created: "2023-04-06" },
-    { Name: "John Walsh", Chassis_Number: "PQR202122", Contact_Number: "52940163512", Model: "Vios", Year: "2022", Date_Created: "2023-04-01 " },
-    { Name: "Bob Herm", Chassis_Number: "STU232425", Contact_Number: "01587459043", Model: "Raptor", Year: "2023", Date_Created: "2023-04-07" },
-  ];
 
   const action = [
     {
@@ -51,12 +56,27 @@ export default function VehiclesDataTable() {
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      onClick: (event,rowData) => {
+        setVehicleInfo({
+          ...vehicleInfo,
+          id: rowData.id,
+          customer_name: rowData.customer_name,
+          vehicle_name: rowData.vehicle_name,
+          chassis_number: rowData.chassis_number,
+          contact_number: rowData.contact_number,
+          make: rowData.make,
+          model: rowData.model,
+          year: rowData.year,
+          image: rowData.image,
+          notes: rowData.notes,
+        })
+        setShowModal(true)
+      }
     },
-    {
-      icon: () => <div className="btn btn-success btn-sm" onClick={handleClick}><ZoomInRoundedIcon  /></div> ,
-      tooltip: 'Note'
-    }
+    // {
+    //   icon: () => <div className="btn btn-success btn-sm" onClick={handleClick}><ZoomInRoundedIcon  /></div> ,
+    //   tooltip: 'Note'
+    // }
 
   ]
 
@@ -83,9 +103,32 @@ export default function VehiclesDataTable() {
     },
   }
 
+  // const handleClick = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
+
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
+
+  const handleModalClose = () => {
+    setShowModal(false)
+    setVehicleInfo([])
+  }
+
+
+  useEffect(() => {
+    getVehicle()
+    if (location.state == 'success'){
+      getVehicle()
+      setShowModal(false)
+      location.state = null
+    }
+  }, [location.state])
+
   return (
     <div>
-          <Popover
+      {/* <Popover
         id={id}
         open={open}
         anchorEl={anchorEl}
@@ -96,16 +139,16 @@ export default function VehiclesDataTable() {
         }}
       >
         <Typography sx={{ p: 2 }}>Sangkap yukung Kape kabang manaya ku!</Typography>
-      </Popover>
+      </Popover> */}
 
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={vehicle.data}
         actions={action}
         options={options}
       />
-      <VehicleModal show={showModal} close={() => setShowModal(false)} id={1}/>
+      <VehicleModal show={showModal} close={handleModalClose} Data={vehicleInfo} />
     </div>
   )
 }

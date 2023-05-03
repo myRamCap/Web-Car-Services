@@ -7,10 +7,11 @@ import Button from 'react-bootstrap/Button';
 import { Autocomplete, Card, CardMedia, TextField } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-export default function ServicesModal(props) {
+export default function ServiceCenterServiceModal(props) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [errors, setErrors] = useState(null)
   const id = props.Data?.id ?? null;
   const [serviceLogo, setServiceLogo] = useState([])
@@ -22,6 +23,7 @@ export default function ServicesModal(props) {
     image_url: "",
   })
 
+ 
   useEffect(() => {
     getServiceLogo()
   }, [])
@@ -50,24 +52,24 @@ export default function ServicesModal(props) {
       ev.preventDefault()
       const payload = {...service}
       if (id) {
-        axiosClient.put(`services/${id}`, payload)
-        .then(() => {
-          Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: "Your data has been successfully saved!",
-          }).then(() => {
-            navigate('/services' , {state:  'success' })
-          })
-        })
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-            setErrors(response.data.errors)
-          }
-        }) 
+        // axiosClient.put(`services/${id}`, payload)
+        // .then(() => {
+        //   Swal.fire({
+        //         icon: 'success',
+        //         title: 'Success',
+        //         text: "Your data has been successfully saved!",
+        //   }).then(() => {
+        //     navigate('/services' , {state:  'success' })
+        //   })
+        // })
+        // .catch(err => {
+        //   const response = err.response
+        //   if (response && response.status === 422) {
+        //     setErrors(response.data.errors)
+        //   }
+        // }) 
       } else {
-        axiosClient.post('/services', payload)
+        axiosClient.post('/servicecenter/services', payload)
         .then(() => {
           Swal.fire({
             icon: 'success',
@@ -113,7 +115,7 @@ export default function ServicesModal(props) {
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Create Services</Modal.Title>
+            <Modal.Title>Create Services for {location.state}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 

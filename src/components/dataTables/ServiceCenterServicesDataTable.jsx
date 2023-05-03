@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
-import ServicesModal from '../../views/modal/ServiceModal';
+import ServiceCenterServiceModal from '../../views/modal/ServiceCenterServiceModal';
+import { useLocation } from 'react-router-dom';
 
 export default function ServiceCenterServicesDataTable() {
   const [showModal, setShowModal] = useState(false)
@@ -66,7 +67,7 @@ export default function ServiceCenterServicesDataTable() {
         actions={action}
         options={options}
       />
-      <ServicesModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServiceCenterServiceModal show={showModal} close={() => setShowModal(false)} id={1}/> 
     </div>
   )
 }

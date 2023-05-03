@@ -58,7 +58,7 @@ export default function ServicesLogoModal(props) {
           Swal.fire({
                 icon: 'success',
                 title: 'Success',
-                text: "Your data has been successfully saved!",
+                text: "Your data has been successfully updated!",
           }).then(() => {
             navigate('/serviceslogo' , {state:  'success' })
           })
@@ -75,7 +75,7 @@ export default function ServicesLogoModal(props) {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: "Your data was saved!",
+            text: "Your data has been successfully saved!",
           }).then(() => {
             navigate('/serviceslogo' , {state:  'success' })
           })
@@ -137,13 +137,13 @@ export default function ServicesLogoModal(props) {
                     </Col>
                 </Col>
                 <Col xs={12} md={6}> 
-                <Card raised >
-                        <CardMedia image={servicesLogo.image_url != "" ? servicesLogo.image_url :  NoImage}
-                            component="img"
-                            height="250"
-                            alt={"not found"} 
-                            sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>
-                    </Card>
+                  <Card raised >
+                    <CardMedia image={servicesLogo.image_url != "" ? servicesLogo.image_url :  NoImage}
+                      component="img"
+                      height="250"
+                      alt={"not found"} 
+                      sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>
+                  </Card>
                 </Col>
               </Row>
             </Form.Group>
