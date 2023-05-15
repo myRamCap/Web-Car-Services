@@ -120,6 +120,16 @@ export default function Navbar() {
                 <span className="tooltip">Notifications</span>
             </li>
             <li>
+                <Link className={splitLocation[1] === "promotions" ? "isActive" : ""} to="/promotions">
+                    <i>
+                        <box-icon name='party' color={splitLocation[1] === "party" ? 'white' : ''} />
+                    </i>
+                    
+                    <span className="link_name">Promotions</span>
+                </Link>
+                <span className="tooltip">Promotions</span>
+            </li>
+            <li>
                 <Link className={splitLocation[1] === "users" ? "isActive" : ""} to="/users">
                     <i>
                         <box-icon name='user-circle' color={splitLocation[1] === "users" ? 'white' : ''} />
@@ -135,9 +145,9 @@ export default function Navbar() {
                         <box-icon name='group' color={splitLocation[1] === "customer" ? 'white' : ''} />
                     </i>
                     
-                    <span className="link_name">Customer</span>
+                    <span className="link_name">Customers</span>
                 </Link>
-                <span className="tooltip">Customer</span>
+                <span className="tooltip">Customers</span>
             </li>
        
          
