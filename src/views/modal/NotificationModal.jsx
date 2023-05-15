@@ -5,10 +5,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import SC from '../../data/JSON/dummy/refSC.json'
-import { Autocomplete, Box, Card, CardMedia, Input, InputLabel, TextField } from '@mui/material';
-
+import CorporateAccount from '../../data/JSON/dummy/refCorporateAccount.json'
+import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField } from '@mui/material';
 
 export default function NotificationModal(props) {
+  const [selected, setSelected] = useState('');
+  const [image, setImage] = useState('')
+
+  const handleCheckboxChange = (event) => {
+    setSelected(event.target.value);
+  };
 
   const optionsSC = SC.RECORDS.map((option) => {
     const firstLetter = option.name[0].toUpperCase();
@@ -18,7 +24,14 @@ export default function NotificationModal(props) {
     };
   })
 
-  const [image, setImage] = useState('')
+  const optionsCorporateAccount = CorporateAccount.RECORDS.map((option) => {
+    const firstLetter = option.name[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  })
+
   const onSubmit = (ev) => {
       alert('randy')
       ev.preventDefault()
@@ -26,52 +39,80 @@ export default function NotificationModal(props) {
       console.log(product)
   }
 
-  const handleChange = (event, newValue) => {
-    // console.log(newValue.year)
-  //  if (newValue != null) {
-       console.log(newValue.year)
-       setImage(newValue.image);
-    //  }
-  }
+
 
   return (
     <div id="NotificationModal">
-        <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
-            <Modal.Header closeButton>
-            <Modal.Title>Create Notification</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="modal-main">
-            <Form onSubmit={onSubmit}>
+      <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Create Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="modal-main">
+          <Form onSubmit={onSubmit}>
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
-                <Col xs={12} md={12}>
-                <Autocomplete
-                      id="notification"
-                      disableClearable
-                      options={optionsSC.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                      // onChange={handleChangeProvince}
-                      getOptionLabel={(options) => options.name }  
+                <Col xs={12} md={6}>
+                  <FormControlLabel
+                    control={ 
+                      <Checkbox
+                        checked={selected === 'corporate_account'}
+                        onChange={handleCheckboxChange}
+                        value="corporate_account"
+                      />
+                    }
+                    label="CORPORATE ACCOUNT"
+                  />
+                </Col>
+                <Col xs={12} md={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selected === 'service_center'}
+                        onChange={handleCheckboxChange}
+                        value="service_center"
+                      />
+                    }
+                    label="SERVICE CENTER"
+                  />
+                </Col>
+                <Col xs={12} md={6}>
+                  <Autocomplete
+                    id="corporate-account-autocomplete"
+                    options={optionsCorporateAccount}
+                    disabled={selected === 'service_center'} // disable when Corporate Account is checked
+                    getOptionLabel={(options) => options.name }
+                      isOptionEqualToValue={(option, value) => option.name === value.name}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Corporate Account"
+                          InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                          }}
+                        />
+                          )}
+                  />
+                </Col>
+                <Col xs={12} md={6}>
+                  <Autocomplete
+                      id="service-center-autocomplete"
+                      options={optionsSC}
+                      disabled={selected === 'corporate_account'} // disable when Corporate Account is checked
+                      getOptionLabel={(option) => option.name }
                       isOptionEqualToValue={(option, value) => option.name === value.name}
                       renderInput={(params) => (
                           <TextField
-                          {...params}
-                          label="Service Center"
-                          InputProps={{
+                            {...params}
+                            label="Service Center"
+                            InputProps={{
                               ...params.InputProps,
                               type: 'search',
-                          }}
+                            }}
                           />
-                      )}
+                        )}
                     />
-                </Col>
-              </Row>
-              </Form.Group>
-
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Row>
-                <Col xs={12} md={12}>
-                  <TextField type="text" id="title" label="Title" variant="outlined" fullWidth/>
                 </Col>
               </Row>
             </Form.Group>
@@ -79,7 +120,24 @@ export default function NotificationModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={12}>
-                  <TextField type="text" id="title" label="Content" variant="outlined" fullWidth/>
+                  <TextField type="text" id="title" label="Title" variant="outlined" fullWidth/> 
+                </Col>
+              </Row>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row>
+                <Col xs={12} md={12}>
+                  <TextField
+                      type= "text"
+                      id="content"
+                      label="Content"
+                      variant="outlined"
+                      multiline
+                      rows={4}
+                      maxRows={10}
+                      fullWidth
+                  />
                 </Col>
               </Row>
             </Form.Group>
@@ -110,8 +168,8 @@ export default function NotificationModal(props) {
               </Row>
             </Form.Group>
           </Form>
-            </Modal.Body>
-        </Modal>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }
