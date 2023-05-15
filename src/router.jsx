@@ -12,6 +12,7 @@ import Vehicles from "./views/pages/Vehicles"
 import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
 import Notification from "./views/pages/Notification"
+import Promotions from "./views/pages/Promotions"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
 import ServiceLogo from "./views/pages/ServiceLogo"
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
             {
                 path: '/notification',
                 element: <Notification />
+            },
+            {
+                path: '/promotions',
+                element: <Promotions />
             },
             {
                 path: '/users',
