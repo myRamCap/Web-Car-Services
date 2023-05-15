@@ -1,26 +1,26 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import { Box, Tab } from '@mui/material'
 import React, { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import ServiceCenterBooking from '../../views/pages/ServiceCenterBooking'
 import ServiceCenterTimeSlot from '../../views/pages/ServiceCenterTimeSlot'
-import ServiceCenterServices from '../../views/pages/ServiceCenterServices'
 import { Link } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ServiceCenterServicesDataTable from '../dataTables/ServiceCenterServicesDataTable'
 
-export default function ServiceCenterTabs() {
-    const location = useLocation()
+export default function ServiceCenterTabs(props) {
+    const param = useParams()
     const [value, setValue] = useState('1')
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
     }
-
+ 
   return (
     
     <div id="services">
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <h1 className='pb-5'>{location.state}</h1>
+            <h1 className='pb-5'>{param.name}</h1>
         </div>
         <Link to="/servicecenter">
         <button className="btn btn-secondary"><ArrowBackIcon /> Back  </button>
@@ -34,7 +34,7 @@ export default function ServiceCenterTabs() {
                         <Tab label="Booking" value="3" /> 
                     </TabList>
                     <TabPanel value="1">
-                        <ServiceCenterServices />
+                        <ServiceCenterServicesDataTable id={param.id} />
                     </TabPanel>
                     <TabPanel value="2">
                         <ServiceCenterTimeSlot />

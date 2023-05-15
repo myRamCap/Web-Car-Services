@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
-import BookingsModal from '../../views/modal/BookingsModal';
+// import BookingsModal from '../../views/modal/BookingsModal';
 import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded';
 import { Button, Popover, Typography } from '@mui/material';
 
@@ -110,7 +110,7 @@ export default function BookingDataTable() {
         actions={action}
         options={options}
       />
-      <BookingsModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      {/* <BookingsModal show={showModal} close={() => setShowModal(false)} id={1}/>  */}
     </div>
   )
 }

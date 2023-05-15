@@ -5,11 +5,11 @@ import { color } from '@mui/system';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../../axios-client';
+import Loading from '../loader/Loading';
 
 export default function ServiceCenterDataTable(props) {
-  // const location = useLocation()
-  // console.log(location.state)
   const location = useLocation()
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [serviceCenter, setServiceCenter] = useState([])
@@ -31,15 +31,16 @@ export default function ServiceCenterDataTable(props) {
   ])
 
   const getServiceCenter = () => {
-    // loading here
+    setLoading(true)
     axiosClient.get('/servicecenter')
       .then(({data}) => {
         setServiceCenter(data)
+        setLoading(false)
       })
   }
 
   const columns = [
-    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to={`/servicecenter/details/${rowData.id}`} state={{SCName:rowData.name}}>{rowData.name}</Link>},
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to={`/servicecenter/details/${rowData.name}/${rowData.id}`}>{rowData.name}</Link>},
     { field: "category", title: "Category", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
     { field: "barangay", title: "Barangay", customSort: (a, b) => a.barangay.localeCompare(b.barangay, undefined, { sensitivity: 'base' }) },
     { field: "municipality", title: "Municipality", customSort: (a, b) => a.municipality.localeCompare(b.municipality, undefined, { sensitivity: 'base' }) },
@@ -105,6 +106,11 @@ export default function ServiceCenterDataTable(props) {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
   useEffect(() => {
     getServiceCenter()
     if (location.state == 'success'){
@@ -127,6 +133,8 @@ export default function ServiceCenterDataTable(props) {
         data={serviceCenter.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <ServiceCenterModal show={showModal} close={handleClose} Data={serviceCenterInfo} /> 
     </div>

@@ -6,11 +6,13 @@ import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded';
 import { Popover, Typography } from '@mui/material';
 import axiosClient from '../../axios-client';
 import { useLocation } from 'react-router-dom';
+import Loading from '../loader/Loading';
 
 export default function VehiclesDataTable() {
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [vehicle, setVehicle] = useState([])
   const location = useLocation()
   const open = Boolean(anchorEl);
@@ -31,9 +33,11 @@ export default function VehiclesDataTable() {
   ])
 
   const getVehicle = () => {
+    setLoading(true)
     axiosClient.get('/vehicles')
     .then(({data}) => {
       setVehicle(data)
+      setLoading(false)
     })
   }
 
@@ -103,6 +107,11 @@ export default function VehiclesDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
   // const handleClick = (event) => {
   //   setAnchorEl(event.currentTarget);
   // };
@@ -147,6 +156,8 @@ export default function VehiclesDataTable() {
         data={vehicle.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <VehicleModal show={showModal} close={handleModalClose} Data={vehicleInfo} />
     </div>

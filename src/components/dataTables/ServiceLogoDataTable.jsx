@@ -5,9 +5,10 @@ import ServicesLogoModal from '../../views/modal/ServicesLogoModal';
 import axiosClient from '../../axios-client';
 import { useLocation } from 'react-router-dom';
 import NoImage from '../../assets/images/No-Image.png';
+import Loading from '../loader/Loading';
 
 export default function ServiceLogoDataTable() {
-    
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false)
     const paginationAlignment = useState("center")
     const [servicesLogo, setServicesLogo] = useState([])
@@ -23,9 +24,11 @@ export default function ServiceLogoDataTable() {
     ])
 
     const getServicesLogo = () => {
+      setLoading(true)
       axiosClient.get('/serviceslogo')
         .then(({data}) => {
           setServicesLogo(data)
+          setLoading(false)
         })
     } 
 
@@ -88,6 +91,11 @@ export default function ServiceLogoDataTable() {
           fontSize: 16,
         },
       }
+
+      const components = {
+        // define your custom components here
+        OverlayLoading: () => <Loading />,
+      };
  
       useEffect(() => {
         getServicesLogo()
@@ -111,6 +119,8 @@ export default function ServiceLogoDataTable() {
         data={servicesLogo.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <ServicesLogoModal show={showModal} close={handleClose} Data={serviceLogoID}/>
     </div>

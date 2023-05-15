@@ -4,9 +4,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import ServicesModal from '../../views/modal/ServiceModal';
 import axiosClient from '../../axios-client';
 import { useLocation } from 'react-router-dom';
+import Loading from '../loader/Loading';
 
 export default function ServicesDataTable() {
   const location = useLocation()
+  const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [services, setServices] = useState([])
@@ -21,10 +23,11 @@ export default function ServicesDataTable() {
   ])
 
   const getServices = () => {
-    // loading here
+    setLoading(true)
     axiosClient.get('/services')
       .then(({data}) => {
         setServices(data)
+        setLoading(false)
       })
   }
   
@@ -65,6 +68,7 @@ export default function ServicesDataTable() {
   ]
 
   const options = {
+    // loadingType: "overlay",
     paginationAlignment,
     actionsColumnIndex: -1,
     searchFieldAlignment: "left",
@@ -87,6 +91,11 @@ export default function ServicesDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
   useEffect(() => {
     getServices()
     if (location.state){
@@ -103,13 +112,17 @@ export default function ServicesDataTable() {
   
   return (
     <div>
-      <MaterialTable
-        title=""
-        columns={columns}
-        data={services.data}
-        actions={action}
-        options={options}
-      />
+ 
+        <MaterialTable
+          title=""
+          columns={columns}
+          data={services.data}
+          actions={action}
+          options={options} 
+          isLoading={loading}
+          components={components}
+        />
+     
       <ServicesModal show={showModal} close={handleClose} Data={servicesInfo} /> 
     </div>
   )

@@ -1,27 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import UserModal from '../../views/modal/UserModal';
+import Loading from '../loader/Loading';
+import axiosClient from '../../axios-client';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function UsersDataTable() {
   const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([])
   const paginationAlignment = useState("center")
+  const {role, user} = useStateContext()
 
+  const getUsers = () => {
+    setLoading(true)
+    axiosClient.get(`/users/${role}` )
+    .then(({data}) => {
+      setUsers(data)
+      setLoading(false)
+    })
+  }
+console.log(role)
   const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Surname', field: 'surname' },
-    { title: 'Birth Year', field: 'birthYear' },
-    { title: 'Birth Place',field: 'birthCity' },
+    { title: 'Name', field: 'fullname' },
+    { title: 'Email', field: 'email' },
+    { title: 'Contact Number', field: 'contact_number' },
+    { title: 'Role',field: 'role_name' },
   ]
 
-  const data = [
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-  ]
+ 
 
    const action = [
     {
@@ -60,14 +68,25 @@ export default function UsersDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
+  useEffect(() => {
+    getUsers()
+  }, [])
+
   return (
     <div>
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
-        actions={action}
+        data={users.data}
+        actions={action} 
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <UserModal show={showModal} close={() => setShowModal(false)} id={1}/>
     </div>

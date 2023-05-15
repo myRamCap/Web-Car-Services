@@ -14,7 +14,7 @@ import Swal from 'sweetalert2'
 export default function ModalOTP(props) {
     const inputPassRef = useRef()
     const inputConfirmPassRef = useRef()
-    const {setUser,setToken} = useStateContext()
+    const {setUser,setToken,setRole} = useStateContext()
     
     const onSubmit = (ev) => {
       ev.preventDefault()
@@ -31,6 +31,7 @@ export default function ModalOTP(props) {
           }).then(() => {
             setUser(data.user)
             setToken(data.token)
+            setRole(data.role)
           })
           
         })

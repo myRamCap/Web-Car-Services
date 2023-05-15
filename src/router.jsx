@@ -25,6 +25,8 @@ import OTP2 from "./views/otp verification/OTP2"
 import GuestLayout from "./components/GuestLayout"
 import NotFound from "./views/NotFound"
 import LineGraph from "./views/graph/LineGraph"
+import Loading from "./components/loader/Loading"
+import Sample from "./views/Sample"
 
 const router = createBrowserRouter([
     {
@@ -69,7 +71,7 @@ const router = createBrowserRouter([
                 element: <Customers />
             },
             {
-                path: '/servicecenter/details',
+                path: '/servicecenter/details/:name/:id',
                 element: <ServiceCenterTabs />
             },
             {
@@ -115,8 +117,12 @@ const router = createBrowserRouter([
         element: <NotFound />
     },
     {
-        path: 'graph',
-        element: <LineGraph />
+        path: 'loading',
+        element: <Loading />
+    },
+    {
+        path: 'client',
+        element: <Sample />
     }
     
     

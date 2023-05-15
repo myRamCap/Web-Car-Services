@@ -48,9 +48,10 @@ export default function ServicesModal(props) {
 
   const onSubmit = (ev) => {
       ev.preventDefault()
+      setErrors(null)
       const payload = {...service}
       if (id) {
-        axiosClient.put(`services/${id}`, payload)
+        axiosClient.put(`/services/${id}`, payload)
         .then(() => {
           Swal.fire({
                 icon: 'success',

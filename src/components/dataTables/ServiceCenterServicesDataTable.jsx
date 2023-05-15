@@ -1,24 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServiceCenterServiceModal from '../../views/modal/ServiceCenterServiceModal';
 import { useLocation } from 'react-router-dom';
+import axiosClient from '../../axios-client';
+import Loading from '../loader/Loading';
 
-export default function ServiceCenterServicesDataTable() {
+export default function ServiceCenterServicesDataTable(props) {
+  const location = useLocation()
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
-  
+  const [serviceCenterServices, setServiceCenterServices] = useState([])
+  const [serviceCenterServicesInfo, setServiceCenterServicesInfo] = useState([
+    {
+      id: null,
+      service_center_id: null,
+      service_id: null,
+      estimated_time: null,
+      estimated_time_desc: "",
+      name: "",
+      details: "",
+      image_id: "",
+      image_url: "",
+    }
+  ])
+
+  const getServiceCenterServices = () => {
+    setLoading(true)
+    axiosClient.get('/service_center/services')
+    .then(({data}) => {
+      setServiceCenterServices(data)
+      setLoading(false)
+    })
+  }
+ 
   const columns = [
-    { field: "Name", title: "Name" },
-    { field: "Details", title: "Details" },
-    { field: "Date_Created", title: "Date Created" }
-   ];
-
-   const data = [
-    { Name: "Oil Change", Details: "Oil Change", Date_Created: "2023-04-03" },
-    { Name: "New Tires", Details: "New Tires", Date_Created: "2023-04-05" },
-    { Name: "Tire Rotation", Details: "Tire Rotation", Date_Created: "2023-04-06" },
-
+    { field: "name", title: "Name" },
+    { field: "details", title: "Details" },
+    { field: "estimated_time_desc", title: "Estimated Time" },
+    { field: "created_at", title: "Date Created" }
    ];
 
    const action = [
@@ -30,8 +51,22 @@ export default function ServiceCenterServicesDataTable() {
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      tooltip: 'Edit',
+      onClick: (event,rowData) => { 
+        setServiceCenterServicesInfo({
+          ...serviceCenterServicesInfo,
+          id: rowData.id,
+          service_center_id: rowData.service_center_id,
+          service_id: rowData.service_id,
+          estimated_time: rowData.estimated_time,
+          estimated_time_desc: rowData.estimated_time_desc,
+          name: rowData.name,
+          details: rowData.details,
+          image_id: rowData.image_id,
+          image_url: rowData.image_url,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -58,16 +93,37 @@ export default function ServiceCenterServicesDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
+  const handleClose = () => {
+    setShowModal(false)
+    setServiceCenterServicesInfo([])
+  }
+
+  useEffect(() => {
+    getServiceCenterServices()
+    if (location.state == 'success'){
+          getServiceCenterServices()
+          setShowModal(false)
+          location.state = null
+    }
+  }, [location.state])
+
   return (
     <div>
-      <MaterialTable
+        <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={serviceCenterServices.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
-      <ServiceCenterServiceModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServiceCenterServiceModal show={showModal} close={handleClose} Data={serviceCenterServicesInfo} /> 
     </div>
   )
 }

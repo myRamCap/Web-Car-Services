@@ -1,28 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import TimeSlotModal from '../../views/modal/TimeSlotModal';
+import axiosClient from '../../axios-client';
+import { useLocation } from 'react-router-dom';
 
 export default function ServiceCenterTimeSlotDataTable() {
+  const location = useLocation()
   const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(true);
   const paginationAlignment = useState("center")
+  const [serviceCenterTimeSLot, setServiceCenterTimeSLot] = useState([])
+  const [serviceCenterTimeSLotInfo, setServiceCenterTimeSLotInfo] = useState([
+    {
+      id: null,
+      service_center_id: null,
+      time: null,
+      max_limit: null
+    }
+  ])
+
+  const getServiceCenterTimeSlot = () => {
+    setLoading(true)
+    axiosClient.get('/service_center/timeslot')
+    .then(({data}) => {
+      setServiceCenterTimeSLot(data)
+      setLoading(false)
+    })
+  }
 
   const columns = [
-    { field: "Timeslot", title: "Time Slot" },
-    { field: "MaxLimit", title: "Max Limit" },
-    { field: "Booking_Date", title: "Booking Date" },
-    { field: "Date_Created", title: "Date Created" },
+    { field: "time", title: "Time Slot" },
+    { field: "max_limit", title: "Max Limit" },
+    { field: "created_at", title: "Date Created" },
 
-   ];
-
-   const data = [
-    { Timeslot: "08:00", MaxLimit: "1", Booking_Date: "2023-04-03", Date_Created: "2023-04-03" },
-    { Timeslot: "08:30", MaxLimit: "1", Booking_Date: "2023-04-05", Date_Created: "2023-04-05" },
-    { Timeslot: "09:00", MaxLimit: "1", Booking_Date: "2023-04-06", Date_Created: "2023-04-06" },
-    { Timeslot: "09:30", MaxLimit: "1", Booking_Date: "2023-04-06", Date_Created: "2023-04-04" },
-    { Timeslot: "10:00", MaxLimit: "1", Booking_Date: "2023-04-06", Date_Created: "2023-04-06" },
-    { Timeslot: "10:30", MaxLimit: "1", Booking_Date: "2023-04-01", Date_Created: "2023-04-01" },
-    { Timeslot: "11:00", MaxLimit: "1", Booking_Date: "2023-04-07", Date_Created: "2023-04-07" },
    ];
 
    const action = [
@@ -35,7 +46,16 @@ export default function ServiceCenterTimeSlotDataTable() {
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
       tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      onClick: (event,rowData) => { 
+        setServiceCenterTimeSLotInfo({
+          ...serviceCenterTimeSLotInfo,
+          id: rowData.id,
+          service_center_id: rowData.service_center_id,
+          time: rowData.time,
+          max_limit: rowData.max_limit,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -62,16 +82,30 @@ export default function ServiceCenterTimeSlotDataTable() {
     },
   }
 
+  const handleClose = () => {
+    setShowModal(false)
+    setServiceCenterTimeSLotInfo([])
+  }
+
+  useEffect(() => {
+    getServiceCenterTimeSlot()
+    if (location.state == 'success'){
+          getServiceCenterTimeSlot()
+          setShowModal(false)
+          location.state = null
+    }
+  }, [location.state])
+
   return (
     <div>
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={serviceCenterTimeSLot.data}
         actions={action}
         options={options}
       />
-      <TimeSlotModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <TimeSlotModal show={showModal} close={handleClose} Data={serviceCenterTimeSLotInfo} /> 
     </div>
   )
 }

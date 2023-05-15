@@ -7,25 +7,30 @@ import Button from 'react-bootstrap/Button';
 import { Autocomplete, Card, CardMedia, TextField } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import NoImage from '../../assets/images/No-Image.png';
+import EstimatedTime from '../../data/JSON/refHours.json'
 
 export default function ServiceCenterServiceModal(props) {
   const navigate = useNavigate()
   const location = useLocation()
   const [errors, setErrors] = useState(null)
-  const id = props.Data?.id ?? null;
-  const [serviceLogo, setServiceLogo] = useState([])
+  const id = props.Data?.id ?? null
+  const [services, setServices] = useState([])
+  const param = useParams()
   const [service, setService] = useState({
     id: null,
+    service_center_id: param.id,
+    service_id: null,
+    estimated_time: null,
+    estimated_time_desc: null,
     name: "",
     details: "",
-    image_id: "",
     image_url: "",
   })
 
- 
   useEffect(() => {
-    getServiceLogo()
+    getService()
   }, [])
 
   useEffect(() => {
@@ -33,18 +38,28 @@ export default function ServiceCenterServiceModal(props) {
       setService({
         ...service,
         id: props.Data.id,
+        service_id: props.Data.service_id,
+        estimated_time: props.Data.estimated_time,
+        estimated_time_desc: props.Data.estimated_time_desc,
         name: props.Data.name,
         details: props.Data.details,
-        image_id: props.Data.image_id,
         image_url: props.Data.image_url,
       })
     }
   }, [id])
- 
-  const getServiceLogo = () => {
-    axiosClient.get('/serviceslogo')
+  
+  const optionsEstimatedTime = EstimatedTime.RECORDS.map((option) => {
+    const firstLetter = option.details[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  })
+
+  const getService = () => {
+    axiosClient.get('/services')
     .then(({data}) => {
-      setServiceLogo(data.data)
+      setServices(data.data)
     })
   }
 
@@ -52,49 +67,58 @@ export default function ServiceCenterServiceModal(props) {
       ev.preventDefault()
       const payload = {...service}
       if (id) {
-        // axiosClient.put(`services/${id}`, payload)
-        // .then(() => {
-        //   Swal.fire({
-        //         icon: 'success',
-        //         title: 'Success',
-        //         text: "Your data has been successfully saved!",
-        //   }).then(() => {
-        //     navigate('/services' , {state:  'success' })
-        //   })
-        // })
-        // .catch(err => {
-        //   const response = err.response
-        //   if (response && response.status === 422) {
-        //     setErrors(response.data.errors)
-        //   }
-        // }) 
+        axiosClient.put(`/service_center/services/${id}`, payload)
+        .then(() => {
+          Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: "Your data has been successfully updated!",
+          }).then(() => {
+            navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
+          })
+        })
+        .catch(err => {
+          const response = err.response
+          if (response && response.status === 422) {
+              setErrors(response.data.errors)
+          }
+        }) 
       } else {
-        axiosClient.post('/servicecenter/services', payload)
+        axiosClient.post('/service_center/services', payload)
         .then(() => {
           Swal.fire({
             icon: 'success',
             title: 'Success',
             text: "Your data has been successfully saved!",
           }).then(() => {
-            navigate('/services' , {state:  'success' })
+            navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
           })
         })
         .catch(err => {
           const response = err.response
-          if (response && response.status === 422) {
+          if (response && response.status === 422) { 
             setErrors(response.data.errors)
           }
         }) 
       }
   }
 
-  const handleChange = (event, newValue) => {
+  const handleChangeService = (event, newValue) => {
     setService({
       ...service,
-      name: newValue.title,
-      details: newValue.description,
+      service_id: newValue.id,
+      name: newValue.name,
+      details: newValue.details,
       image_id: newValue.id,
       image_url: newValue.image_url,
+    })
+  }
+
+  const handleChangeEstimatedTime = (event, newValue) => {
+    setService({
+      ...service,
+      estimated_time: newValue.time,
+      estimated_time_desc: newValue.details,
     })
   }
 
@@ -103,19 +127,24 @@ export default function ServiceCenterServiceModal(props) {
       setService({
         ...service,
         id: null,
+        service_id: null,
+        estimated_time: null,
+        estimated_time_desc: "",
         name: "",
         details: "",
-        image_id: "",
+        image_url: "",
       })
       setErrors(null)
     }
   },[props.show])
 
+  const [num, setNum] = React.useState();
+
   return (
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Create Services for {location.state}</Modal.Title>
+            <Modal.Title>Create Services for {param.name}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -131,17 +160,16 @@ export default function ServiceCenterServiceModal(props) {
                 <Col xs={12} md={6}>
                     <Col xs={12} md={12}>
                     <Autocomplete
-                        freeSolo
                         disableClearable
-                        onChange={handleChange}
-                        options={serviceLogo}  
+                        onChange={handleChangeService}
+                        options={services}  
                         value={service.name}
-                        getOptionLabel={(options) => options.title ? options.title.toString() : service.name}
-                        // isOptionEqualToValue={(option, value) => option.title === service.name}
+                        getOptionLabel={(options) => options.name ? options.name.toString() : service.name}
+                        isOptionEqualToValue={(option, value) => option.name ?? "" === service.name}
                         renderInput={(params) => (
                             <TextField
                             {...params}
-                            label="Name" 
+                            label="Service Name" 
                             InputProps={{
                                 ...params.InputProps,
                                 type: 'search',
@@ -150,16 +178,38 @@ export default function ServiceCenterServiceModal(props) {
                         )}
                         />
                     </Col>
-                    <Col xs={12} md={12} className="mt-5">
+                    <Col xs={12} md={12} className="mt-4">
                         <TextField type="text" value={service.details} id="description" label="Description" variant="outlined" fullWidth/>
+                    </Col>
+                    <Col xs={12} md={12} className="mt-4">
+                        {/* <TextField type="number" value={service.estimate_time} onChange={(e) => setNum(e.target.value)}
+          id="estimated_time" label="Estimated Time" variant="outlined" fullWidth/> */}
+                      <Autocomplete
+                        disableClearable
+                        options={optionsEstimatedTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                        onChange={handleChangeEstimatedTime}
+                        value={service.estimated_time_desc}
+                        getOptionLabel={(options) => options.details ? options.details.toString() : service.estimated_time_desc}  
+                        isOptionEqualToValue={(option, value) => option.details ?? "" === service.estimated_time_desc}
+                        renderInput={(params) => (
+                            <TextField
+                            {...params}
+                            label="Estimated Time"
+                            InputProps={{
+                                ...params.InputProps,
+                                type: 'search',
+                            }}
+                            />
+                        )}
+                      />
                     </Col>
                 </Col>
 
                 <Col xs={12} md={6}> 
                     <Card raised >
-                        <CardMedia image={service.image_url ? service.image_url : "data:image/png;base64,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"}
+                        <CardMedia src={service.image_url ? service.image_url : NoImage}
                             component="img"
-                            height="250"
+                            height="216"
                             alt={"alt"}
                             title={"titleasdasdsada"}
                             sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>

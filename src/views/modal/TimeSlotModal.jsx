@@ -1,15 +1,40 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { Autocomplete, FormControlLabel, Input, Radio, RadioGroup, TextField } from '@mui/material';
 import Timeslot from '../../data/JSON/dummy/refTimeslot.json'
 import MaxLimit from '../../data/JSON/dummy/refMaxLimit.json'
+import { useNavigate, useParams } from 'react-router-dom';
+import axiosClient from '../../axios-client';
+import Swal from 'sweetalert2'
 
 export default function TimeSlotModal(props) {
+  const navigate = useNavigate()
+  const param = useParams()
+  const id = props.Data?.id ?? null;
+  const [errors, setErrors] = useState(null)
+  const [timeSlot, setTimeSlot] = useState({
+    id: null,
+    service_center_id: param.id,
+    time: null,
+    max_limit: null
+  })
 
+  useEffect(() => {
+    if (id) { 
+      setTimeSlot({
+        ...timeSlot,
+        id: props.Data.id,
+        service_center_id: props.Data.service_center_id,
+        time: props.Data.time,
+        max_limit: props.Data.max_limit,
+      })
+    }
+  }, [id])
+ 
   const optionsTimeslot = Timeslot.RECORDS.map((option) => {
     const firstLetter = option.time[0].toUpperCase();
     return {
@@ -29,11 +54,73 @@ export default function TimeSlotModal(props) {
    
 
   const onSubmit = (ev) => {
-    alert('randy')
     ev.preventDefault()
+    const payload = {...timeSlot}
+    setErrors(null)
+    if (id) {
+      axiosClient.put(`/service_center/timeslot/${id}`, payload)
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: "Your data has been successfully updated!",
+        }).then(() => {
+          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
+        })
+      })
+      .catch(err => {
+        const response = err.response
+        if (response && response.status === 422) { 
+          setErrors(response.data.errors)
+        }
+      }) 
+    } else {
+      axiosClient.post('/service_center/timeslot', payload)
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: "Your data has been successfully saved!",
+        }).then(() => {
+          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
+        })
+      })
+      .catch(err => {
+        const response = err.response
+        if (response && response.status === 422) { 
+          setErrors(response.data.errors)
+        }
+      }) 
+    }
+    
 
-    // console.log(product)
   }
+
+  const handleChangeTime = (event, newValue) => {
+    setTimeSlot({
+      ...timeSlot,
+      time: newValue.time
+    })
+  }
+
+  const handleChangeMaxLimit = (event, newValue) => {
+    setTimeSlot({
+      ...timeSlot,
+      max_limit: newValue.number
+    })
+  }
+
+  useEffect(() => {
+    if (props.show == false) {
+      setTimeSlot({
+        ...timeSlot,
+        id: null,
+        time: null,
+        max_limit: null
+      })
+      setErrors(null)
+    }
+  },[props.show])
 
   return (
     <div id="TimeSlotModal">
@@ -42,17 +129,24 @@ export default function TimeSlotModal(props) {
             <Modal.Title>Add Time Slot</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
+            {errors && 
+              <div className="sevices_logo_errors">
+                {Object.keys(errors).map(key => (
+                  <p key={key}>{errors[key][0]}</p>
+                ))}
+              </div>
+            }
             <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={12}>
                   <Autocomplete
-                      id="Timeslot"
                       disableClearable
                       options={optionsTimeslot.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                      // onChange={handleChangeProvince}
-                      getOptionLabel={(options) => options.time }  
-                      isOptionEqualToValue={(option, value) => option.time === value.time}
+                      onChange={handleChangeTime}
+                      value={timeSlot.time}
+                      getOptionLabel={(options) => options.time ? options.time.toString() : timeSlot.time }  
+                      isOptionEqualToValue={(option, value) => option.time ?? "" === timeSlot.time}
                       renderInput={(params) => (
                           <TextField
                           {...params}
@@ -72,11 +166,12 @@ export default function TimeSlotModal(props) {
               <Row>
                 <Col xs={12} md={12}> 
                   <Autocomplete
-                    id="MaxLimit"
                     disableClearable
+                    onChange={handleChangeMaxLimit}
                     options={optionsMaxLimit.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.number }  
-                    isOptionEqualToValue={(option, value) => option.number === value.number}
+                    value={timeSlot.max_limit}
+                    getOptionLabel={(options) => options.number ? options.number.toString() : timeSlot.max_limit.toString() }  
+                    isOptionEqualToValue={(option, value) => option.number ?? "" === timeSlot.max_limit}
                     renderInput={(params) => (
                         <TextField
                         {...params}
