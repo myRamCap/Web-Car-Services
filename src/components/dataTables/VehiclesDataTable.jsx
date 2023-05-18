@@ -20,7 +20,8 @@ export default function VehiclesDataTable() {
   const [vehicleInfo, setVehicleInfo] = useState([
     {
       id: null,
-      customer_name: "",
+      client_id: "",
+      client_name: "",
       vehicle_name: "",
       chassis_number: "",
       contact_number: "",
@@ -42,7 +43,7 @@ export default function VehiclesDataTable() {
   }
 
   const columns = [
-    { field: "customer_name", title: "Customer Name" },
+    { field: "client_name", title: "Client Name" },
     { field: "chassis_number", title: "Chassis Number" },
     { field: "contact_number", title: "Contact Number" },
     { field: "model", title: "Model" },
@@ -64,7 +65,8 @@ export default function VehiclesDataTable() {
         setVehicleInfo({
           ...vehicleInfo,
           id: rowData.id,
-          customer_name: rowData.customer_name,
+          client_id: rowData.client_id,
+          client_name: rowData.client_name,
           vehicle_name: rowData.vehicle_name,
           chassis_number: rowData.chassis_number,
           contact_number: rowData.contact_number,

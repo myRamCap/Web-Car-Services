@@ -5,10 +5,11 @@ import BookingsModal from '../../views/modal/ServiceCenterBookingsModal';
 import axiosClient from '../../axios-client';
 import ServiceCenterBookingsModal from '../../views/modal/ServiceCenterBookingsModal';
 import Loading from '../loader/Loading';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 export default function ServiceCenterBookingDataTable() {
   const location = useLocation()
+  const param = useParams()
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
@@ -16,8 +17,8 @@ export default function ServiceCenterBookingDataTable() {
   const [serviceCenterBookingInfo, setServiceCenterBookingInfo] = useState([
     {
       id: null,
-      customer_id: "",
-      customer_name: "",
+      client_id: "",
+      client_name: "",
       vehicle_id: "",
       vehicle_name: "",
       services_id: "",
@@ -34,7 +35,7 @@ export default function ServiceCenterBookingDataTable() {
 
   const getBooking = () => {
     setLoading(true)
-    axiosClient.get('/service_center/booking')
+    axiosClient.get(`/service_center/booking/${param.id}`)
     .then(({data}) => {
       setServiceCenterBooking(data)
       setLoading(false)
@@ -42,7 +43,7 @@ export default function ServiceCenterBookingDataTable() {
   }
 
   const columns = [ 
-    { field: "customer_name", title: "Name" },
+    { field: "client_name", title: "Client Name" },
     { field: "service", title: "Service" },
     { field: "service_center", title: "Service Center" },
     { field: "contact_number", title: "Contact Number" },
@@ -66,8 +67,8 @@ export default function ServiceCenterBookingDataTable() {
         setServiceCenterBookingInfo({
           ...serviceCenterBookingInfo,
           id: rowData.id,
-          customer_id: rowData.customer_id,
-          customer_name: rowData.customer_name,
+          client_id: rowData.client_id,
+          client_name: rowData.client_name,
           vehicle_id: rowData.vehicle_id,
           vehicle_name: rowData.vehicle_name,
           services_id: rowData.services_id,

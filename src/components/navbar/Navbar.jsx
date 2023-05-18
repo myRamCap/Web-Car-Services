@@ -148,6 +148,20 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
+            { role == 4 || role == 1 ? 
+                ( 
+                    <li>
+                        <Link className={splitLocation[1] === "promotions" ? "isActive" : ""} to="/promotions">
+                            <i>
+                            <box-icon name='party' color={splitLocation[1] === "promotions" ? 'white' : ''} />
+                            </i>
+                            
+                            <span className="link_name">Promotions</span>
+                        </Link>
+                        <span className="tooltip">Promotions</span>
+                    </li>
+                ) : null
+            }
             { role == 1 || role == 2 || role == 4 ? 
                 ( 
                     <li>

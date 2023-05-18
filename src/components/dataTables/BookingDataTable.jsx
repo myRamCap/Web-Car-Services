@@ -1,49 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 // import BookingsModal from '../../views/modal/BookingsModal';
 import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded';
 import { Button, Popover, Typography } from '@mui/material';
+import axiosClient from '../../axios-client';
+import Loading from '../loader/Loading';
 
  
 
 export default function BookingDataTable() {
   const [showModal, setShowModal] = useState(false)
+  const [loading, setLoading] = useState(true);
   const paginationAlignment = useState("center")
+  const [booking, setBooking] = useState([])
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  // const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleClick = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  // const open = Boolean(anchorEl);
+  // const id = open ? 'simple-popover' : undefined;
+
+  const getBooking = () => {
+    setLoading(true)
+    axiosClient.get('/service_center/booking')
+    .then(({data}) => {
+      setBooking(data)
+      setLoading(false)
+    })
+  }
  
 
   const columns = [
-    { field: "Name", title: "Name" },
-    { field: "Service", title: "Service" },
-    { field: "Service_center", title: "Service Center" },
-    { field: "Contact_Number", title: "Contact Number" },
-    { field: "Status", title: "Status" },
-    { field: "Booking_Date", title: "Booking Date" },
-    { field: "Date_Created", title: "Date Created" },
-
-   ];
-
-   const data = [
-    { Name: "John Walsh", Service: "Oil Change", Service_center: "Ramcap 1 Dealers", Contact_Number: "12346799", Status: "In Process", Booking_Date: "2023-04-03", Date_Created: "2023-04-03" },
-    { Name: "Bob Herm", Service: "New Tires", Service_center: "Ramcap 2 Dealers", Contact_Number: "987654321", Status: "Completed", Booking_Date: "2023-04-05", Date_Created: "2023-04-05" },
-    { Name: "James Houston", Service: "Tire Rotation", Service_center: "Ramcap 3 Dealers", Contact_Number: "5123483545", Status: "Up Coming", Booking_Date: "2023-04-06", Date_Created: "2023-04-06" },
-    { Name: "Joe James", Service: "Auto Detailing", Service_center: "Ramcap 4 Dealers", Contact_Number: "124984234216", Status: "Completed", Booking_Date: "2023-04-04", Date_Created: "2023-04-04" },
-    { Name: "John Walsh", Service: "Window Tinting", Service_center: "Ramcap 5 Dealers", Contact_Number: "92852940273", Status: "Up Coming", Booking_Date: "2023-04-06", Date_Created: "2023-04-06" },
-    { Name: "Bob Herm", Service: "New Car Purchase", Service_center: "Ramcap 6 Dealers", Contact_Number: "2795027536", Status: "Missed", Booking_Date: "2023-04-01", Date_Created: "2023-04-01" },
-    { Name: "James Houston", Service: "Manufacturer Recall", Service_center: "Ramcap 7 Dealers", Contact_Number: "184029653", Status: "Cancelled", Booking_Date: "2023-04-07", Date_Created: "2023-04-07" },
+    { field: "client_name", title: "Client Name" },
+    { field: "service", title: "Service" },
+    { field: "service_center", title: "Service Center" },
+    { field: "contact_number", title: "Contact Number" },
+    { field: "status", title: "Status" },
+    { field: "booking_date", title: "Booking Date" },
+    { field: "created_at", title: "Date Created" },
    ];
 
    const action = [
@@ -58,11 +60,11 @@ export default function BookingDataTable() {
       tooltip: 'Save User',
       onClick: (event) => setShowModal(true)
     },
-    {
-      icon: () => 
-      <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
-      tooltip: 'Note'
-    }
+    // {
+    //   icon: () => 
+    //   <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
+    //   tooltip: 'Note'
+    // }
   ]
 
   const options = {
@@ -88,9 +90,18 @@ export default function BookingDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
+  useEffect(() => {
+    getBooking()
+  }, [])
+
   return (
     <div>
-          <Popover
+          {/* <Popover
         id={id}
         open={open}
         anchorEl={anchorEl}
@@ -101,14 +112,16 @@ export default function BookingDataTable() {
         }}
       >
         <Typography sx={{ p: 2 }}>Sangkap yukung Kape kabang manaya ku!</Typography>
-      </Popover>
+      </Popover> */}
 
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={booking.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       {/* <BookingsModal show={showModal} close={() => setShowModal(false)} id={1}/>  */}
     </div>

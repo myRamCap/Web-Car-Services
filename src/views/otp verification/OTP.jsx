@@ -27,7 +27,7 @@ export default function OTP({route,navigate}) {
     const otp5 = useRef()
     const otp6 = useRef() 
     const MySwal = withReactContent(Swal)
-    const {setUser,setToken,setRole} = useStateContext()
+    const {setUser,setToken,setRole, setUser_ID} = useStateContext()
 
     const onKeyPress = (ev) => {
         if (!/[0-9]/.test(ev.key)) {
@@ -50,6 +50,7 @@ export default function OTP({route,navigate}) {
                     setUser(data.user)
                     setToken(data.token)
                     setRole(data.role)
+                    setUser_ID(data.user_ID)
                 } else {
                     // console.log('login no')
                     setShowModal(true)

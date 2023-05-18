@@ -25,13 +25,14 @@ export default function ServiceCenterBookingsModal(props) {
   const [services, setServices] = useState([])
   const [timeSlot, setTimeSlot] = useState([])
   const [vehicle, setVehicle] = useState([])
+  const [clients, setClients] = useState([])
   const navigate = useNavigate()
   const param = useParams()
   const id = props.Data?.id ?? null
   const [booking, setBooking] = useState({
     id: null,
-    customer_id: "",
-    customer_name: "",
+    client_id: "",
+    client_name: "",
     vehicle_id: "",
     vehicle_name: "",
     services_id: "",
@@ -52,6 +53,14 @@ export default function ServiceCenterBookingsModal(props) {
         setServices(data.data)
       })
   }
+
+  const getClients = () => {
+    axiosClient.get('/client')
+    .then(({data}) => {
+      setClients(data.data)
+    })
+  }
+
   useEffect(() => {
     if (id) {
       const [year, month, day] =  props.Data.booking_date.split('-')
@@ -59,8 +68,8 @@ export default function ServiceCenterBookingsModal(props) {
       setBooking({
         ...booking,
         id: props.Data.id,
-        customer_id: props.Data.customer_id,
-        customer_name: props.Data.customer_name,
+        client_id: props.Data.client_id,
+        client_name: props.Data.client_name,
         vehicle_id: props.Data.vehicle_id,
         vehicle_name: props.Data.vehicle_name,
         services_id: props.Data.services_id,
@@ -79,10 +88,13 @@ export default function ServiceCenterBookingsModal(props) {
   }, [id])
 
   const handleChangeCustomer = (event, newValue) => {
+    setDisabledVehicle(true)
     setBooking({
       ...booking,
-      customer_id: newValue.id,
-      customer_name: newValue.name,
+      client_id: newValue.id,
+      client_name: newValue.fullname,
+      vehicle_name: "",
+      vehicle_id: "",
     })
 
     axiosClient.get(`/service_center/vehicle/${newValue.id}`)
@@ -113,7 +125,6 @@ export default function ServiceCenterBookingsModal(props) {
   }
 
   const handleChangeService = (event, newValue) => {
-    console.log(newValue)
     setBooking({
       ...booking,
       services_id: newValue.service_id,
@@ -131,9 +142,11 @@ export default function ServiceCenterBookingsModal(props) {
     })
   }
   const handleChangeVehicle = (event, newValue) => {
+    console.log(newValue)
     setBooking({
       ...booking,
       vehicle_id: newValue.id,
+      vehicle_name: newValue.vehicle_name,
     })
   }
 
@@ -147,8 +160,8 @@ export default function ServiceCenterBookingsModal(props) {
 
 
 
-  const optionsCustomer = Customer.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
+  const optionsCustomer = clients.map((option) => {
+    const firstLetter = option.fullname[0].toUpperCase();
     return {
       firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
       ...option,
@@ -190,7 +203,6 @@ export default function ServiceCenterBookingsModal(props) {
   const onSubmit = (ev) => {
     ev.preventDefault()
     const payload = { ...booking }
-console.log(payload)
     if (id) {
       axiosClient.put(`/service_center/booking/${id}`, payload)
       .then(({}) => {
@@ -231,12 +243,13 @@ console.log(payload)
   }
   useEffect(() => {
     getServices()
+    getClients()
     if (props.show == false) {
       setBooking({
         ...booking,
         id: null,
-        customer_id: "",
-        customer_name: "",
+        client_id: "",
+        client_name: "",
         vehicle_id: "",
         vehicle_name: "",
         services_id: "",
@@ -277,9 +290,9 @@ console.log(payload)
                     disableClearable
                     options={optionsCustomer.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                     onChange={handleChangeCustomer}
-                    value={booking.customer_name}
-                    getOptionLabel={(options) => options.name ? options.name.toString() : booking.customer_name}
-                    isOptionEqualToValue={(option, value) => option.name ?? "" === booking.customer_name}
+                    value={booking.client_name}
+                    getOptionLabel={(options) => options.fullname ? options.fullname.toString() : booking.client_name}
+                    isOptionEqualToValue={(option, value) => option.fullname ?? "" === booking.client_name}
                     renderInput={(params) => (
                       <TextField
                         {...params}

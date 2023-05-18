@@ -17,10 +17,12 @@ export default function VehicleModal(props) {
   const [image, setImage] = useState('')
   const navigate = useNavigate()
   const [errors, setErrors] = useState(null)
+  const [clients, setClients] = useState([])
   const id = props.Data?.id ?? null
   const [vehicle, setVehicle] = useState({
     id: null,
-    customer_name: "",
+    client_id: "",
+    client_name: "",
     vehicle_name: "",
     chassis_number: "",
     contact_number: "",
@@ -36,7 +38,8 @@ export default function VehicleModal(props) {
       setVehicle({
         ...vehicle,
         id: props.Data.id,
-        customer_name: props.Data.customer_name,
+        client_id: props.Data.client_id,
+        client_name: props.Data.client_name,
         vehicle_name: props.Data.vehicle_name,
         chassis_number: props.Data.chassis_number,
         contact_number: props.Data.contact_number,
@@ -49,8 +52,15 @@ export default function VehicleModal(props) {
     }
   }, [id])
 
-  const optionsCustomer = Customer.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
+  const getClients = () => {
+    axiosClient.get('/client')
+    .then(({data}) => {
+      setClients(data.data)
+    })
+  }
+
+  const optionsCustomer = clients.map((option) => {
+    const firstLetter = option.fullname[0].toUpperCase();
     return {
       firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
       ...option,
@@ -101,7 +111,8 @@ export default function VehicleModal(props) {
   const handleChangeCustomer = (event, newValue) => {
     setVehicle({
       ...vehicle,
-      customer_name: newValue.name,
+      client_id: newValue.id,
+      client_name: newValue.fullname,
     }) 
   }
 
@@ -118,11 +129,14 @@ export default function VehicleModal(props) {
   }
 
   useEffect(() => {
+    getClients()
     if (props.show == false) {
+      getClients()
       setVehicle({
         ...vehicle,
         id: null,
-        customer_name: "",
+        client_id: "",
+        client_name: "",
         vehicle_name: "",
         chassis_number: "",
         contact_number: "",
@@ -156,15 +170,16 @@ export default function VehicleModal(props) {
                 <Col xs={12} md={6}>
                   <Autocomplete
                     disableClearable
-                    value={vehicle.customer_name}
+                    value={ vehicle.client_name}
                     options={optionsCustomer.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    // options={clients}
                     onChange={handleChangeCustomer}
-                    getOptionLabel={(options) => options.name ? options.name.toString() : vehicle.customer_name}
-                    isOptionEqualToValue={(option, value) => option.name ?? "" === vehicle.customer_name}
+                    getOptionLabel={(options) => options.fullname ? options.fullname.toString() : vehicle.client_name}
+                    isOptionEqualToValue={(option, value) => option.fullname ?? "" === vehicle.client_name}
                     renderInput={(params) => (
                         <TextField
                         {...params}
-                        label="Customer Name"
+                        label="Client Name"
                         InputProps={{
                             ...params.InputProps,
                             type: 'search',

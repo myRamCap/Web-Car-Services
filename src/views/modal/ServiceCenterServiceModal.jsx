@@ -20,6 +20,8 @@ export default function ServiceCenterServiceModal(props) {
   const param = useParams()
   const [service, setService] = useState({
     id: null,
+    customer_id: "",
+    customer_name: "",
     service_center_id: param.id,
     service_id: null,
     estimated_time: null,
