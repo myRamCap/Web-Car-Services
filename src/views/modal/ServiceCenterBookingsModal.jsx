@@ -157,9 +157,6 @@ export default function ServiceCenterBookingsModal(props) {
     })
   }
 
-
-
-
   const optionsCustomer = clients.map((option) => {
     const firstLetter = option.fullname[0].toUpperCase();
     return {
@@ -296,7 +293,7 @@ export default function ServiceCenterBookingsModal(props) {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Customer Name"
+                        label="Client Name"
                         InputProps={{
                           ...params.InputProps,
                           type: 'search',
@@ -384,7 +381,6 @@ export default function ServiceCenterBookingsModal(props) {
                       <TextField
                         {...params}
                         label="Vehicle"
-                 
                         InputProps={{
                           ...params.InputProps,
                           type: 'search',

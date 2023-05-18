@@ -54,10 +54,10 @@ export default function ModalOTP(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row> 
                 <Col xs={12} md={12}>
-                  <TextField inputRef={inputPassRef}  type="text"   label="Password" variant="outlined" fullWidth/>
+                  <TextField inputRef={inputPassRef}  type="password"   label="Password" variant="outlined" fullWidth/>
                 </Col>
                 <Col xs={12} md={12} className="mt-3">
-                    <TextField inputRef={inputConfirmPassRef}  type="text"  label="Confirm Password" variant="outlined" fullWidth/>
+                    <TextField inputRef={inputConfirmPassRef}  type="password"  label="Confirm Password" variant="outlined" fullWidth/>
                 </Col>
               </Row>
             </Form.Group>

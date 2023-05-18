@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import ServiceCenterServiceModal from '../../views/modal/ServiceCenterServiceModal';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import axiosClient from '../../axios-client';
 import Loading from '../loader/Loading';
 
@@ -11,6 +11,7 @@ export default function ServiceCenterServicesDataTable(props) {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+  const param = useParams()
   const [serviceCenterServices, setServiceCenterServices] = useState([])
   const [serviceCenterServicesInfo, setServiceCenterServicesInfo] = useState([
     {
@@ -28,7 +29,7 @@ export default function ServiceCenterServicesDataTable(props) {
 
   const getServiceCenterServices = () => {
     setLoading(true)
-    axiosClient.get('/service_center/services')
+    axiosClient.get(`/service_center/services/${param.id}`)
     .then(({data}) => {
       setServiceCenterServices(data)
       setLoading(false)

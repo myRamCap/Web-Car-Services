@@ -72,7 +72,7 @@ const router = createBrowserRouter([
                 element: <Users />
             },
             {
-                path: '/customer',
+                path: '/client',
                 element: <Customers />
             },
             {
@@ -125,10 +125,6 @@ const router = createBrowserRouter([
         path: 'loading',
         element: <Loading />
     },
-    {
-        path: 'client',
-        element: <Sample />
-    }
     
     
 

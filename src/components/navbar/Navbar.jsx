@@ -179,14 +179,14 @@ export default function Navbar() {
             { role == 1 ? 
                 ( 
                     <li>
-                        <Link className={splitLocation[1] === "customer" ? "isActive" : ""} to="/customer">
+                        <Link className={splitLocation[1] === "client" ? "isActive" : ""} to="/client">
                             <i>
-                                <box-icon name='group' color={splitLocation[1] === "customer" ? 'white' : ''} />
+                                <box-icon name='group' color={splitLocation[1] === "client" ? 'white' : ''} />
                             </i>
                             
-                            <span className="link_name">Customer</span>
+                            <span className="link_name">Client</span>
                         </Link>
-                        <span className="tooltip">Customer</span>
+                        <span className="tooltip">Client</span>
                     </li>
                 ) : null
             }

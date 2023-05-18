@@ -3,12 +3,13 @@ import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
 import TimeSlotModal from '../../views/modal/TimeSlotModal';
 import axiosClient from '../../axios-client';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 export default function ServiceCenterTimeSlotDataTable() {
   const location = useLocation()
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(true);
+  const param = useParams()
   const paginationAlignment = useState("center")
   const [serviceCenterTimeSLot, setServiceCenterTimeSLot] = useState([])
   const [serviceCenterTimeSLotInfo, setServiceCenterTimeSLotInfo] = useState([
@@ -22,7 +23,7 @@ export default function ServiceCenterTimeSlotDataTable() {
 
   const getServiceCenterTimeSlot = () => {
     setLoading(true)
-    axiosClient.get('/service_center/timeslot')
+    axiosClient.get(`/service_center/timeslot/${param.id}`)
     .then(({data}) => {
       setServiceCenterTimeSLot(data)
       setLoading(false)

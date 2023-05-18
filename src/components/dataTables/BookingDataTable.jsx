@@ -6,6 +6,7 @@ import ZoomInRoundedIcon from '@mui/icons-material/ZoomInRounded';
 import { Button, Popover, Typography } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Loading from '../loader/Loading';
+import Booking from '../../views/modal/Booking';
 
  
 
@@ -49,17 +50,17 @@ export default function BookingDataTable() {
    ];
 
    const action = [
-    {
-      icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
-      isFreeAction: true,
-      onClick: (event) => setShowModal(true)
-    },
-    {
-      icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
-      onClick: (event) => setShowModal(true)
-    },
+    // {
+    //   icon: () => <div className="btn btn-primary">Add New</div> ,
+    //   tooltip: 'Add User',
+    //   isFreeAction: true,
+    //   onClick: (event) => setShowModal(true)
+    // },
+    // {
+    //   icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
+    //   tooltip: 'Save User',
+    //   onClick: (event) => setShowModal(true)
+    // },
     // {
     //   icon: () => 
     //   <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
@@ -123,7 +124,7 @@ export default function BookingDataTable() {
         isLoading={loading}
         components={components}
       />
-      {/* <BookingsModal show={showModal} close={() => setShowModal(false)} id={1}/>  */}
+      {/* <Booking show={showModal} close={() => setShowModal(false)} id={1}/>  */}
     </div>
   )
 }

@@ -17,78 +17,146 @@ import axiosClient from '../../axios-client';
 
 
 export default function Booking(props) {
+  const [disabledVehicle, setDisabledVehicle] = useState(true)
+  const [disabledTime, setDisabledTime] = useState(true)
   const [services, setServices] = useState([])
   const [timeSlot, setTimeSlot] = useState([])
   const [vehicle, setVehicle] = useState([])
+  const [clients, setClients] = useState([])
+  const [booking, setBooking] = useState({
+    id: null,
+    client_id: "",
+    client_name: "",
+    vehicle_id: "",
+    vehicle_name: "",
+    services_id: "",
+    service: "",
+    estimated_time: "",
+    service_center_id: "",
+    contact_number: null,
+    status: "",
+    booking_date: null,
+    time: "",
+    estimated_time_desc: "",
+    notes: "",
+  })
 
-  const getServices = () => {
-    axiosClient.get('/service_center/services')
+  const getClients = () => {
+    axiosClient.get('/client')
     .then(({data}) => {
-      setServices(data.data)
+      setClients(data.data)
     })
   }
 
-  const getTimeSlot = () => {
-    axiosClient.get('/service_center/timeslot')
-    .then(({data}) => {
-      setTimeSlot(data.data)
-    })
-  }
-
-  // const getVehicle = () => {
-  //   axiosClient.get('/service_center/timeslot')
+  // const getServices = () => {
+  //   axiosClient.get('/service_center/services')
   //   .then(({data}) => {
-  //     setVehicle(data.data)
+  //     setServices(data.data)
   //   })
   // }
 
-  const optionsCustomer = Customer.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
+  // const getTimeSlot = () => {
+  //   axiosClient.get('/service_center/timeslot')
+  //   .then(({data}) => {
+  //     setTimeSlot(data.data)
+  //   })
+  // }
+
+  // // const getVehicle = () => {
+  // //   axiosClient.get('/service_center/timeslot')
+  // //   .then(({data}) => {
+  // //     setVehicle(data.data)
+  // //   })
+  // // }
+
+  const handleChangeClient = async (event, newValue) => {
+    setDisabledVehicle(true)
+    setVehicle([])
+    setBooking({
+      ...booking,
+      client_id: newValue.id,
+      client_name: newValue.fullname,
+      vehicle_name: "",
+      vehicle_id: "",
+    })
+
+    try {
+      const {data} = await axiosClient.get(`/service_center/vehicle/${newValue.id}`)
+      setVehicle(data)
+      setDisabledVehicle(false)
+    } catch (error) {
+
+    }
+  }
+
+  const handleChangeDate = async (event, newValue) => {
+    setDisabledTime(true)
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    const convertedDate = year + '/' + month + '/' + day;
+    setBooking({
+      ...booking,
+      booking_date: convertedDate,
+    })
+
+    try {
+      const {data} = await axiosClient.get(`/service_center/timeslot/${param.id}/${convertedDate}`)
+      setTimeSlot(data.data)
+      setDisabledTime(false)
+    } catch (error) {
+
+    }
+  }
+
+  const handleChangeVehicle = (event, newValue) => {
+    setBooking({
+      ...booking,
+      vehicle_id: newValue.id,
+      vehicle_name: newValue.vehicle_name,
+    })
+  }
+
+  const optionsClient = clients.map((option) => {
+    const firstLetter = option.fullname[0].toUpperCase();
     return {
       firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
       ...option,
     };
   })
 
-  const optionsServices = services.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
+  // const optionsServices = services.map((option) => {
+  //   const firstLetter = option.name[0].toUpperCase();
+  //   return {
+  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+  //     ...option,
+  //   };
+  // })
 
-  const optionsVehicles = Vehicles.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
+  // const optionsStatus = Status.RECORDS.map((option) => {
+  //   const firstLetter = option.name[0].toUpperCase();
+  //   return {
+  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+  //     ...option,
+  //   };
+  // }) 
 
-  const optionsStatus = Status.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
+  // const optionsSC = SC.RECORDS.map((option) => {
+  //   const firstLetter = option.name[0].toUpperCase();
+  //   return {
+  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+  //     ...option,
+  //   };
+  // })
 
-  const optionsSC = SC.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
-
-  const optionsTime = timeSlot.map((option) => {
-    const firstLetter = option.time[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
+  // const optionsTime = timeSlot.map((option) => {
+  //   const firstLetter = option.time[0].toUpperCase();
+  //   return {
+  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+  //     ...option,
+  //   };
+  // })
 
   const onSubmit = (ev) => {
     alert('randy')
@@ -96,8 +164,9 @@ export default function Booking(props) {
   }
 
   useEffect(() => {
-    getServices()
-    getTimeSlot()
+    // getServices()
+    // getTimeSlot()
+    getClients()
   }, [])
 
   return (
@@ -112,32 +181,35 @@ export default function Booking(props) {
               <Row>
                 <Col xs={12} md={6}>
                   <Autocomplete
-                      id="customerName"
-                      disableClearable
-                      options={optionsCustomer.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                      // onChange={handleChangeProvince}
-                      getOptionLabel={(options) => options.name }  
-                      isOptionEqualToValue={(option, value) => option.name === value.name}
-                      renderInput={(params) => (
-                          <TextField
-                          {...params}
-                          label="Customer Name"
-                          InputProps={{
-                              ...params.InputProps,
-                              type: 'search',
-                          }}
-                          />
-                      )}
-                    />
+                    id="customerName"
+                    disableClearable
+                    options={optionsClient.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    onChange={handleChangeClient}
+                    value={booking.client_name}
+                    getOptionLabel={(options) => options.fullname ? options.fullname.toString() : booking.client_name}
+                    isOptionEqualToValue={(option, value) => option.fullname ?? "" === booking.client_name}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Client Name"
+                        InputProps={{
+                          ...params.InputProps,
+                          type: 'search',
+                        }}
+                      />
+                    )}
+                  />
                 </Col>
 
                 <Col xs={12} md={6}> 
                   <LocalizationProvider dateAdapter={AdapterDayjs} >
                     <DatePicker 
-                      disablePast 
-                      className='datePicker'
+                      disablePast
+                      value={booking.booking_date ? dayjs(booking.booking_date) : null}
+                      className='datePicker' 
                       label="Date"
-                      renderInput={(params) => <TextField {...params} fullWidth />} 
+                      onChange={handleChangeDate}
+                      renderInput={(params) => <TextField {...params} fullWidth />}
                     />
                   </LocalizationProvider>
                 </Col>
@@ -146,32 +218,35 @@ export default function Booking(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <Autocomplete
+                  {/* <Autocomplete
                     id="service"
                     disableClearable
+                    // onChange={handleChangeService}
+                    // value={booking.service}
                     options={optionsServices.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.name }  
-                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                    getOptionLabel={(options) => options.name ? options.name+' - '+options.estimated_time_desc : booking.service+' - '+booking.estimated_time_desc}
+                    isOptionEqualToValue={(option, value) => option.name ?? "" === booking.service}
                     renderInput={(params) => (
-                        <TextField
+                      <TextField
                         {...params}
                         label="Service"
                         InputProps={{
-                            ...params.InputProps,
-                            type: 'search',
+                          ...params.InputProps,
+                          type: 'search',
                         }}
-                        />
+                      />
                     )}
-                  />
+                  /> */}
                 </Col>
 
                 <Col xs={12} md={6}> 
                   <Autocomplete
                     id="time"
                     disableClearable
-                    options={optionsTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.time }  
-                    isOptionEqualToValue={(option, value) => option.time === value.time}
+                    disabled={disabledTime}
+                    // options={optionsTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    // getOptionLabel={(options) => options.time }  
+                    // isOptionEqualToValue={(option, value) => option.time === value.time}
                     renderInput={(params) => (
                         <TextField
                         {...params}
@@ -192,9 +267,12 @@ export default function Booking(props) {
                   <Autocomplete
                     id="vehicle"
                     disableClearable
-                    options={optionsVehicles.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.name }  
-                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                    disabled={disabledVehicle}
+                    value={booking.vehicle_name}
+                    onChange={handleChangeVehicle}
+                    options={vehicle.data || []}
+                    getOptionLabel={(options) => options.vehicle_name ? options.vehicle_name.toString() : booking.vehicle_name} 
+                    isOptionEqualToValue={(option, value) => option.vehicle_name ?? null === booking.vehicle_name}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -209,7 +287,7 @@ export default function Booking(props) {
                 </Col>
 
                 <Col xs={12} md={6}> 
-                  <Autocomplete
+                  {/* <Autocomplete
                     id="status"
                     disableClearable
                     options={optionsStatus.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -225,11 +303,11 @@ export default function Booking(props) {
                         }}
                       />
                     )}
-                  />
+                  /> */}
                 </Col>
               </Row>
             </Form.Group>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            {/* <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
                   <Autocomplete
@@ -261,7 +339,7 @@ export default function Booking(props) {
                   <Button variant="success"  type="submit">Save Changes</Button>
                 </Col>
               </Row>
-            </Form.Group>
+            </Form.Group> */}
           </Form>
             </Modal.Body>
         </Modal>

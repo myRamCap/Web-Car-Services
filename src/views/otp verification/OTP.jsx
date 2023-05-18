@@ -115,7 +115,7 @@ export default function OTP({route,navigate}) {
         let timerId;
 
         if (runTimer) {
-            setCountDown(5 * 1);
+            setCountDown(60 * 3);
             timerId = setInterval(() => {
                 setCountDown((countDown) => countDown - 1);
             }, 1000);
@@ -140,7 +140,7 @@ export default function OTP({route,navigate}) {
             axiosClient.post('/expiredotp', otpEmail)
             .then(({data}) => {
                 // Navigate('/dashboard')   
-                console.log(data)
+                // console.log(data)
             })
           }
     }, [countDown, runTimer])

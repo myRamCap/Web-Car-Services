@@ -1,16 +1,27 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import SC from '../../data/JSON/dummy/refSC.json'
 import CorporateAccount from '../../data/JSON/dummy/refCorporateAccount.json'
 import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField } from '@mui/material';
+import axiosClient from '../../axios-client';
 
 export default function NotificationModal(props) {
   const [selected, setSelected] = useState('');
+  const [corporate, setCorporate] = useState([])
   const [image, setImage] = useState('')
+
+  const getCorporate = async () => {
+    try {
+      const {data} = await axiosClient.get('/corporate_account')
+      setCorporate(data)
+    } catch (error) {
+
+    }
+  }
 
   const handleCheckboxChange = (event) => {
     setSelected(event.target.value);
@@ -24,8 +35,8 @@ export default function NotificationModal(props) {
     };
   })
 
-  const optionsCorporateAccount = CorporateAccount.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
+  const optionsCorporateAccount = corporate.map((option) => {
+    const firstLetter = option.first_name[0].toUpperCase();
     return {
       firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
       ...option,
@@ -33,12 +44,12 @@ export default function NotificationModal(props) {
   })
 
   const onSubmit = (ev) => {
-      alert('randy')
       ev.preventDefault()
-
-      console.log(product)
   }
 
+  useEffect(() => {
+    getCorporate()
+  },[])
 
 
   return (
@@ -81,8 +92,8 @@ export default function NotificationModal(props) {
                     id="corporate-account-autocomplete"
                     options={optionsCorporateAccount}
                     disabled={selected === 'service_center'} // disable when Corporate Account is checked
-                    getOptionLabel={(options) => options.name }
-                      isOptionEqualToValue={(option, value) => option.name === value.name}
+                    getOptionLabel={(options) => options.first_name+' '+options.last_name }
+                      isOptionEqualToValue={(option, value) => option.first_name+' '+option.last_name === value.first_name+' '+value.last_name}
                       renderInput={(params) => (
                         <TextField
                           {...params}
