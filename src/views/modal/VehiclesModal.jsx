@@ -131,7 +131,6 @@ export default function VehicleModal(props) {
   useEffect(() => {
     getClients()
     if (props.show == false) {
-      getClients()
       setVehicle({
         ...vehicle,
         id: null,

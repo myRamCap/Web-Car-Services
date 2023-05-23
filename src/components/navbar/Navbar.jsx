@@ -137,9 +137,9 @@ export default function Navbar() {
             { role == 4 || role == 1 ? 
                 ( 
                     <li>
-                        <Link className={splitLocation[1] === "notification" ? "isActive" : ""} to="/notification">
+                        <Link className={splitLocation[1] === "notifications" ? "isActive" : ""} to="/notifications">
                             <i>
-                                <box-icon name='notification' color={splitLocation[1] === "notification" ? 'white' : ''} />
+                                <box-icon name='notification' color={splitLocation[1] === "notifications" ? 'white' : ''} />
                             </i>
                             
                             <span className="link_name">Notifications</span>

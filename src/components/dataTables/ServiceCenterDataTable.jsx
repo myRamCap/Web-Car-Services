@@ -25,6 +25,7 @@ export default function ServiceCenterDataTable(props) {
       province: "",
       longitude: "",
       latitude: "",
+      facility: "",
       branch_manager_id: "",
       image: "",
     }
@@ -75,6 +76,7 @@ export default function ServiceCenterDataTable(props) {
           province: rowData.province,
           longitude: rowData.longitude,
           latitude: rowData.latitude,
+          facility: rowData.facility,
           branch_manager_id: rowData.branch_manager_id,
           image: rowData.image,
         })

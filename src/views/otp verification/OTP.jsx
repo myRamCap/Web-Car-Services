@@ -156,7 +156,6 @@ export default function OTP({route,navigate}) {
                 <span className="title">Email Verification</span>
                 <p className="description">Please enter the code we have sent you.</p>
             </div>
-      {location.state.email ?? 'nothing'}
             <div className="inputs">
                 <input ref={otp1} placeholder="" type="text" maxLength="1" onKeyPress={onKeyPress} />
                 <input ref={otp2} placeholder="" type="tel" maxLength="1" onKeyPress={onKeyPress} />

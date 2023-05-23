@@ -4,15 +4,10 @@ import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { Autocomplete, FormControlLabel, Input, Radio, RadioGroup, TextField } from '@mui/material';
+import { Autocomplete,  TextField } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import Customer from '../../data/JSON/dummy/refCustomer.json'
-import Services from '../../data/JSON/dummy/refServices.json'
-import Vehicles from '../../data/JSON/dummy/refVehicles.json'
 import Status from '../../data/JSON/dummy/refStatus.json'
-import SC from '../../data/JSON/dummy/refSC.json'
-import Time from '../../data/JSON/dummy/refTime.json'
 import axiosClient from '../../axios-client';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'
@@ -181,14 +176,6 @@ export default function ServiceCenterBookingsModal(props) {
     };
   })
 
-  const optionsSC = SC.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
-
   const optionsTime = timeSlot.map((option) => {
     const firstLetter = option.time[0].toUpperCase();
     return {
@@ -235,9 +222,8 @@ export default function ServiceCenterBookingsModal(props) {
         }
       }) 
     }
-
-    
   }
+
   useEffect(() => {
     getServices()
     getClients()
@@ -340,7 +326,6 @@ export default function ServiceCenterBookingsModal(props) {
                     )}
                   />
                 </Col>
-
                 <Col xs={12} md={6}>
                   <Autocomplete
                     id="time"
@@ -389,7 +374,6 @@ export default function ServiceCenterBookingsModal(props) {
                     )}
                   />
                 </Col>
-
                 <Col xs={12} md={6}>
                   <Autocomplete
                     id="status"

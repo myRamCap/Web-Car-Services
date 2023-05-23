@@ -160,7 +160,6 @@ export default function ServicesModal(props) {
                             component="img"
                             height="250"
                             alt={"alt"}
-                            title={"titleasdasdsada"}
                             sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>
                     </Card>
             

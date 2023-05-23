@@ -40,6 +40,7 @@ export default function ServiceCenterModal(props) {
     province: "",
     longitude: "",
     latitude: "",
+    facility: "",
     branch_manager_id: "",
     image: "",
   }) 
@@ -58,6 +59,7 @@ export default function ServiceCenterModal(props) {
         province: props.Data.province,
         longitude: props.Data.longitude,
         latitude: props.Data.latitude,
+        facility: props.Data.facility,
         branch_manager_id: props.Data.branch_manager_id,
         image: props.Data.image,
       })
@@ -216,6 +218,7 @@ export default function ServiceCenterModal(props) {
         province: "",
         longitude: "",
         latitude: "",
+        facility: "",
         branch_manager_id: "",
         image: "",
       })
@@ -262,8 +265,8 @@ export default function ServiceCenterModal(props) {
                     onChange={onRadioChange}
                     value={serviceCenter.category ?? null}
                   >
-                    <FormControlLabel value="delearship" control={<Radio />} label="DEALERSHIP"/>
-                    <FormControlLabel value="nondelearship" control={<Radio />} label="NON-DEALERSHIP"/>
+                    <FormControlLabel value="dealership" control={<Radio />} label="DEALERSHIP"/>
+                    <FormControlLabel value="nondealership" control={<Radio />} label="NON-DEALERSHIP"/>
                   </RadioGroup>
                 </Col>
               </Row>
@@ -372,7 +375,7 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" value={serviceCenter.branch_manager_id}  onChange={ev => setServiceCenter({...serviceCenter, branch_manager_id: ev.target.value})}  id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
+                  <TextField type="text" value={serviceCenter.facility}  onChange={ev => setServiceCenter({...serviceCenter, facility: ev.target.value})}  id="branchManager" label="Facility" variant="outlined" fullWidth/>
                 </Col>
                 <Col xs={12} md={5}> 
                     <input accept=".jpg, .jpeg, .png" onChange={onImageChoose} className="fileUpload" name="arquivo" id="arquivo" type="file" />
@@ -386,6 +389,13 @@ export default function ServiceCenterModal(props) {
                             sx={{  objectFit: "contain" }}
                             />
                     </Card>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row>
+                <Col xs={12} md={6}>
+                  <TextField type="text" value={serviceCenter.branch_manager_id}  onChange={ev => setServiceCenter({...serviceCenter, branch_manager_id: ev.target.value})}  id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
                 </Col>
               </Row>
             </Form.Group>

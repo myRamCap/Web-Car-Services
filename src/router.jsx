@@ -1,33 +1,24 @@
 import {createBrowserRouter, Navigate} from "react-router-dom"
 import DefaultLayout from "./components/DefaultLayout"
-import Loader from "./components/loader/Loader"
 import ChangePassword from "./views/authentication/ChangePassword"
 import Login from "./views/authentication/Login"
 import Dashboard from "./views/pages/Dashboard"
 import OTP from "./views/otp verification/OTP"
 import Workout from "./views/pages/Services"
-import DataFake from "./components/DataFake"
-import DataTable from "./components/dataTables/ServicesDataTable"
 import Vehicles from "./views/pages/Vehicles"
 import ServiceCenter from "./views/pages/ServiceCenter"
 import Bookings from "./views/pages/Bookings"
-import Notification from "./views/pages/Notification"
 import Promotions from "./views/pages/Promotions"
 import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
 import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
-import GoogleMaps from "./components/googleMap/GoogleMaps"
 import SelectLoc from "./components/googleMap/SelectLoc"
 import ModalOTP from "./views/otp verification/ModalOTP" 
-import Spinner from "./components/loader/Spinner"
 import Loader2 from "./components/loader/Loader2"
-import OTP2 from "./views/otp verification/OTP2"
 import GuestLayout from "./components/GuestLayout"
 import NotFound from "./views/NotFound"
-import LineGraph from "./views/graph/LineGraph"
-import Loading from "./components/loader/Loading"
-import Sample from "./views/Sample"
+import Notification from "./views/pages/Notification"
 
 const router = createBrowserRouter([
     {
@@ -60,7 +51,7 @@ const router = createBrowserRouter([
                 element: <Bookings />
             },
             {
-                path: '/notification',
+                path: '/notifications',
                 element: <Notification />
             },
             {
@@ -121,10 +112,10 @@ const router = createBrowserRouter([
         path: '*',
         element: <NotFound />
     },
-    {
-        path: 'loading',
-        element: <Loading />
-    },
+    // {
+    //     path: 'loading',
+    //     element: <Loading />
+    // },
     
     
 

@@ -133,7 +133,15 @@ export default function ServicesLogoModal(props) {
                     <TextField type="text" value={servicesLogo.description} onChange={ev => setServicesLogo({...servicesLogo, description: ev.target.value})} id="description" label="Description" variant="outlined" fullWidth/>
                     </Col>
                     <Col xs={12} md={12} className="mt-5">
-                      <input accept=".jpg, .jpeg, .png" title=" " className="fileUpload" name="logo" id="logo" type="file" onChange={onImageChoose} />
+                      <input 
+                        accept=".jpg, .jpeg, .png" 
+                        title=" " 
+                        className="fileUpload" 
+                        name="logo" 
+                        id="logo" 
+                        type="file" 
+                        onChange={onImageChoose} 
+                      />
                     </Col>
                 </Col>
                 <Col xs={12} md={6}> 

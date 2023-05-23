@@ -715,3 +715,8 @@ tbody tr:hover {
 .sc-image {
   cursor: pointer;
 }
+
+
+.MuiDateRangeCalendar-root > div:first-child {
+  display: none;
+}
