@@ -14,11 +14,18 @@ import Status from '../../data/JSON/dummy/refStatus.json'
 import SC from '../../data/JSON/dummy/refSC.json'
 import Time from '../../data/JSON/dummy/refTime.json'
 import axiosClient from '../../axios-client';
+import dayjs from 'dayjs';
+import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Booking(props) {
+  const [errors, setErrors] = useState(null)
   const [disabledVehicle, setDisabledVehicle] = useState(true)
   const [disabledTime, setDisabledTime] = useState(true)
+  const id = props.Data?.id ?? null
+  const navigate = useNavigate()
+  const [modalVisible, setModalVisible] = useState(props.show); 
   const [services, setServices] = useState([])
   const [timeSlot, setTimeSlot] = useState([])
   const [vehicle, setVehicle] = useState([])
@@ -33,6 +40,7 @@ export default function Booking(props) {
     service: "",
     estimated_time: "",
     service_center_id: "",
+    service_center: "",
     contact_number: null,
     status: "",
     booking_date: null,
@@ -41,6 +49,35 @@ export default function Booking(props) {
     notes: "",
   })
 
+  useEffect(() => {
+    if (id) {
+      const [year, month, day] =  props.Data.booking_date.split('-')
+      const date = `${year}/${month}/${day}` 
+      setBooking({
+        ...booking,
+        id: props.Data.id,
+        client_id: props.Data.client_id,
+        client_name: props.Data.client_name,
+        vehicle_id: props.Data.vehicle_id,
+        vehicle_name: props.Data.vehicle_name,
+        services_id: props.Data.services_id,
+        service: props.Data.service,
+        service_center_id: props.Data.service_center_id,
+        service_center: props.Data.service_center,
+        estimated_time: props.Data.estimated_time,
+        contact_number: props.Data.contact_number,
+        status: props.Data.status,
+        booking_date: date,
+        time: props.Data.time,
+        estimated_time_desc: props.Data.estimated_time_desc,
+        notes: props.Data.notes,
+      })
+      setDisabledTime(false)
+      setDisabledVehicle(false)
+      
+    }
+  }, [id])
+
   const getClients = () => {
     axiosClient.get('/client')
     .then(({data}) => {
@@ -48,26 +85,23 @@ export default function Booking(props) {
     })
   }
 
-  // const getServices = () => {
-  //   axiosClient.get('/service_center/services')
-  //   .then(({data}) => {
-  //     setServices(data.data)
-  //   })
-  // }
+  const getServices = () => {
+    axiosClient.get(`/bookings/service_center/services/${props.userID}`)
+    .then(({data}) => {
+      setServices(data.data)
+    })
+  }
 
-  // const getTimeSlot = () => {
-  //   axiosClient.get('/service_center/timeslot')
-  //   .then(({data}) => {
-  //     setTimeSlot(data.data)
-  //   })
-  // }
-
-  // // const getVehicle = () => {
-  // //   axiosClient.get('/service_center/timeslot')
-  // //   .then(({data}) => {
-  // //     setVehicle(data.data)
-  // //   })
-  // // }
+  const service_center = () => {
+    axiosClient.get(`/bookings/service_center/${props.userID}`)
+    .then(({data}) => {
+      setBooking({
+        ...booking,
+        service_center_id: data.data[0]['id'],
+        service_center: data.data[0]['name'],
+      })
+    })
+  }
 
   const handleChangeClient = async (event, newValue) => {
     setDisabledVehicle(true)
@@ -89,7 +123,7 @@ export default function Booking(props) {
     }
   }
 
-  const handleChangeDate = async (event, newValue) => {
+  const handleChangeDate = (date) => {
     setDisabledTime(true)
     const d = new Date(date);
     const year = d.getFullYear();
@@ -101,13 +135,30 @@ export default function Booking(props) {
       booking_date: convertedDate,
     })
 
-    try {
-      const {data} = await axiosClient.get(`/service_center/timeslot/${param.id}/${convertedDate}`)
+    axiosClient.get(`/bookings/${props.userID}/${convertedDate}`)
+    .then(({ data }) => {
       setTimeSlot(data.data)
       setDisabledTime(false)
-    } catch (error) {
+    })
 
-    }
+  }
+
+  const handleChangeService = (event, newValue) => {
+    setBooking({
+      ...booking,
+      services_id: newValue.service_id,
+      service: newValue.name,
+      estimated_time: newValue.estimated_time,
+      estimated_time_desc: newValue.estimated_time_desc,
+    })
+  }
+
+  const handleChangeTime = (event, newValue) => {
+    
+    setBooking({
+      ...booking,
+      time: newValue.time,
+    })
   }
 
   const handleChangeVehicle = (event, newValue) => {
@@ -115,6 +166,13 @@ export default function Booking(props) {
       ...booking,
       vehicle_id: newValue.id,
       vehicle_name: newValue.vehicle_name,
+    })
+  }
+
+  const handleChangeStatus = (event, newValue) => {
+    setBooking({
+      ...booking,
+      status: newValue.name,
     })
   }
 
@@ -126,48 +184,88 @@ export default function Booking(props) {
     };
   })
 
-  // const optionsServices = services.map((option) => {
-  //   const firstLetter = option.name[0].toUpperCase();
-  //   return {
-  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-  //     ...option,
-  //   };
-  // })
+  const optionsServices = services.map((option) => {
+    const firstLetter = option.name[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  })
 
-  // const optionsStatus = Status.RECORDS.map((option) => {
-  //   const firstLetter = option.name[0].toUpperCase();
-  //   return {
-  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-  //     ...option,
-  //   };
-  // }) 
+  const optionsStatus = Status.RECORDS.map((option) => {
+    const firstLetter = option.name[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  }) 
 
-  // const optionsSC = SC.RECORDS.map((option) => {
-  //   const firstLetter = option.name[0].toUpperCase();
-  //   return {
-  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-  //     ...option,
-  //   };
-  // })
+  const optionsTime = timeSlot.map((option) => {
+    const firstLetter = option.time[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  })
 
-  // const optionsTime = timeSlot.map((option) => {
-  //   const firstLetter = option.time[0].toUpperCase();
-  //   return {
-  //     firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-  //     ...option,
-  //   };
-  // })
-
-  const onSubmit = (ev) => {
-    alert('randy')
+  const onSubmit = async (ev) => {
     ev.preventDefault()
+    const payload = { ...booking }
+    
+    try {
+      const response = id
+      ? await axiosClient.put(`/booking/${id}`, payload)
+      : await axiosClient.post('/booking', payload);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: id
+          ? 'Your data has been successfully updated!'
+          : 'Your data has been successfully saved!',
+      }).then(() => {
+        navigate('/bookings', { state: 'success' });
+      });
+      
+    } catch (error) {
+      const response = error.response;
+      if (response && response.status === 422) {
+        setErrors(response.data.errors);
+      }
+    }
   }
 
   useEffect(() => {
-    // getServices()
-    // getTimeSlot()
+    getServices()
+    service_center()
     getClients()
   }, [])
+
+  useEffect(() => {
+    if (props.show == false) {
+      setBooking({
+        ...booking,
+        id: null,
+        client_id: "",
+        client_name: "",
+        vehicle_id: "",
+        vehicle_name: "",
+        services_id: "",
+        service: "",
+        estimated_time: "",
+        service_center_id: "",
+        service_center: "",
+        contact_number: null,
+        status: "",
+        booking_date: null,
+        time: "",
+        estimated_time_desc: "",
+        notes: "",
+      })
+      setErrors(null)
+    }
+  },[props.show])
+  
 
   return (
     <div id="servicesModal">
@@ -176,6 +274,13 @@ export default function Booking(props) {
             <Modal.Title>Create Booking</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
+            {errors && 
+              <div className="sevices_logo_errors">
+                {Object.keys(errors).map(key => (
+                  <p key={key}>{errors[key][0]}</p>
+                ))}
+              </div>
+            }
             <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
@@ -209,7 +314,6 @@ export default function Booking(props) {
                       className='datePicker' 
                       label="Date"
                       onChange={handleChangeDate}
-                      renderInput={(params) => <TextField {...params} fullWidth />}
                     />
                   </LocalizationProvider>
                 </Col>
@@ -218,11 +322,11 @@ export default function Booking(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  {/* <Autocomplete
+                  <Autocomplete
                     id="service"
                     disableClearable
-                    // onChange={handleChangeService}
-                    // value={booking.service}
+                    onChange={handleChangeService}
+                    value={booking.service}
                     options={optionsServices.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
                     getOptionLabel={(options) => options.name ? options.name+' - '+options.estimated_time_desc : booking.service+' - '+booking.estimated_time_desc}
                     isOptionEqualToValue={(option, value) => option.name ?? "" === booking.service}
@@ -236,7 +340,7 @@ export default function Booking(props) {
                         }}
                       />
                     )}
-                  /> */}
+                  />
                 </Col>
 
                 <Col xs={12} md={6}> 
@@ -244,18 +348,20 @@ export default function Booking(props) {
                     id="time"
                     disableClearable
                     disabled={disabledTime}
-                    // options={optionsTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    // getOptionLabel={(options) => options.time }  
-                    // isOptionEqualToValue={(option, value) => option.time === value.time}
+                    onChange={handleChangeTime}
+                    value={booking.time}
+                    options={optionsTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                    getOptionLabel={(options) => options.time ? options.time.toString() : booking.time}
+                    isOptionEqualToValue={(option, value) => option.time ?? "" === booking.time}
                     renderInput={(params) => (
-                        <TextField
+                      <TextField
                         {...params}
                         label="Time"
                         InputProps={{
-                            ...params.InputProps,
-                            type: 'search',
+                          ...params.InputProps,
+                          type: 'search',
                         }}
-                        />
+                      />
                     )}
                   />
                 </Col>
@@ -287,12 +393,14 @@ export default function Booking(props) {
                 </Col>
 
                 <Col xs={12} md={6}> 
-                  {/* <Autocomplete
+                  <Autocomplete
                     id="status"
                     disableClearable
+                    onChange={handleChangeStatus}
                     options={optionsStatus.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.name}
-                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                    value={booking.status}
+                    getOptionLabel={(options) => options.name ? options.name.toString() : booking.status}
+                    isOptionEqualToValue={(option, value) => option.name ?? "" === booking.status}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -303,33 +411,17 @@ export default function Booking(props) {
                         }}
                       />
                     )}
-                  /> */}
+                  />
                 </Col>
               </Row>
             </Form.Group>
-            {/* <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
-                <Col xs={12} md={6}>
-                  <Autocomplete
-                    id="service_center"
-                    disableClearable
-                    options={optionsSC.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    getOptionLabel={(options) => options.name}
-                    isOptionEqualToValue={(option, value) => option.name === value.name}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Service Center"
-                        InputProps={{
-                          ...params.InputProps,
-                          type: 'search',
-                        }}
-                      />
-                    )}
-                  />
+              <Col xs={12} md={6}>
+                  <TextField value={booking.service_center} disabled type="text" id="service_center" label="Service Center" variant="outlined" fullWidth />
                 </Col>
-                <Col xs={12} md={6}> 
-                  <TextField type="text" id="notes" label="Notes.." variant="outlined" fullWidth/>
+                <Col xs={12} md={6}>
+                  <TextField type="text" value={booking.notes} onChange={ev => setBooking({...booking, notes: ev.target.value})} id="notes" label="Notes.." variant="outlined" fullWidth />
                 </Col>
               </Row>
             </Form.Group>
@@ -339,7 +431,7 @@ export default function Booking(props) {
                   <Button variant="success"  type="submit">Save Changes</Button>
                 </Col>
               </Row>
-            </Form.Group> */}
+            </Form.Group>
           </Form>
             </Modal.Body>
         </Modal>

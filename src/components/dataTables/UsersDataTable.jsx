@@ -19,10 +19,16 @@ export default function UsersDataTable() {
       id: null,
       first_name: "",
       last_name: "",
+      fullname: "",
       email: "",
       contact_number: "",
       role_id: "",
       role_name: "",
+      service_center_id: "",
+      service_center: "",
+      branch_manager: "",
+      allowed_sc: "",
+      allowed_bm: "",
     }
   ])
 
@@ -49,15 +55,21 @@ export default function UsersDataTable() {
     setShowModal(true);
   };
   
-  const handleEditUser = (rowData) => {
+  const handleEditUser = (event,rowData) => {
     setUserInfo({
       id: rowData.id,
       first_name: rowData.first_name,
       last_name: rowData.last_name,
+      fullname: rowData.fullname,
       email: rowData.email,
       contact_number: rowData.contact_number,
       role_id: rowData.role_id,
       role_name: rowData.role_name,
+      service_center_id: rowData.service_center_id,
+      service_center: rowData.service_center,
+      branch_manager: rowData.branch_manager,
+      allowed_sc: rowData.allowed_sc,
+      allowed_bm: rowData.allowed_bm,
     });
     setShowModal(true);
   };
@@ -112,8 +124,9 @@ export default function UsersDataTable() {
   useEffect(() => {
     getUsers()
     if (location.state == 'success'){
-      getUsers()
       setShowModal(false)
+      setUserInfo([])
+      getUsers()
       location.state = null
     }
   }, [location.state])
@@ -129,7 +142,7 @@ export default function UsersDataTable() {
         isLoading={loading}
         components={components}
       />
-      <UserModal show={showModal} close={handleModalClose} Data={userInfo} />
+      <UserModal show={showModal} close={handleModalClose} Data={userInfo} userID={user_ID} userRole={role}/>
     </div>
   )
 }

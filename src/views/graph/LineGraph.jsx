@@ -53,30 +53,37 @@ export const data = {
       backgroundColor: 'violet',
     },
     {
-        label: 'Dataset 3',
-        data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-        borderColor: 'green',
-        backgroundColor: 'green',
-      },
-      {
-        label: 'Dataset 4',
-        data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-        borderColor: 'red',
-        backgroundColor: 'red',
-      },
-      {
-        label: 'Dataset 5',
-        data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-        borderColor: 'blue',
-        backgroundColor: 'blue',
-      },
+      label: 'Dataset 3',
+      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+      borderColor: 'green',
+      backgroundColor: 'green',
+    },
+    {
+      label: 'Dataset 4',
+      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+      borderColor: 'red',
+      backgroundColor: 'red',
+    },
+    {
+      label: 'Dataset 5',
+      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+      borderColor: 'blue',
+      backgroundColor: 'blue',
+    },
   ],
 };
 
 export default function LineGraph() {
   return (
     <div>
+              <select name="cars" id="cars">
+  <option value="volvo">Volvo</option>
+  <option value="saab">Saab</option>
+  <option value="mercedes">Mercedes</option>
+  <option value="audi">Audi</option>
+</select>
         <Line options={options} data={data} />
+
     </div>
   )
 }

@@ -26,10 +26,13 @@ body {
     height: 100%;
     box-shadow: 5px 0 30px rgba(0,0,0,0.1);
     transition: all .5s ease;
+    
 }
 
 .sidebar.active {
-    width: 240px;
+    width: 255px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .sidebar .logo_content .logo {
@@ -68,7 +71,7 @@ body {
 }
 
 .sidebar.active #btn {
-    left: 85%;
+    left: 90%;
 }
 
  

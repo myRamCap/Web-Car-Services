@@ -6,8 +6,10 @@ import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../../axios-client';
 import Loading from '../loader/Loading';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function ServiceCenterDataTable(props) {
+  const {user_ID, role} = useStateContext()
   const location = useLocation()
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
@@ -26,14 +28,13 @@ export default function ServiceCenterDataTable(props) {
       longitude: "",
       latitude: "",
       facility: "",
-      branch_manager_id: "",
       image: "",
     }
   ])
 
   const getServiceCenter = () => {
     setLoading(true)
-    axiosClient.get('/servicecenter')
+    axiosClient.get(`/servicecenter/${user_ID}`)
       .then(({data}) => {
         setServiceCenter(data)
         setLoading(false)
@@ -49,16 +50,18 @@ export default function ServiceCenterDataTable(props) {
     { field: "created_at", title: "Date Created" },
    ];
 
-   const action = [
+   const action = role == '1' || role == '2' ? [
     {
-      icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
-      isFreeAction: true,
-      onClick: ((event) => {
-        setShowModal(true)
-        localStorage.removeItem('lati')
-        localStorage.removeItem('longi')
-      })
+       
+        icon: () => <div className="btn btn-primary">Add New</div> ,
+        tooltip: 'Add User',
+        isFreeAction: true,
+        onClick: ((event) => {
+          setShowModal(true)
+          localStorage.removeItem('lati')
+          localStorage.removeItem('longi')
+        })
+       
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
@@ -77,13 +80,12 @@ export default function ServiceCenterDataTable(props) {
           longitude: rowData.longitude,
           latitude: rowData.latitude,
           facility: rowData.facility,
-          branch_manager_id: rowData.branch_manager_id,
           image: rowData.image,
         })
         setShowModal(true)
       }
     }
-  ]
+  ] : []
 
   const options = {
     paginationAlignment,
@@ -117,6 +119,7 @@ export default function ServiceCenterDataTable(props) {
     getServiceCenter()
     if (location.state == 'success'){
       getServiceCenter()
+      setServiceCenterInfo([])
       setShowModal(false)
       location.state = null
     }

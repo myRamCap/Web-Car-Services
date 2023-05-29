@@ -14,8 +14,10 @@ import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
 import ImageModal from './ImageModal';
 import NoImage from '../../assets/images/No-Image.png';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function ServiceCenterModal(props) {
+  const {user_ID} = useStateContext()
   const location = useLocation()
   const navigate = useNavigate()
   const [errors, setErrors] = useState(null)
@@ -41,10 +43,10 @@ export default function ServiceCenterModal(props) {
     longitude: "",
     latitude: "",
     facility: "",
-    branch_manager_id: "",
+    corporate_manager_id: user_ID,
     image: "",
   }) 
-  
+ 
   useEffect(() => {
     if (id) {
       setServiceCenter({
@@ -60,7 +62,6 @@ export default function ServiceCenterModal(props) {
         longitude: props.Data.longitude,
         latitude: props.Data.latitude,
         facility: props.Data.facility,
-        branch_manager_id: props.Data.branch_manager_id,
         image: props.Data.image,
       })
     }
@@ -219,7 +220,6 @@ export default function ServiceCenterModal(props) {
         longitude: "",
         latitude: "",
         facility: "",
-        branch_manager_id: "",
         image: "",
       })
       setValBrgy(null);
@@ -303,7 +303,7 @@ export default function ServiceCenterModal(props) {
                         InputProps={{
                             ...params.InputProps,
                             type: 'search',
-                        }}
+                        }} 
                         />
                     )}
                   />
@@ -375,7 +375,7 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" value={serviceCenter.facility}  onChange={ev => setServiceCenter({...serviceCenter, facility: ev.target.value})}  id="branchManager" label="Facility" variant="outlined" fullWidth/>
+                  <TextField type="number" value={serviceCenter.facility}  onChange={ev => setServiceCenter({...serviceCenter, facility: ev.target.value})}  id="branchManager" label="Facility" variant="outlined" fullWidth/>
                 </Col>
                 <Col xs={12} md={5}> 
                     <input accept=".jpg, .jpeg, .png" onChange={onImageChoose} className="fileUpload" name="arquivo" id="arquivo" type="file" />
@@ -392,13 +392,13 @@ export default function ServiceCenterModal(props) {
                 </Col>
               </Row>
             </Form.Group>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            {/* <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
                   <TextField type="text" value={serviceCenter.branch_manager_id}  onChange={ev => setServiceCenter({...serviceCenter, branch_manager_id: ev.target.value})}  id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
                 </Col>
               </Row>
-            </Form.Group>
+            </Form.Group> */}
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>

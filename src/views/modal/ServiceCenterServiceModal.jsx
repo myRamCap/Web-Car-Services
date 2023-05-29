@@ -106,6 +106,7 @@ export default function ServiceCenterServiceModal(props) {
   }
 
   const handleChangeService = (event, newValue) => {
+    console.log(newValue)
     setService({
       ...service,
       service_id: newValue.id,

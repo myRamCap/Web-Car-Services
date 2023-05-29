@@ -6,7 +6,7 @@ import { useStateContext } from '../../contexts/ContextProvider';
 import Swal from 'sweetalert2'
 
 export default function Navbar() {
-    const {setUser, setToken, setRole, role} = useStateContext()
+    const {setUser, setToken, setRole, role, setUser_ID} = useStateContext()
     const location = useLocation();
     const { pathname } = location;
     const splitLocation = pathname.split("/");
@@ -33,6 +33,8 @@ export default function Navbar() {
                     setUser({})
                     setToken(null)
                     setRole(null)
+                    setRole(null)
+                    setUser_ID(null)
                 })
                 })
             }
@@ -79,7 +81,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 2 || role == 1 ? 
+            { role == 1 || role == 2 ? 
                 (   
                     <li>
                         <Link className={splitLocation[1] === "services" ? "isActive" : ""} to="/services"> 
@@ -92,7 +94,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 4 || role == 1 ? 
+            { role == 1 || role == 4 ? 
                 (   
                     <li>
                         <Link className={splitLocation[1] === "vehicles" ? "isActive" : ""} to="/vehicles">
@@ -106,7 +108,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 2 | role == 1 ? 
+            { role == 1 || role == 2 || role == 3 || role == 4  ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "servicecenter" ? "isActive" : ""} to="/servicecenter">
@@ -120,7 +122,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 4 || role == 1 ? 
+            { role == 1 || role == 2 || role == 3 || role == 4 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "bookings" ? "isActive" : ""} to="/bookings">
@@ -134,7 +136,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 4 || role == 1 ? 
+            { role == 1 || role == 2 || role == 3 || role == 4 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "notifications" ? "isActive" : ""} to="/notifications">
@@ -148,7 +150,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 4 || role == 1 ? 
+            { role == 1 || role == 2 || role == 3 || role == 4 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "promotions" ? "isActive" : ""} to="/promotions">
@@ -162,7 +164,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 1 || role == 2 || role == 4 ? 
+            { role == 1 || role == 2 || role == 3 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "users" ? "isActive" : ""} to="/users">

@@ -43,7 +43,7 @@ export default function ServiceCenterBookingsModal(props) {
   })
  
   const getServices = () => {
-    axiosClient.get('/service_center/services')
+    axiosClient.get(`/service_center/services/${param.id}`)
       .then(({ data }) => {
         setServices(data.data)
       })
@@ -297,7 +297,7 @@ export default function ServiceCenterBookingsModal(props) {
                       className='datePicker' 
                       label="Date"
                       onChange={handleChangeDate}
-                      renderInput={(params) => <TextField {...params} fullWidth />}
+                      // renderInput={(params) => <TextField {...params} fullWidth />}
                     />
                   </LocalizationProvider>
                 </Col>

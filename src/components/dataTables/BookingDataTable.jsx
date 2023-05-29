@@ -7,14 +7,38 @@ import { Button, Popover, Typography } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Loading from '../loader/Loading';
 import Booking from '../../views/modal/Booking';
+import { useStateContext } from '../../contexts/ContextProvider';
+import { useLocation } from 'react-router-dom';
 
  
 
 export default function BookingDataTable() {
+  const location = useLocation()
+  const {user_ID} = useStateContext()
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(true);
   const paginationAlignment = useState("center")
   const [booking, setBooking] = useState([])
+  const [bookingInfo, setBookingInfo] = useState([
+    {
+      id: null,
+      client_id: "",
+      client_name: "",
+      vehicle_id: "",
+      vehicle_name: "",
+      services_id: "",
+      service: "",
+      service_center_id: "",
+      service_center: "",
+      estimated_time: "",
+      contact_number: null,
+      status: "",
+      booking_date: "",
+      time: "",
+      estimated_time_desc: "",
+      notes: "",
+    }
+  ])
 
   // const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -31,7 +55,7 @@ export default function BookingDataTable() {
 
   const getBooking = () => {
     setLoading(true)
-    axiosClient.get('/service_center/booking')
+    axiosClient.get(`/booking/${user_ID}`)
     .then(({data}) => {
       setBooking(data)
       setLoading(false)
@@ -50,17 +74,38 @@ export default function BookingDataTable() {
    ];
 
    const action = [
-    // {
-    //   icon: () => <div className="btn btn-primary">Add New</div> ,
-    //   tooltip: 'Add User',
-    //   isFreeAction: true,
-    //   onClick: (event) => setShowModal(true)
-    // },
-    // {
-    //   icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-    //   tooltip: 'Save User',
-    //   onClick: (event) => setShowModal(true)
-    // },
+    {
+      icon: () => <div className="btn btn-primary">Add New</div> ,
+      tooltip: 'Add User',
+      isFreeAction: true,
+      onClick: (event) => setShowModal(true)
+    },
+    {
+      icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
+      tooltip: 'Save User',
+      onClick: (event,rowData) => {
+        setBookingInfo({
+          ...bookingInfo,
+          id: rowData.id,
+          client_id: rowData.client_id,
+          client_name: rowData.client_name,
+          vehicle_id: rowData.vehicle_id,
+          vehicle_name: rowData.vehicle_name,
+          services_id: rowData.services_id,
+          service: rowData.service,
+          service_center_id: rowData.service_center_id,
+          service_center: rowData.service_center,
+          estimated_time: rowData.estimated_time,
+          contact_number: rowData.contact_number,
+          status: rowData.status,
+          booking_date: rowData.booking_date,
+          time: rowData.time,
+          estimated_time_desc: rowData.estimated_time_desc,
+          notes: rowData.notes,
+        })
+        setShowModal(true)
+      }
+    },
     // {
     //   icon: () => 
     //   <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
@@ -96,9 +141,20 @@ export default function BookingDataTable() {
     OverlayLoading: () => <Loading />,
   };
 
+  const handleClose = () => {
+    setShowModal(false)
+    setBookingInfo([])
+  }
+
   useEffect(() => {
     getBooking()
-  }, [])
+    if (location.state == 'success'){
+      setShowModal(false)
+      setBookingInfo([])
+      getBooking()
+      location.state = null
+    }
+  }, [location.state])
 
   return (
     <div>
@@ -124,7 +180,7 @@ export default function BookingDataTable() {
         isLoading={loading}
         components={components}
       />
-      {/* <Booking show={showModal} close={() => setShowModal(false)} id={1}/>  */}
+      <Booking show={showModal} close={handleClose} userID={user_ID} Data={bookingInfo}/> 
     </div>
   )
 }
