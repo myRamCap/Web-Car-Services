@@ -234,6 +234,9 @@ export default function NotificationsModal(props) {
                 content: null,
                 image_url: null,
             })
+            setErrors(null)
+            setCheckbox2Checked(false)
+            setCheckbox1Checked(false)
         }
     }, [props.show])
     
