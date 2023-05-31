@@ -5,30 +5,217 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Customer from '../../data/JSON/dummy/refCustomer.json'
-import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField } from '@mui/material';
+import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField, Chip } from '@mui/material';
+import axiosClient from '../../axios-client';
+import Swal from 'sweetalert2'
+import NoImage from '../../assets/images/No-Image.png';
+import dayjs from 'dayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { DateRangePicker } from '@mui/x-date-pickers-pro'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo'
+import { useNavigate } from 'react-router-dom';
 
 export default function PromotionModal(props) {
-  const [selected, setSelected] = useState('');
-  const [image, setImage] = useState('')
-  
-  const optionsCustomer = Customer.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
-  })
+    const [checkbox1Checked, setCheckbox1Checked] = useState(false);
+    const [checkbox2Checked, setCheckbox2Checked] = useState(false);
+    const navigate = useNavigate()
+    const id = props.Data?.id ?? null
+    const [errors, setErrors] = useState(null);
+    const fixedOptions = [];
+    const [client, setClient] = useState([])
+    const [value, setValue] = useState([...fixedOptions]);
+    const [promotion, setPromotion] = useState({
+      id: null,
+      category: "",
+      client: "",
+      datefrom: "",
+      dateto: "",
+      title: "",
+      content: "",
+      image_url: "",
+    })
 
-  const handleCheckboxChange = (event) => {
-    setSelected(event.target.value);
-  };
+    const getClient = async () => {
+      try {
+        const { data } = await axiosClient.get('/client_name')
+        setClient(data.data)
+      } catch (error) {
+
+      }
+    }
+
+    const handleChangeClient = (event, newValue) => {
+      setValue([
+        ...fixedOptions,
+        ...newValue.filter((option) => fixedOptions.indexOf(option) === -1)
+      ])
+      setPromotion({
+        ...promotion,
+        client: [
+          ...fixedOptions,
+          ...newValue.filter((option) => fixedOptions.indexOf(option) === -1)
+        ]
+      })
+    };
+
+    const onImageChoose = (ev) => {
+      const file = ev.target.files[0]
+      const reader = new FileReader()
+      reader.onload = () => {
+        setPromotion({
+          ...promotion,
+          image_url: reader.result,
+        }) 
+      }
+      reader.readAsDataURL(file)
+    }
+
+    const handleChangeDateRangePicker = (date) => {
+      if (date[1]) {
+        const df = new Date(date[0]);
+        const dt = new Date(date[1]);
+        const dfyear = df.getFullYear();
+        const dtyear = dt.getFullYear();
+        const dfonth = ('0' + (df.getMonth() + 1)).slice(-2);
+        const dtmonth = ('0' + (dt.getMonth() + 1)).slice(-2);
+        const dfday = ('0' + df.getDate()).slice(-2);
+        const dtday = ('0' + dt.getDate()).slice(-2);
+        const datefrom = dfyear + '/' + dfonth + '/' + dfday;
+        const dateto = dtyear + '/' + dtmonth + '/' + dtday;
+
+        setPromotion({
+          ...promotion,
+            datefrom: datefrom,
+            dateto: dateto,
+        })
+      }
+    };
+ 
+    const handleCheckbox1Change = (event) => {
+      const checked = event.target.checked;
+      setCheckbox1Checked(checked);
+      if (checked) {
+        setCheckbox2Checked(false);
+        setPromotion({
+            ...promotion,
+            category: 'ALL',
+            client: ""
+        })
+        setValue([
+          ...fixedOptions
+        ])
+      }
+    };
+
+    const handleCheckbox2Change = (event) => {
+      const checked = event.target.checked;
+      setCheckbox2Checked(checked);
+      if (checked) {
+        setCheckbox1Checked(false);
+        setPromotion({
+          ...promotion,
+          category: 'SELECTED',
+        })
+      } 
+    };
   
-  const onSubmit = (ev) => {
-      alert('randy')
+    const onSubmit = (ev) => {
       ev.preventDefault()
-      console.log(product)
-  }
-  
+      const payload = {...promotion}
+
+      if (id) {
+        axiosClient.put(`/promotion/${id}`, payload)
+        .then(({}) => {
+          Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: "Your data has been successfully updated!",
+          }).then(() => {
+              navigate('/promotions' , {state:  'success' })
+          })
+        })
+        .catch(err => {
+            const response = err.response
+            if (response && response.status === 422) {
+                setErrors(response.data.errors)
+            }
+        })
+      } else {
+        axiosClient.post('/promotion', payload)
+        .then(({}) => {
+          Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: "Your data has been successfully saved!",
+          }).then(() => {
+              navigate('/promotions' , {state:  'success' })
+          })
+        })
+        .catch(err => {
+            const response = err.response
+            if (response && response.status === 422) {
+                setErrors(response.data.errors)
+            }
+        })
+      }
+ 
+       
+    }
+
+    useEffect(() => {
+      if (id) {
+        setPromotion({
+          ...promotion,
+          id: props.Data.id,
+          category: props.Data.category,
+          client:  props.Data.client,
+          datefrom: props.Data.datefrom,
+          dateto: props.Data.dateto,
+          title: props.Data.title,
+          content: props.Data.content,
+          image_url: props.Data.image_url,
+        })
+
+        if (props.Data.client == null) {
+          setValue([
+            ...fixedOptions
+          ])
+        } else {
+          setValue(props.Data.client)
+        }
+
+        if (props.Data.category == "ALL") {
+          setCheckbox1Checked(true)
+          setCheckbox2Checked(false)
+        } else if (props.Data.category == "SELECTED") {
+          setCheckbox2Checked(true)
+          setCheckbox1Checked(false)
+        }
+      }
+    }, [id])
+
+    useEffect(() => {
+      getClient()
+      if (props.show == false) {
+          setPromotion({
+            ...promotion,
+              id: null,
+              category: "",
+              client: "",
+              datefrom: "",
+              dateto: "",
+              title: "",
+              content: "",
+              image_url: "",
+          })
+          setErrors(null)
+          setCheckbox2Checked(false)
+          setCheckbox1Checked(false)
+      }
+    }, [props.show])
+
+
   return (
     <div id="PromotionModal">
       <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
@@ -36,6 +223,13 @@ export default function PromotionModal(props) {
           <Modal.Title>Create Promotion</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
+          {errors && 
+                    <div className="sevices_logo_errors">
+                    {Object.keys(errors).map(key => (
+                        <p key={key}>{errors[key][0]}</p>
+                    ))}
+                    </div>
+          }
           <Form onSubmit={onSubmit}>
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row>
@@ -43,41 +237,78 @@ export default function PromotionModal(props) {
                 <FormControlLabel
                   value="all_customers"
                   control={ 
+                    // <Checkbox
+                    //   checked={selected === 'all_customers'}
+                    //   onChange={handleCheckboxChange}
+                    //   value="all_customers"
+                    // />
                     <Checkbox
-                      checked={selected === 'all_customers'}
-                      onChange={handleCheckboxChange}
-                      value="all_customers"
-                    />
+                                            checked={checkbox1Checked}
+                                            onChange={handleCheckbox1Change}
+                                        />
                   }
-                  label="SELECT ALL CUSTOMERS"
+                  label="SELECT ALL CLIENTS"
                 />
               </Col>
               <Col xs={12} md={6}>
                 <FormControlLabel
                   value="choose_customer"
                   control={
+                    // <Checkbox
+                    //   checked={selected === 'choose_customer'}
+                    //   onChange={handleCheckboxChange}
+                    //   value="choose_customer"
+                    // />
                     <Checkbox
-                      checked={selected === 'choose_customer'}
-                      onChange={handleCheckboxChange}
-                      value="choose_customer"
-                    />
+                                            checked={checkbox2Checked}
+                                            onChange={handleCheckbox2Change}
+                                        />
                   }
-                  label="CHOOSE CUSTOMER"
+                  label="CHOOSE CLIENT"
                 />
               </Col>
-              <Col xs={12} md={12}>
-                  <Autocomplete
-                      id="choose-customer-autocomplete"
-                      options={optionsCustomer}
-                      disabled={selected === 'all_customers'} // disabled when All Customers is checked
-                      getOptionLabel={(option) => option.name }
-                      isOptionEqualToValue={(option, value) => option.name === value.name}
-                      getOptionSelected={(option, value) => option.name === value.name} // use getOptionSelected to compare selected options
+            </Row>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Row>
+            <Col xs={12} md={12}>
+                  {/* <Autocomplete
                       multiple // enable multiple selections
+                      options={optionsCustomer}
+                      // value={promotion.client_name}
+                      value={Array.isArray(promotion.client_name) ? promotion.client_name : []}
+                      disabled={selected === 'all_customers'} // disabled when All Customers is checked
+                      // getOptionLabel={(options) => options.fullname ? options.fullname : promotion.client_name  }
+                      // getOptionLabel={(option) => typeof option === 'string' ? option : option.fullname}
+                      getOptionLabel={(option) => typeof option === 'string' ? option : option?.fullname}
+                      // isOptionEqualToValue={(option, value) => option.fullname ?? ""  === value.fullname }
+                      isOptionEqualToValue={(option, value) => option === value || option?.fullname === value?.fullname}
+                      // isOptionEqualToValue={(option, value) => option === value || option.fullname === value.fullname}
+                      // getOptionSelected={(option, value) => option.name === value.name} // use getOptionSelected to compare selected options
+                      onChange={handleChangeClient} // Handle the onChange event
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           label="Choose Customer"
+                          InputProps={{
+                              ...params.InputProps,
+                              type: 'search',
+                          }}
+                        />
+                      )}
+                  /> */}
+                  <Autocomplete
+                  disabled={!checkbox2Checked}
+                      multiple
+                      value={value}
+                      onChange={handleChangeClient} 
+                      options={client}
+                      getOptionLabel={(option) => option.fullname}
+                      isOptionEqualToValue={(option, value) => option.fullname === value.fullname}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Client"
                           InputProps={{
                               ...params.InputProps,
                               type: 'search',
@@ -89,9 +320,33 @@ export default function PromotionModal(props) {
             </Row>
           </Form.Group>
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                        <Row>
+                            <Col xs={12} md={12}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['DateRangePicker', 'DateRangePicker']}>
+                                        <DemoItem label="Date Range" component="DateRangePicker">
+                                            <DateRangePicker
+                                                disablePast
+                                                value={ [dayjs(promotion.datefrom), dayjs(promotion.dateto) ] }
+                                                onChange={handleChangeDateRangePicker}
+                                            />
+                                        </DemoItem>
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </Col>
+                        </Row>
+                    </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row>
               <Col xs={12} md={12}>
-                <TextField type="text" id="title" label="Title" variant="outlined" fullWidth/> 
+                <TextField 
+                  type="text" 
+                  value={promotion.title ? promotion.title : ""}
+                  onChange={ev => setPromotion({...promotion, title: ev.target.value})} 
+                  label="Title" 
+                  variant="outlined" 
+                  fullWidth
+                /> 
               </Col>
             </Row>
           </Form.Group>
@@ -100,12 +355,12 @@ export default function PromotionModal(props) {
               <Col xs={12} md={12}>
                 <TextField
                   type= "text"
-                  id="content"
+                  value={promotion.content ? promotion.content : ""}
+                  onChange={ev => setPromotion({...promotion, content: ev.target.value})} 
                   label="Content"
                   variant="outlined"
                   multiline
                   rows={4}
-                  maxRows={10}
                   fullWidth
                 />
               </Col>
@@ -114,11 +369,19 @@ export default function PromotionModal(props) {
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row>
                 <Col xs={12} md={4} className="mt-2">
-                  <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" />
+                  <input 
+                    accept=".jpg, .jpeg, .png" 
+                    className="fileUpload" 
+                    name="arquivo" 
+                    id="arquivo" 
+                    type="file" 
+                    onChange={onImageChoose} 
+                  />
                 </Col>
                 <Col xs={12} md={8}>
                     <Card raised >
-                        <CardMedia image={image ? image : "data:image/png;base64,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"}
+                        <CardMedia 
+                            image={promotion.image_url != "" ? promotion.image_url : NoImage}
                             component="img"
                             height="200"
                             alt={"alt"}

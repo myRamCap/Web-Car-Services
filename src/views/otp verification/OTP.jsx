@@ -28,24 +28,28 @@ export default function OTP({route,navigate}) {
     const otp6 = useRef() 
     const MySwal = withReactContent(Swal)
     const {setUser,setToken,setRole, setUser_ID} = useStateContext()
+    const email = location.state?.email ?? null;
+ 
+    if (!email) {
+        Navigate('/')
+    }
 
     const onKeyPress = (ev) => {
         if (!/[0-9]/.test(ev.key)) {
             ev.preventDefault();
           }
     } 
- 
+
     const onSubmit = (ev) => {
         ev.preventDefault()
         
         const verification = {
             token: otp1.current.value+otp2.current.value+otp3.current.value+otp4.current.value+otp5.current.value+otp6.current.value,
-            email: location.state.email,
+            email: email,
         }
 
         axiosClient.post('/verifyotp', verification)
             .then(({data}) => {
-                console.log(data.user)
                 if (data.user) {
                     setUser(data.user)
                     setToken(data.token)
@@ -85,7 +89,7 @@ export default function OTP({route,navigate}) {
         // setCountDown(10);
 
         const otpEmail = {
-            email: location.state.email
+            email: email
         }
 
         axiosClient.post('/resendotp', otpEmail)
@@ -134,7 +138,7 @@ export default function OTP({route,navigate}) {
             setCountDown(0);
 
             const otpEmail = {
-                email: location.state.email
+                email: email
             }
 
             axiosClient.post('/expiredotp', otpEmail)
@@ -145,8 +149,6 @@ export default function OTP({route,navigate}) {
           }
     }, [countDown, runTimer])
 
-   
- 
   return (
     <div id="otp"> 
  
@@ -182,7 +184,7 @@ export default function OTP({route,navigate}) {
             </div>
         </form>
 
-         <ModalOTP show={showModal} close={() => setShowModal(false)} email= {location.state.email} id={userID} />
+         <ModalOTP show={showModal} close={() => setShowModal(false)} email= {email} id={userID} />
     </div>
   )
 }

@@ -13,12 +13,14 @@ import Users from "./views/pages/Users"
 import Customers from "./views/pages/Customers"
 import ServiceLogo from "./views/pages/ServiceLogo"
 import ServiceCenterTabs from "./components/tabs/ServiceCenterTabs"
-import SelectLoc from "./components/googleMap/SelectLoc"
 import ModalOTP from "./views/otp verification/ModalOTP" 
 import Loader2 from "./components/loader/Loader2"
 import GuestLayout from "./components/GuestLayout"
 import NotFound from "./views/NotFound"
 import Notification from "./views/pages/Notification"
+import Forgot_password from "./views/pages/Forgot_password"
+import OTP2 from "./views/otp verification/OTP2"
+import Sample from "./views/pages/Sample"
 
 const router = createBrowserRouter([
     {
@@ -94,6 +96,10 @@ const router = createBrowserRouter([
                 element: <OTP />
             },
             {
+                path: '/otp2',
+                element: <OTP2 />
+            },
+            {
                 path: '/changepassword',
                 element: <ChangePassword />
             },
@@ -101,9 +107,13 @@ const router = createBrowserRouter([
                 path: '/loader',
                 element: <Loader2 />
             },
+            // {
+            //     path: '/data',
+            //     element: <SelectLoc />
+            // },
             {
-                path: '/data',
-                element: <SelectLoc />
+                path: '/forgot_password',
+                element: <Forgot_password />
             },
         ]
 
@@ -112,10 +122,10 @@ const router = createBrowserRouter([
         path: '*',
         element: <NotFound />
     },
-    // {
-    //     path: 'loading',
-    //     element: <Loading />
-    // },
+    {
+        path: 'loading',
+        element: <Sample />
+    },
     
     
 

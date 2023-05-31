@@ -14,7 +14,7 @@ import { useLocation } from 'react-router-dom';
 
 export default function BookingDataTable() {
   const location = useLocation()
-  const {user_ID} = useStateContext()
+  const {user_ID, role} = useStateContext()
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(true);
   const paginationAlignment = useState("center")
@@ -72,8 +72,9 @@ export default function BookingDataTable() {
     { field: "booking_date", title: "Booking Date" },
     { field: "created_at", title: "Date Created" },
    ];
-
+ 
    const action = [
+
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
       tooltip: 'Add User',
@@ -104,14 +105,16 @@ export default function BookingDataTable() {
           notes: rowData.notes,
         })
         setShowModal(true)
-      }
-    },
+      },
+    }
+  
     // {
     //   icon: () => 
     //   <div className="btn btn-success btn-sm" onClick={handleClick}> <ZoomInRoundedIcon  /></div> ,
     //   tooltip: 'Note'
     // }
   ]
+ 
 
   const options = {
     paginationAlignment,
@@ -180,7 +183,10 @@ export default function BookingDataTable() {
         isLoading={loading}
         components={components}
       />
+
+  { role != 1 &&
       <Booking show={showModal} close={handleClose} userID={user_ID} Data={bookingInfo}/> 
+  }
     </div>
   )
 }

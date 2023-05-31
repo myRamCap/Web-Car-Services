@@ -12,9 +12,10 @@ import Swal from 'sweetalert2'
  
 
 export default function ModalOTP(props) {
+  const [errors, setErrors] = useState(null)
     const inputPassRef = useRef()
     const inputConfirmPassRef = useRef()
-    const {setUser,setToken,setRole} = useStateContext()
+    const {setUser,setToken,setRole, setUser_ID} = useStateContext()
     
     const onSubmit = (ev) => {
       ev.preventDefault()
@@ -32,6 +33,7 @@ export default function ModalOTP(props) {
             setUser(data.user)
             setToken(data.token)
             setRole(data.role)
+            setUser_ID(data.user_ID)
           })
           
         })
@@ -50,6 +52,12 @@ export default function ModalOTP(props) {
           <Modal.Title>New Password</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
+            {errors && <div className="alert">
+                {Object.keys(errors).map(key => (
+                <p key={key}>{errors[key][0]}</p>
+                ))}
+              </div>
+            }
             <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row> 

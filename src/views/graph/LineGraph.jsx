@@ -1,6 +1,3 @@
-
- 
-
 import React from 'react';
 import {
   Chart as ChartJS,
@@ -24,6 +21,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 
 export const options = {
   responsive: true,
