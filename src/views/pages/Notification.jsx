@@ -1,5 +1,5 @@
 import React from 'react'
-import NotificationDataTable from '../../components/dataTables/NotificationDataTable'
+import NotificationsDatatable from '../../components/dataTables/NotificationsDatatable'
 
 export default function Notification() {
   return (
@@ -7,7 +7,7 @@ export default function Notification() {
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <h1 className='pb-2'>Notifications</h1>
       </div> 
-        <NotificationDataTable />
+        <NotificationsDatatable />
     </div>
   )
 }

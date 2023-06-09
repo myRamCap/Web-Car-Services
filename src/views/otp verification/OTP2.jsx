@@ -1,32 +1,165 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import axiosClient from '../../axios-client'
+import Loader from '../../components/loader/Loader'
+import { useStateContext } from '../../contexts/ContextProvider'
+import ModalOTP from './ModalOTP'
+import Spinner from '../../components/loader/Spinner' 
+import Swal from 'sweetalert2'
 
 export default function OTP2() {
+    const [showModal, setShowModal] = useState(false);
+    const [userID, setUserID] = useState();
+    const [loading, setLoading] = useState(false);
+    const [countDown, setCountDown] = useState(0);
+    const [errors, setErrors] = useState();
+    const [runTimer, setRunTimer] = useState(true);
+    const seconds = String(countDown % 60).padStart(2, 0);
+    const minutes = String(Math.floor(countDown / 60)).padStart(2, 0);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const resendRef = useRef();
+    const otpRefs = Array.from({ length: 6 }, () => useRef());
+    const { setUser, setToken, setRole, setUser_ID } = useStateContext();
+    const email = location.state?.email ?? null;
+
+    const onKeyPress = (ev) => {
+        if (!/[0-9]/.test(ev.key)) {
+          ev.preventDefault();
+        }
+      };
+    
+      const onSubmit = async (ev) => {
+        ev.preventDefault();
+    
+        const otpValue = otpRefs.map((ref) => ref.current.value).join('');
+    
+        const verification = {
+          token: otpValue,
+          email,
+        };
+    
+        try {
+          const { data } = await axiosClient.post('/verifyotp_forgotpwd', verification);
+          setShowModal(true);
+          setUserID(data.id);
+        } catch (err) {
+          const response = err.response;
+    
+          if (response?.status === 422) {
+            const errors = response.data.errors || {
+              email: [response.data.message],
+            };
+            setErrors(errors);
+          }
+        }
+      };
+    
+      const onResend = async (ev) => {
+        ev.preventDefault();
+        setLoading(true);
+        resendRef.current.classList.add('isDisabled');
+    
+        const otpEmail = { email };
+    
+        try {
+          const { data } = await axiosClient.post('/resendotp', otpEmail);
+    
+          if (data === 'blocked') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text:
+                'Your account has been temporarily locked due to 3 consecutive request OTP attempts. Please try again in 60 minutes or contact your Corporate Manager.',
+            }).then(() => {
+              navigate('/');
+            });
+          } else {
+            resendRef.current.classList.add('isDisabled');
+            setRunTimer(true);
+          }
+    
+          setLoading(false);
+          setErrors('');
+        } catch (error) {
+          setLoading(false);
+          setErrors(error.message);
+        }
+      };
+    
+      useEffect(() => {
+        let timerId;
+    
+        if (runTimer) {
+          setCountDown(60 * 3);
+          timerId = setInterval(() => {
+            setCountDown((countDown) => countDown - 1);
+          }, 1000);
+        } else {
+          clearInterval(timerId);
+        }
+    
+        return () => clearInterval(timerId);
+      }, [runTimer]);
+    
+      useEffect(() => {
+        if (countDown < 0 && runTimer) {
+          resendRef.current.classList.remove('isDisabled');
+          setRunTimer(false);
+          setCountDown(0);
+    
+          const otpEmail = {
+            email,
+          };
+    
+          axiosClient.post('/expiredotp', otpEmail).then(({ data }) => {
+            // Navigate('/dashboard')
+            // console.log(data)
+          });
+        }
+      }, [countDown, runTimer]);
+      
   return (
-    <div id="otp2">
-
-        <div className="design-container">
-            <div className="design-wrapper">
-                <div className="call">
-                    <div>
-                    <p className="phone-number">+1 555 773-</p>
-                    <p className="phone-desc">unknown caller</p>
-                </div>
-            
-                </div>
-                <form className="form-card">
-                    <p className="form-card-title">We're calling your number to confirm it</p>
-                    <p className="form-card-prompt">Enter last 4 digits of the number we are calling you from</p>
-                    <div className="form-card-input-wrapper">
-                    <input type="tel" maxlength="4" placeholder="____" className="form-card-input"/>
-                    <div className="form-card-input-bg"></div>
-                    </div>
-                    <p className="call-again"><span className="underlined">call again</span> in 0:30 seconds</p>
-                    <button className="form-card-submit" type="submit">submit</button>
-
-                </form>
-            </div>
-     
+    <div id="otp">
+      <form className="form" onSubmit={onSubmit}>
+        <span className="close">X</span>
+        <div className="info">
+          <span className="title">Email Verification</span>
+          <p className="description">Please enter the code we have sent you.</p>
         </div>
+        <div className="inputs">
+          {otpRefs.map((ref, index) => (
+            <input
+              key={index}
+              ref={ref}
+              placeholder=""
+              type="text"
+              maxLength="1"
+              onKeyPress={onKeyPress}
+            />
+          ))}
+        </div>
+        {errors && (
+          <div className="otp_alert">
+            {Object.keys(errors).map((key) => (
+              <p key={key}>{errors[key][0] ?? ''}</p>
+            ))}
+          </div>
+        )}
+        <div className="timer">Time: {minutes}:{seconds}</div>
+        <button className="validate">Verify</button>
+        <div>
+          <p className="resend">
+            Did not receive email verification?
+            <a ref={resendRef} onClick={onResend} className="resend-action isDisabled">
+              send again
+            </a>
+          </p>
+          {loading && <Spinner />}
+        </div>
+      </form>
+
+      <ModalOTP show={showModal} close={() => setShowModal(false)} email={email} id={userID} />
     </div>
   )
 }

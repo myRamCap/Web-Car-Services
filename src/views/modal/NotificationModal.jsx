@@ -1,77 +1,369 @@
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import SC from '../../data/JSON/dummy/refSC.json'
-import { Autocomplete, Box, Card, CardMedia, Input, InputLabel, TextField } from '@mui/material';
-
+import NoImage from '../../assets/images/No-Image.png';
+import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField } from '@mui/material';
+import axiosClient from '../../axios-client';
+import Swal from 'sweetalert2'
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 export default function NotificationModal(props) {
-
-  const optionsSC = SC.RECORDS.map((option) => {
-    const firstLetter = option.name[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
+  const [checkbox1Checked, setCheckbox1Checked] = useState(false)
+  const [checkbox2Checked, setCheckbox2Checked] = useState(false)
+  const [selected, setSelected] = useState(null)
+  const navigate = useNavigate()
+  const id = props.Data?.id ?? null
+  const [corporate, setCorporate] = useState([])
+  const [serviceCenter, setServiceCenter] = useState([])
+  const [image, setImage] = useState('')
+  const [errors, setErrors] = useState(null)
+  const [notification, setNotification] = useState({
+    id: null,
+    corporate_id: null,
+    first_name: null,
+    last_name: null,
+    service_center_id: null,
+    service_center: null,
+    datefrom: "",
+    dateto: "",
+    title: "",
+    content: "",
+    image_url: "",
   })
 
-  const [image, setImage] = useState('')
+  useEffect(() => {
+    if (id) {
+      console.log( props.Data)
+      setNotification({
+        ...notification,
+        id: props.Data.id,
+        corporate_id: props.Data.corporate_id,
+        first_name: props.Data.first_name,
+        last_name: props.Data.last_name,
+        service_center_id: props.Data.service_center_id,
+        service_center: props.Data.service_center,
+        datefrom: props.Data.datefrom,
+        dateto: props.Data.dateto,
+        title: props.Data.title,
+        content: props.Data.content,
+        image_url: props.Data.image_url,
+      })
+
+      if (props.Data.corporate_id) {
+        setCheckbox1Checked(true)
+        setCheckbox2Checked(false)
+      } else {
+        setCheckbox2Checked(true)
+        setCheckbox1Checked(false)
+      }
+    }
+  }, [id])
+
+  const getCorporate = () => {
+
+    // axiosClient.get('/corporate_account')
+    // .then(({data}) => {
+    //   setCorporate(data)
+    //         setNotification({
+    //     ...notification,
+    //     service_center_id: null,
+    //     service_center: null,
+    //   })
+    // })
+    // try {
+    //   const { data } = await axiosClient.get('/corporate_account')
+    //   setCorporate(data)
+    //   setNotification({
+    //     ...notification,
+    //     service_center_id: null,
+    //     service_center: null,
+    //   })
+    // } catch (error) {
+
+    // }
+  }
+
+  const getServiceCenter = () => {
+    // axiosClient.get('/servicecenter')
+    // .then(({data}) => {
+    //   setServiceCenter(data.data)
+    //   setNotification({
+    //     ...notification,
+    //     corporate_id: null,
+    //     corporate_name: null,
+    //   })
+    // })
+
+    // try {
+    //   const { data } = await axiosClient.get('/servicecenter')
+    //   setServiceCenter(data.data)
+    //   setNotification({
+    //     ...notification,
+    //     corporate_id: null,
+    //     corporate_name: null,
+    //   })
+    // } catch (error) {
+
+    // }
+  }
+
+  const handleCheckbox1Change = (event) => {
+    const checked = event.target.checked;
+    setCheckbox1Checked(checked);
+    if (checked) {
+      setCheckbox2Checked(false);
+    } else {
+      setNotification({
+        ...notification,
+        corporate_id: null,
+        corporate_name: null,
+      })
+    }
+  };
+
+  const handleCheckbox2Change = (event) => {
+    const checked = event.target.checked;
+    setCheckbox2Checked(checked);
+    if (checked) {
+      setCheckbox1Checked(false);
+    } else {
+      setNotification({
+        ...notification,
+        service_center_id: null,
+      service_center: null,
+      })
+    }
+  };
+
+  const optionsCorporateAccount = corporate.map((option) => {
+    // const firstLetter = option.first_name[0].toUpperCase();
+    // return {
+    //   firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+    //   ...option,
+    // };
+  })
+
+  const optionsSC = serviceCenter.map((option) => {
+    // const firstLetter = option.name[0].toUpperCase();
+    // return {
+    //   firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+    //   ...option,
+    // };
+  })
+
+  const handleChangeCorporate = (event, newValue) => {
+    // setNotification({
+    //   ...notification,
+    //   corporate_id: newValue.id,
+    //   corporate_name: newValue.first_name+' '+newValue.last_name,
+    // })
+  }
+  
+  const handleChangeServiceCenter = (event, newValue) => {
+    // setNotification({
+    //   ...notification,
+    //   service_center_id: newValue.id,
+    // service_center: newValue.name,
+    // })
+  }
+
+  const handleChangeDateRangePicker = (date) => {
+    const df = new Date(date[0]);
+    const dt = new Date(date[1]);
+    const dfyear = df.getFullYear();
+    const dtyear = dt.getFullYear();
+    const dfonth = ('0' + (df.getMonth() + 1)).slice(-2);
+    const dtmonth = ('0' + (dt.getMonth() + 1)).slice(-2);
+    const dfday = ('0' + df.getDate()).slice(-2);
+    const dtday = ('0' + dt.getDate()).slice(-2);
+    const datefrom = dfyear + '/' + dfonth + '/' + dfday;
+    const dateto = dtyear + '/' + dtmonth + '/' + dtday;
+
+    setNotification({
+      ...notification,
+      datefrom: datefrom,
+      dateto: dateto,
+    })
+  }
+
+  const onImageChoose = (ev) => {
+    // const file = ev.target.files[0]
+    // const reader = new FileReader()
+    // reader.onload = () => {
+    //   setNotification({
+    //     ...notification,
+    //     image_url: reader.result,
+    //   }) 
+    // }
+    // reader.readAsDataURL(file)
+  }
+
   const onSubmit = (ev) => {
-      alert('randy')
-      ev.preventDefault()
+    ev.preventDefault()
+    const payload = {...notification}
 
-      console.log(product)
+    console.log(payload)
+    // axiosClient.post('/notification', payload)
+    // .then(({}) => {
+    //   Swal.fire({
+    //     icon: 'success',
+    //     title: 'Success',
+    //     text: "Your data has been successfully saved!",
+    //   }).then(() => {
+    //     navigate('/notification' , {state:  'success' })
+    //   })
+    // })
+    // .catch(err => {
+    //   const response = err.response
+    //   if (response && response.status === 422) {
+    //     // console.log(response.data.errors)
+    //     setErrors(response.data.errors)
+    //   }
+    // }) 
   }
 
-  const handleChange = (event, newValue) => {
-    // console.log(newValue.year)
-  //  if (newValue != null) {
-       console.log(newValue.year)
-       setImage(newValue.image);
-    //  }
-  }
+
+ 
+  useEffect(() => {
+    // getCorporate()
+    // getServiceCenter()
+    if (props.show == false) {
+      setNotification({
+        ...notification,
+        id: null,
+        corporate_id: null,
+        corporate_name: null,
+        service_center_id: null,
+        service_center: null,
+        datefrom: "",
+        dateto: "",
+        title: "",
+        content: "",
+        image_url: "",
+      })
+      setErrors(null)
+    }
+  }, [props.show])
 
   return (
     <div id="NotificationModal">
-        <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
-            <Modal.Header closeButton>
-            <Modal.Title>Create Notification</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="modal-main">
-            <Form onSubmit={onSubmit}>
-
+      <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Create Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="modal-main">
+          {errors && 
+              <div className="sevices_logo_errors">
+                {Object.keys(errors).map(key => (
+                  <p key={key}>{errors[key][0]}</p>
+                ))}
+              </div>
+          }
+          <Form onSubmit={onSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
-                <Col xs={12} md={12}>
-                <Autocomplete
-                      id="notification"
-                      disableClearable
-                      options={optionsSC.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                      // onChange={handleChangeProvince}
-                      getOptionLabel={(options) => options.name }  
-                      isOptionEqualToValue={(option, value) => option.name === value.name}
-                      renderInput={(params) => (
-                          <TextField
-                          {...params}
-                          label="Service Center"
-                          InputProps={{
-                              ...params.InputProps,
-                              type: 'search',
-                          }}
-                          />
-                      )}
-                    />
+                <Col xs={12} md={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={checkbox1Checked}
+                        onChange={handleCheckbox1Change}
+                      />
+                    }
+                    label="CORPORATE ACCOUNT"
+                  />
+                </Col>
+                <Col xs={12} md={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={checkbox2Checked}
+                        onChange={handleCheckbox2Change}
+                      />
+                    }
+                    label="SERVICE CENTER"
+                  />
+                </Col>
+
+              </Row>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row>
+                <Col xs={12} md={6}>
+                  <Autocomplete
+                    disableClearable
+                    id="corporate-account-autocomplete"
+                    value={notification.first_name}
+                    onChange={handleChangeCorporate}
+                    options={optionsCorporateAccount}
+                    disabled={!checkbox1Checked}
+                    getOptionLabel={(options) => options.first_name ? options?.first_name  : notification.first_name }
+                    isOptionEqualToValue={(option, value) => option.first_name ?? "" === notification.first_name }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Corporate Account"
+                        InputProps={{
+                          ...params.InputProps,
+                          type: 'search',
+                        }}
+                      />
+                    )}
+                  />
+                </Col>
+                <Col xs={12} md={6}>
+                  <Autocomplete
+                    disableClearable
+                    id="service-center-autocomplete"
+                    onChange={handleChangeServiceCenter}
+                    value={notification.service_center}
+                    options={optionsSC}
+                    disabled={!checkbox2Checked}
+                    getOptionLabel={(option) => option.name ? option.name : notification.service_center}
+                    isOptionEqualToValue={(option, value) => option.name ?? "" === notification.service_center}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Service Center"
+                        InputProps={{
+                          ...params.InputProps,
+                          type: 'search',
+                        }}
+                      />
+                    )}
+                  />
                 </Col>
               </Row>
-              </Form.Group>
-
+            </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={12}>
-                  <TextField type="text" id="title" label="Title" variant="outlined" fullWidth/>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DateRangePicker', 'DateRangePicker']}>
+                      <DemoItem label="Date Range" component="DateRangePicker">
+                        <DateRangePicker
+                          disablePast
+                          // value={notification.datefrom ? [dayjs(notification.datefrom), dayjs(notification.dateto)] : [dayjs(), dayjs()]}
+                          onChange={handleChangeDateRangePicker}
+                        />
+                      </DemoItem>
+                    </DemoContainer>
+                  </LocalizationProvider>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Row>
+                <Col xs={12} md={12}>
+                  <TextField type="text" value={notification.title} onChange={ev => setNotification({...notification, title: ev.target.value})} id="title" label="Title" variant="outlined" fullWidth />
                 </Col>
               </Row>
             </Form.Group>
@@ -79,39 +371,50 @@ export default function NotificationModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={12}>
-                  <TextField type="text" id="title" label="Content" variant="outlined" fullWidth/>
+                  <TextField
+                    type="text"
+                    value={notification.content}
+                    onChange={ev => setNotification({...notification, content: ev.target.value})}
+                    id="content"
+                    label="Content"
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                    // maxRows={10}
+                    fullWidth
+                  />
                 </Col>
               </Row>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Row>
-                <Col xs={12} md={4} className="mt-2">
-                  <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" />
+              <Row>
+                <Col xs={12} md={6} className="mt-2">
+                  <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file" 
+                  onChange={onImageChoose} 
+                  />
                 </Col>
-                <Col xs={12} md={8}>
-                    <Card raised >
-                        <CardMedia image={image ? image : "data:image/png;base64,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"}
-                            component="img"
-                            height="200"
-                            alt={"alt"}
-                            title={"notification"}
-                            sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>
-                    </Card>
+                <Col xs={12} md={6}>
+                  <Card raised >
+                    <CardMedia image={notification.image_url != "" ? notification.image_url :  NoImage}
+                      component="img"
+                      height="200"
+                      sx={{objectFit: "contain" }} />
+                  </Card>
                 </Col>
-            </Row>
+              </Row>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success"  type="submit">Save Changes</Button>
+                  <Button variant="success" type="submit">Save Changes</Button>
                 </Col>
               </Row>
             </Form.Group>
           </Form>
-            </Modal.Body>
-        </Modal>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }

@@ -63,9 +63,11 @@ export default function ChangePassword() {
 
         axiosClient.post('/login', payload)
             .then(({data}) => {
-                 navigate('/otp')
+                navigate('/otp')
                 setUser(data.user)
                 setToken(data.token)
+                setRole(data.role)
+            
                 
             })
             .catch(err => {

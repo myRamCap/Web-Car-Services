@@ -1,41 +1,87 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
 import EditIcon from '@mui/icons-material/Edit';
-import BookingsModal from '../../views/modal/BookingsModal';
+import BookingsModal from '../../views/modal/ServiceCenterBookingsModal';
+import axiosClient from '../../axios-client';
+import ServiceCenterBookingsModal from '../../views/modal/ServiceCenterBookingsModal';
+import Loading from '../loader/Loading';
+import { useLocation, useParams } from 'react-router-dom';
 
 export default function ServiceCenterBookingDataTable() {
+  const location = useLocation()
+  const param = useParams()
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
+  const [serviceCenterBooking, setServiceCenterBooking] = useState([])
+  const [serviceCenterBookingInfo, setServiceCenterBookingInfo] = useState([
+    {
+      id: null,
+      client_id: "",
+      client_name: "",
+      vehicle_id: "",
+      vehicle_name: "",
+      services_id: "",
+      service: "",
+      estimated_time: "",
+      contact_number: null,
+      status: "",
+      booking_date: "",
+      time: "",
+      estimated_time_desc: "",
+      notes: "",
+    }
+  ])
 
-  const columns = [
-    { field: "Name", title: "Name" },
-    { field: "Service", title: "Service" },
-    { field: "Service_center", title: "Service Center" },
-    { field: "Contact_Number", title: "Contact Number" },
-    { field: "Status", title: "Status" },
-    { field: "Booking_Date", title: "Booking Date" },
-    { field: "Date_Created", title: "Date Created" },
+  const getBooking = () => {
+    setLoading(true)
+    axiosClient.get(`/web/service_center/booking/${param.id}`)
+    .then(({data}) => {
+      setServiceCenterBooking(data)
+      setLoading(false)
+    })
+  }
 
-   ];
-
-   const data = [
-    { Name: "John Walsh", Service: "Oil Change", Service_center: "Ramcap 1 Dealers", Contact_Number: "12346799", Status: "In Process", Booking_Date: "2023-04-03", Date_Created: "2023-04-03" },
-    { Name: "Bob Herm", Service: "New Tires", Service_center: "Ramcap 2 Dealers", Contact_Number: "987654321", Status: "Completed", Booking_Date: "2023-04-05", Date_Created: "2023-04-05" },
-    { Name: "James Houston", Service: "Tire Rotation", Service_center: "Ramcap 3 Dealers", Contact_Number: "5123483545", Status: "Up Coming", Booking_Date: "2023-04-06", Date_Created: "2023-04-06" },
+  const columns = [ 
+    { field: "client_name", title: "Client Name" },
+    { field: "service", title: "Service" },
+    { field: "service_center", title: "Service Center" },
+    { field: "contact_number", title: "Contact Number" },
+    { field: "status", title: "Status" },
+    { field: "booking_date", title: "Booking Date" },
+    { field: "created_at", title: "Date Created" },
 
    ];
 
    const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
-      onClick: (event) => setShowModal(true)
+      tooltip: 'Edit',
+      onClick: (event,rowData) => {
+        setServiceCenterBookingInfo({
+          ...serviceCenterBookingInfo,
+          id: rowData.id,
+          client_id: rowData.client_id,
+          client_name: rowData.client_name,
+          vehicle_id: rowData.vehicle_id,
+          vehicle_name: rowData.vehicle_name,
+          services_id: rowData.services_id,
+          service: rowData.service,
+          estimated_time: rowData.estimated_time,
+          contact_number: rowData.contact_number,
+          status: rowData.status,
+          booking_date: rowData.booking_date,
+          time: rowData.time,
+          estimated_time_desc: rowData.estimated_time_desc,
+          notes: rowData.notes,
+        })
+        setShowModal(true)
+      }
     }
   ]
 
@@ -61,17 +107,41 @@ export default function ServiceCenterBookingDataTable() {
       fontSize: 16,
     },
   }
+  
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
+  const handleClose = () => {
+    setShowModal(false)
+    setServiceCenterBookingInfo([])
+  }
+
+  useEffect(() => {
+    getBooking()
+    if (location.state == 'success'){
+      getBooking()
+      setServiceCenterBookingInfo([])
+      setShowModal(false)
+      location.state = null
+    }
+  }, [location.state])
+
+  
 
   return (
     <div>
       <MaterialTable
         title=""
         columns={columns}
-        data={data}
+        data={serviceCenterBooking.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
-      <BookingsModal show={showModal} close={() => setShowModal(false)} id={1}/> 
+      <ServiceCenterBookingsModal show={showModal} close={handleClose} Data={serviceCenterBookingInfo} /> 
     </div>
   )
 }

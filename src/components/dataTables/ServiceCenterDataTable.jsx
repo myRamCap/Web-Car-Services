@@ -5,11 +5,13 @@ import { color } from '@mui/system';
 import ServiceCenterModal from '../../views/modal/ServiceCenterModal';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axiosClient from '../../axios-client';
+import Loading from '../loader/Loading';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function ServiceCenterDataTable(props) {
-  // const location = useLocation()
-  // console.log(location.state)
+  const {user_ID, role} = useStateContext()
   const location = useLocation()
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false)
   const paginationAlignment = useState("center")
   const [serviceCenter, setServiceCenter] = useState([])
@@ -25,21 +27,22 @@ export default function ServiceCenterDataTable(props) {
       province: "",
       longitude: "",
       latitude: "",
-      branch_manager_id: "",
+      facility: "",
       image: "",
     }
   ])
 
   const getServiceCenter = () => {
-    // loading here
-    axiosClient.get('/servicecenter')
+    setLoading(true)
+    axiosClient.get(`/web/servicecenter/${user_ID}`)
       .then(({data}) => {
         setServiceCenter(data)
+        setLoading(false)
       })
   }
 
   const columns = [
-    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to='/servicecenter/details' state={rowData.name}>{rowData.name}</Link>},
+    { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to={`/servicecenter/details/${rowData.name}/${rowData.id}`}>{rowData.name}</Link>},
     { field: "category", title: "Category", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
     { field: "barangay", title: "Barangay", customSort: (a, b) => a.barangay.localeCompare(b.barangay, undefined, { sensitivity: 'base' }) },
     { field: "municipality", title: "Municipality", customSort: (a, b) => a.municipality.localeCompare(b.municipality, undefined, { sensitivity: 'base' }) },
@@ -47,22 +50,22 @@ export default function ServiceCenterDataTable(props) {
     { field: "created_at", title: "Date Created" },
    ];
 
-   const action = [
+   const action = role == '1' || role == '2' ? [
     {
-      icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
-      isFreeAction: true,
-      onClick: ((event) => {
-        setShowModal(true)
-        localStorage.removeItem('lati')
-        localStorage.removeItem('longi')
-      })
+       
+        icon: () => <div className="btn btn-primary">Add New</div> ,
+        isFreeAction: true,
+        onClick: ((event) => {
+          setShowModal(true)
+          localStorage.removeItem('lati')
+          localStorage.removeItem('longi')
+        })
+       
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
-         
         setServiceCenterInfo({
           ...serviceCenterInfo,
           id: rowData.id,
@@ -75,13 +78,13 @@ export default function ServiceCenterDataTable(props) {
           province: rowData.province,
           longitude: rowData.longitude,
           latitude: rowData.latitude,
-          branch_manager_id: rowData.branch_manager_id,
+          facility: rowData.facility,
           image: rowData.image,
         })
         setShowModal(true)
       }
     }
-  ]
+  ] : []
 
   const options = {
     paginationAlignment,
@@ -106,10 +109,16 @@ export default function ServiceCenterDataTable(props) {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
   useEffect(() => {
     getServiceCenter()
     if (location.state == 'success'){
       getServiceCenter()
+      setServiceCenterInfo([])
       setShowModal(false)
       location.state = null
     }
@@ -117,7 +126,7 @@ export default function ServiceCenterDataTable(props) {
 
   const handleClose = () => {
     setShowModal(false)
-    // setServiceLogoID([])
+    setServiceCenterInfo([])
   }
 
   return (
@@ -128,6 +137,8 @@ export default function ServiceCenterDataTable(props) {
         data={serviceCenter.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <ServiceCenterModal show={showModal} close={handleClose} Data={serviceCenterInfo} /> 
     </div>

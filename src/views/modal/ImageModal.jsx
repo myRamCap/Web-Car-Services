@@ -1,25 +1,26 @@
 import Modal from 'react-bootstrap/Modal';
 import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
-import { Card, CardMedia } from '@mui/material';
-
+import { CardMedia } from '@mui/material';
 
 export default function ImageModal(props) {
  
   return (
     <div id="image_modal">
         <Modal
-        show={props.show}
-        onHide={props.close}
-        fullscreen={true}
-      >
+          show={props.show}
+          onHide={props.close}
+          fullscreen={true}
+        >
         <Modal.Header closeButton>
           <Modal.Title id="example-custom-modal-styling-title">
             Image View
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <CardMedia className='sc-image' image={ props.image }
+          <CardMedia 
+            className='sc-image' 
+            image={ props.image }
             component="img"
             height="550"
             alt={"alt"}

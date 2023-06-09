@@ -1,39 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialTable from "@material-table/core";
-import EditIcon from '@mui/icons-material/Edit';
+import axiosClient from '../../axios-client';
+import Loading from '../loader/Loading';
 
 export default function CustomerDataTable() {
   const paginationAlignment = useState("center")
+  const [loading, setLoading] = useState(true);
+  const [client, setClient] = useState([])
 
   const columns = [
-    { title: 'Name', field: 'name' },
-    { title: 'Surname', field: 'surname' },
-    { title: 'Birth Year', field: 'birthYear' },
-    { title: 'Birth Place',field: 'birthCity' },
+    { title: 'Name', field: 'fullname' },
+    { title: 'Email', field: 'email' },
+    { title: 'Contact Number',field: 'contact_number' },
+    { title: 'Address',field: 'address' },
   ]
 
-  const data = [
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-    { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
-    { name: 'Zerya Betül', surname: 'capas', birthYear: 2017, birthCity: 34 },
-  ]
-
-  // const action = [
-  //   {
-  //     icon: () => <div className="btn btn-primary">Add New</div> ,
-  //     tooltip: 'Add User',
-  //     isFreeAction: true,
-  //     onClick: (event) => alert("You want to add a new row")
-  //   },
-  //   {
-  //     icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-  //     tooltip: 'Save User',
-  //     onClick: (event) => alert("You edit")
-  //   }
-  // ]
+  const getClient = () => {
+    setLoading(true)
+    axiosClient.get('/web/client')
+    .then(({data}) => {
+      setClient(data)
+      setLoading(false)
+    })
+  }
 
   const options = {
     paginationAlignment,
@@ -59,13 +48,23 @@ export default function CustomerDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+  
+  useEffect(() => {
+    getClient()
+  }, [])
+
   return (
     <div>
       <MaterialTable 
         title=""
         columns={columns}
-        data={data}
-        // actions={action}
+        data={client.data}
+        isLoading={loading}
+        components={components}
         options={options}
       />
     </div>

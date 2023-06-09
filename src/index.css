@@ -26,10 +26,13 @@ body {
     height: 100%;
     box-shadow: 5px 0 30px rgba(0,0,0,0.1);
     transition: all .5s ease;
+    
 }
 
 .sidebar.active {
-    width: 240px;
+    width: 255px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .sidebar .logo_content .logo {
@@ -68,7 +71,7 @@ body {
 }
 
 .sidebar.active #btn {
-    left: 85%;
+    left: 90%;
 }
 
  
@@ -177,7 +180,15 @@ body {
   margin-left: 15em;
 }
 
- /* Login */
+#modal .alert {
+  background-color: #ff4040;
+  color: white;
+  text-align: start;
+  padding-top: 5px;
+  padding-bottom: 0;
+}
+
+ /* Login  */
  #Login .alert {
   background-color: #ff4040;
   color: white;
@@ -684,6 +695,10 @@ tbody tr:hover {
   margin: 10px 0 !important;
 }
 
+.search-icon {
+  margin: 10px 0 !important;
+}
+
 .datePicker {
   width: 100% !important;
 }
@@ -714,4 +729,9 @@ tbody tr:hover {
 
 .sc-image {
   cursor: pointer;
+}
+
+
+.MuiDateRangeCalendar-root > div:first-child {
+  display: none;
 }
