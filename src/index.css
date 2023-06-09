@@ -180,7 +180,15 @@ body {
   margin-left: 15em;
 }
 
- /* Login */
+#modal .alert {
+  background-color: #ff4040;
+  color: white;
+  text-align: start;
+  padding-top: 5px;
+  padding-bottom: 0;
+}
+
+ /* Login  */
  #Login .alert {
   background-color: #ff4040;
   color: white;
@@ -684,6 +692,10 @@ tbody tr:hover {
 }
 
 .globe-icon {
+  margin: 10px 0 !important;
+}
+
+.search-icon {
   margin: 10px 0 !important;
 }
 

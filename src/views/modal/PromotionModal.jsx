@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import Customer from '../../data/JSON/dummy/refCustomer.json'
-import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField, Chip } from '@mui/material';
+import { Autocomplete, Checkbox, FormControlLabel, Card, CardMedia, TextField } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
 import NoImage from '../../assets/images/No-Image.png';
@@ -17,6 +16,7 @@ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo'
 import { useNavigate } from 'react-router-dom';
 
 export default function PromotionModal(props) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [checkbox1Checked, setCheckbox1Checked] = useState(false);
     const [checkbox2Checked, setCheckbox2Checked] = useState(false);
     const navigate = useNavigate()
@@ -38,7 +38,7 @@ export default function PromotionModal(props) {
 
     const getClient = async () => {
       try {
-        const { data } = await axiosClient.get('/client_name')
+        const { data } = await axiosClient.get('/web/client_name')
         setClient(data.data)
       } catch (error) {
 
@@ -77,12 +77,12 @@ export default function PromotionModal(props) {
         const dt = new Date(date[1]);
         const dfyear = df.getFullYear();
         const dtyear = dt.getFullYear();
-        const dfonth = ('0' + (df.getMonth() + 1)).slice(-2);
+        const dfmonth = ('0' + (df.getMonth() + 1)).slice(-2);
         const dtmonth = ('0' + (dt.getMonth() + 1)).slice(-2);
         const dfday = ('0' + df.getDate()).slice(-2);
         const dtday = ('0' + dt.getDate()).slice(-2);
-        const datefrom = dfyear + '/' + dfonth + '/' + dfday;
-        const dateto = dtyear + '/' + dtmonth + '/' + dtday;
+        const datefrom = `${dfyear}/${dfmonth}/${dfday}`;
+        const dateto = `${dtyear}/${dtmonth}/${dtday}`;
 
         setPromotion({
           ...promotion,
@@ -120,47 +120,33 @@ export default function PromotionModal(props) {
       } 
     };
   
-    const onSubmit = (ev) => {
+    const onSubmit = async (ev) => {
       ev.preventDefault()
+      setIsSubmitting(true);
       const payload = {...promotion}
 
-      if (id) {
-        axiosClient.put(`/promotion/${id}`, payload)
-        .then(({}) => {
-          Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: "Your data has been successfully updated!",
-          }).then(() => {
-              navigate('/promotions' , {state:  'success' })
-          })
-        })
-        .catch(err => {
-            const response = err.response
-            if (response && response.status === 422) {
-                setErrors(response.data.errors)
-            }
-        })
-      } else {
-        axiosClient.post('/promotion', payload)
-        .then(({}) => {
-          Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: "Your data has been successfully saved!",
-          }).then(() => {
-              navigate('/promotions' , {state:  'success' })
-          })
-        })
-        .catch(err => {
-            const response = err.response
-            if (response && response.status === 422) {
-                setErrors(response.data.errors)
-            }
-        })
+      try {
+        const response = id 
+        ? await axiosClient.put(`/web/promotion/${id}`, payload) 
+        : await axiosClient.post('/web/promotion', payload);
+        response
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: id
+            ? 'Your data has been successfully updated!'
+            : 'Your data has been successfully saved!',
+        }).then(() => {
+          setIsSubmitting(false);
+          navigate('/promotions', { state: 'success' });
+        });
+      } catch (err) {
+        const response = err.response;
+        if (response && response.status === 422) {
+          setIsSubmitting(false);
+          setErrors(response.data.errors);
+        }
       }
- 
-       
     }
 
     useEffect(() => {
@@ -220,7 +206,7 @@ export default function PromotionModal(props) {
     <div id="PromotionModal">
       <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Create Promotion</Modal.Title>
+          <Modal.Title>{id ? 'Edit Promotion' : 'Add Promotion'}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
           {errors && 
@@ -237,15 +223,10 @@ export default function PromotionModal(props) {
                 <FormControlLabel
                   value="all_customers"
                   control={ 
-                    // <Checkbox
-                    //   checked={selected === 'all_customers'}
-                    //   onChange={handleCheckboxChange}
-                    //   value="all_customers"
-                    // />
                     <Checkbox
-                                            checked={checkbox1Checked}
-                                            onChange={handleCheckbox1Change}
-                                        />
+                        checked={checkbox1Checked}
+                        onChange={handleCheckbox1Change}
+                    />
                   }
                   label="SELECT ALL CLIENTS"
                 />
@@ -254,15 +235,10 @@ export default function PromotionModal(props) {
                 <FormControlLabel
                   value="choose_customer"
                   control={
-                    // <Checkbox
-                    //   checked={selected === 'choose_customer'}
-                    //   onChange={handleCheckboxChange}
-                    //   value="choose_customer"
-                    // />
                     <Checkbox
-                                            checked={checkbox2Checked}
-                                            onChange={handleCheckbox2Change}
-                                        />
+                        checked={checkbox2Checked}
+                        onChange={handleCheckbox2Change}
+                    />
                   }
                   label="CHOOSE CLIENT"
                 />
@@ -272,49 +248,24 @@ export default function PromotionModal(props) {
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row>
             <Col xs={12} md={12}>
-                  {/* <Autocomplete
-                      multiple // enable multiple selections
-                      options={optionsCustomer}
-                      // value={promotion.client_name}
-                      value={Array.isArray(promotion.client_name) ? promotion.client_name : []}
-                      disabled={selected === 'all_customers'} // disabled when All Customers is checked
-                      // getOptionLabel={(options) => options.fullname ? options.fullname : promotion.client_name  }
-                      // getOptionLabel={(option) => typeof option === 'string' ? option : option.fullname}
-                      getOptionLabel={(option) => typeof option === 'string' ? option : option?.fullname}
-                      // isOptionEqualToValue={(option, value) => option.fullname ?? ""  === value.fullname }
-                      isOptionEqualToValue={(option, value) => option === value || option?.fullname === value?.fullname}
-                      // isOptionEqualToValue={(option, value) => option === value || option.fullname === value.fullname}
-                      // getOptionSelected={(option, value) => option.name === value.name} // use getOptionSelected to compare selected options
-                      onChange={handleChangeClient} // Handle the onChange event
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Choose Customer"
-                          InputProps={{
-                              ...params.InputProps,
-                              type: 'search',
-                          }}
-                        />
-                      )}
-                  /> */}
                   <Autocomplete
-                  disabled={!checkbox2Checked}
-                      multiple
-                      value={value}
-                      onChange={handleChangeClient} 
-                      options={client}
-                      getOptionLabel={(option) => option.fullname}
-                      isOptionEqualToValue={(option, value) => option.fullname === value.fullname}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Select Client"
-                          InputProps={{
-                              ...params.InputProps,
-                              type: 'search',
-                          }}
-                        />
-                      )}
+                    disabled={!checkbox2Checked}
+                    multiple
+                    value={value}
+                    onChange={handleChangeClient} 
+                    options={client}
+                    getOptionLabel={(option) => option.fullname}
+                    isOptionEqualToValue={(option, value) => option.fullname === value.fullname}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Client"
+                        InputProps={{
+                            ...params.InputProps,
+                            type: 'search',
+                        }}
+                      />
+                    )}
                   />
               </Col>
             </Row>
@@ -394,7 +345,7 @@ export default function PromotionModal(props) {
           <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Row >
               <Col xs={12} md={12}>
-                <Button variant="success"  type="submit">Save Changes</Button>
+                <Button variant="success"  type="submit" disabled={isSubmitting}>Save Changes</Button>
               </Col>
             </Row>
           </Form.Group>

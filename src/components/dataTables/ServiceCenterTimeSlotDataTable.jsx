@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import TimeSlotModal from '../../views/modal/TimeSlotModal';
 import axiosClient from '../../axios-client';
 import { useLocation, useParams } from 'react-router-dom';
+import Loading from '../loader/Loading';
 
 export default function ServiceCenterTimeSlotDataTable() {
   const location = useLocation()
@@ -17,13 +18,13 @@ export default function ServiceCenterTimeSlotDataTable() {
       id: null,
       service_center_id: null,
       time: null,
-      max_limit: null
+      // max_limit: null
     }
   ])
 
   const getServiceCenterTimeSlot = () => {
     setLoading(true)
-    axiosClient.get(`/service_center/timeslot/${param.id}`)
+    axiosClient.get(`/web/service_center/timeslot/${param.id}`)
     .then(({data}) => {
       setServiceCenterTimeSLot(data)
       setLoading(false)
@@ -32,28 +33,27 @@ export default function ServiceCenterTimeSlotDataTable() {
 
   const columns = [
     { field: "time", title: "Time Slot" },
-    { field: "max_limit", title: "Max Limit" },
-    { field: "created_at", title: "Date Created" },
+    // { field: "max_limit", title: "Max Limit" },
+    { field: "date_created", title: "Date Created" },
 
    ];
 
    const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => { 
         setServiceCenterTimeSLotInfo({
           ...serviceCenterTimeSLotInfo,
           id: rowData.id,
           service_center_id: rowData.service_center_id,
           time: rowData.time,
-          max_limit: rowData.max_limit,
+          // max_limit: rowData.max_limit,
         })
         setShowModal(true)
       }
@@ -83,6 +83,11 @@ export default function ServiceCenterTimeSlotDataTable() {
     },
   }
 
+  const components = {
+    // define your custom components here
+    OverlayLoading: () => <Loading />,
+  };
+
   const handleClose = () => {
     setShowModal(false)
     setServiceCenterTimeSLotInfo([])
@@ -91,9 +96,10 @@ export default function ServiceCenterTimeSlotDataTable() {
   useEffect(() => {
     getServiceCenterTimeSlot()
     if (location.state == 'success'){
-          getServiceCenterTimeSlot()
-          setShowModal(false)
-          location.state = null
+      getServiceCenterTimeSlot()
+      setShowModal(false)
+      setServiceCenterTimeSLotInfo([])
+      location.state = null
     }
   }, [location.state])
 
@@ -105,6 +111,8 @@ export default function ServiceCenterTimeSlotDataTable() {
         data={serviceCenterTimeSLot.data}
         actions={action}
         options={options}
+        isLoading={loading}
+        components={components}
       />
       <TimeSlotModal show={showModal} close={handleClose} Data={serviceCenterTimeSLotInfo} /> 
     </div>

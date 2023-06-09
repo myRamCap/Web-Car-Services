@@ -34,7 +34,7 @@ export default function ServiceCenterDataTable(props) {
 
   const getServiceCenter = () => {
     setLoading(true)
-    axiosClient.get(`/servicecenter/${user_ID}`)
+    axiosClient.get(`/web/servicecenter/${user_ID}`)
       .then(({data}) => {
         setServiceCenter(data)
         setLoading(false)
@@ -54,7 +54,6 @@ export default function ServiceCenterDataTable(props) {
     {
        
         icon: () => <div className="btn btn-primary">Add New</div> ,
-        tooltip: 'Add User',
         isFreeAction: true,
         onClick: ((event) => {
           setShowModal(true)
@@ -65,7 +64,7 @@ export default function ServiceCenterDataTable(props) {
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
         setServiceCenterInfo({
           ...serviceCenterInfo,

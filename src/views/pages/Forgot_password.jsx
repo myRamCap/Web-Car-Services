@@ -6,7 +6,6 @@ import Avatar from '../../assets/images/avatar.svg'
 import axiosClient from '../../axios-client' 
 import Spinner from '../../components/loader/Spinner'
 import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 
 export default function Forgot_password() {
     const [spinner, setSpinner] = useState(false)
@@ -29,7 +28,7 @@ export default function Forgot_password() {
         emailRef.current.classList.add('focus');
     }
 
-    const onSubmit = (ev) => {
+    const onSubmit = async (ev) => {
         ev.preventDefault()
         setSpinner(true)
         setErrors(null)
@@ -38,20 +37,20 @@ export default function Forgot_password() {
             email: inputEmailRef.current.value
         }
 
-        axiosClient.post('/forgot_password', payload)
-            .then(({data}) => {
-                navigate('/otp2', {state: { id: data.id, email: data.email }})
-                setSpinner(false) 
-            })
-            .catch(err => {
-                setSpinner(false)
-                const response = err.response
-                if (response && response.status === 422) {
-                    setErrors(response.data.errors)
-                    
-                }
-            })
+        try {
+            const { data } = await axiosClient.post('/forgot_password', payload);
+            navigate('/otp2', { state: { id: data.id, email: data.email } });
+        } catch (err) {
+            const response = err.response;
+            if (response && response.status === 422) {
+              setErrors(response.data.errors);
+            }
+        } finally {
+            setSpinner(false);
+        }
     }
+
+
   return (
     <div id="Login"> 
       <img className="wave" src={Wave}/>
@@ -76,7 +75,13 @@ export default function Forgot_password() {
                         </div>
                         <div className="div">
                             <h5>Email</h5>
-                            <input ref={inputEmailRef} type="email" className="input" onChange={emailHandleChange} onClick={emailHandleClick}  />
+                            <input 
+                                ref={inputEmailRef} 
+                                type="email" 
+                                className="input" 
+                                onChange={emailHandleChange} 
+                                onClick={emailHandleClick}  
+                            />
                         </div>
                     </div>
                     <input type="submit" className="btn" value="Send Reset Code" />

@@ -49,43 +49,27 @@ export default function ServicesLogoModal(props) {
     reader.readAsDataURL(file)
   }
  
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
       ev.preventDefault()
       const payload = {...servicesLogo}
-      if (id) {
-        axiosClient.put(`serviceslogo/${id}`, payload)
-        .then(() => {
-          Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: "Your data has been successfully updated!",
-          }).then(() => {
-            navigate('/serviceslogo' , {state:  'success' })
-          })
+
+      try {
+        const response = id
+          ? await axiosClient.put(`/web/serviceslogo/${id}`, payload)
+          : await axiosClient.post(`/web/serviceslogo`, payload);
+        response
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: "Your data has been successfully saved!",
+        }).then(() => {
+          navigate('/serviceslogo' , {state:  'success' })
         })
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-            setErrors(response.data.errors)
-          }
-        }) 
-      } else {
-        axiosClient.post(`serviceslogo`, payload)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: "Your data has been successfully saved!",
-          }).then(() => {
-            navigate('/serviceslogo' , {state:  'success' })
-          })
-        }) 
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-            setErrors(response.data.errors)
-          }
-        }) 
+      } catch (err) {
+        const response = err.response;
+        if (response && response.status === 422) {
+          setErrors(response.data.errors);
+        }
       }
   }
 
@@ -108,11 +92,7 @@ export default function ServicesLogoModal(props) {
       
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            {id ? 
-              <Modal.Title> Edit Service </Modal.Title> 
-              : 
-              <Modal.Title> Add Service </Modal.Title> 
-            }
+              <Modal.Title>{id ? 'Edit Service' : 'Add Service'}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -146,7 +126,8 @@ export default function ServicesLogoModal(props) {
                 </Col>
                 <Col xs={12} md={6}> 
                   <Card raised >
-                    <CardMedia image={servicesLogo.image_url != "" ? servicesLogo.image_url :  NoImage}
+                    <CardMedia 
+                      image={servicesLogo.image_url ? servicesLogo.image_url :  NoImage}
                       component="img"
                       height="250"
                       alt={"not found"} 

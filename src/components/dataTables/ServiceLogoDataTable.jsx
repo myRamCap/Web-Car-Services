@@ -25,7 +25,7 @@ export default function ServiceLogoDataTable() {
 
     const getServicesLogo = () => {
       setLoading(true)
-      axiosClient.get('/serviceslogo')
+      axiosClient.get('/web/serviceslogo')
         .then(({data}) => {
           setServicesLogo(data)
           setLoading(false)
@@ -47,13 +47,12 @@ export default function ServiceLogoDataTable() {
     const action = [
         {
           icon: () => <div className="btn btn-primary">Add New</div> ,
-          tooltip: 'Add User',
           isFreeAction: true,
           onClick: (event) => setShowModal(true)
         },
         {
           icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-          tooltip: 'Edit User',
+          tooltip: 'Edit',
           onClick: (event,rowData) => {
             setServiceLogoID({
               ...serviceLogoID,
@@ -102,6 +101,7 @@ export default function ServiceLogoDataTable() {
         if (location.state){
           getServicesLogo()
           setShowModal(false)
+          setServiceLogoID([])
           location.state = null
         }
       }, [location.state])

@@ -9,9 +9,9 @@ import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom';
 
-
 export default function UserModal(props) {
   const navigate = useNavigate()
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [roles, setRoles] = useState([])
   const [hide, setHide] = useState(true)
   const [service_center, setService_Center] = useState([])
@@ -37,7 +37,93 @@ export default function UserModal(props) {
     user_id: props.userID
   })
 
-  console.log(user)
+  const getRoles = async () => {
+    try {
+      //master
+      const response = await axiosClient.get(`/web/roles/${props.userID}`)
+      setRoles(response.data.data)
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  const getServiceCenter = async () => {
+    try {
+      //master
+      const response = await axiosClient.get(`/web/corporateservicecenter/${props.userID}`)
+      setService_Center(response.data.data)
+    } catch (error) {
+      // Handle error 
+    }
+  }
+
+  const getBranchManager = async () => {
+    try {
+      const response = await axiosClient.get(`/web/branchmanager/${props.userID}`)
+      setBranchManager(response.data)
+    } catch (error) {
+      // Handle error
+    }
+  }
+
+  const handleChangeRole = (event, newValue) => {
+    setUser({
+      ...user,
+      role_id: newValue?.id,
+      role_name: newValue?.name,
+    })
+    if (props.userRole == 2) {
+      if (newValue.name === "Branch Advisor") {
+        setHide(true)
+      } else {
+        setHide(false)
+      }
+    }
+  }
+
+  const handleChangeServiceCenter = (event, newValue) => {
+    setUser({
+      ...user,
+      service_center_id: newValue?.id,
+      service_center: newValue?.name,
+    })
+  }
+
+  const handleChangeBranchManager= (event, newValue) => {
+    setUser({
+      ...user,
+      branch_manager_id: newValue?.id,
+      branch_manager: newValue?.fullname,
+    })
+  }
+
+  const onSubmit = async (ev) => {
+    ev.preventDefault()
+    setIsSubmitting(true);
+    const payload = {...user}
+
+    try {
+      const response = id
+        ? await axiosClient.put(`/web/users/${id}`, payload)
+        : await axiosClient.post('/web/users', payload);
+      response
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: id ? 'Your data has been successfully updated!' : 'Your data has been successfully saved!',
+      }).then(() => {
+        setIsSubmitting(false);
+        navigate('/users', { state: 'success' });
+      });
+    } catch (err) {
+      const response = err.response;
+      if (response && response.status === 422) {
+        setIsSubmitting(false);
+        setErrors(response.data.errors);
+      }
+    }
+  }
+
   useEffect(() => {
     if (id) {
       setUser({
@@ -63,105 +149,11 @@ export default function UserModal(props) {
     }
  
   }, [id])
- 
-  const getRoles = async () => {
-    try {
-      const response = await axiosClient.get(`/roles/${props.userID}`)
-      setRoles(response.data.data)
-    } catch (error) {
-      // Handle error
-    }
-  }
-
-  const getServiceCenter = async () => {
-    try {
-      const response = await axiosClient.get(`/corporateservicecenter/${props.userID}`)
-      setService_Center(response.data.data)
-    } catch (error) {
-
-    }
-  }
-
-  const getBranchManager = async () => {
-    try {
-      const response = await axiosClient.get(`/branchmanager/${props.userID}`)
-      setBranchManager(response.data)
-    } catch (error) {
-
-    }
-  }
-
-  const handleChangeRole = (event, newValue) => {
-    setUser({
-      ...user,
-      role_id: newValue?.id,
-      role_name: newValue?.name,
-    })
-    if (props.userRole == 2) {
-      if (newValue.name === "Branch Advisor") {
-        setHide(true)
-      } else {
-        setHide(false)
-      }
-    }
-    
-  }
-
-  const handleChangeServiceCenter = (event, newValue) => {
-    setUser({
-      ...user,
-      service_center_id: newValue?.id,
-      service_center: newValue?.name,
-    })
-  }
-
-  const handleChangeBranchManager= (event, newValue) => {
-    setUser({
-      ...user,
-      branch_manager_id: newValue?.id,
-      branch_manager: newValue?.fullname,
-    })
-  }
-
-  const onSubmit = (ev) => {
-    ev.preventDefault()
-    const payload = {...user}
-
-    const handleSuccess = () => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: id ? 'Your data has been successfully updated!' : 'Your data has been successfully saved!',
-      }).then(() => {
-        navigate('/users', { state: 'success' });
-      });
-    }
-
-    const handleErrors = (response) => {
-      if (response && response.status === 422) {
-        setErrors(response.data.errors);
-      }
-    }
-
-    const handleRequest = id ? axiosClient.put(`/users/${id}`, payload) : axiosClient.post('/users', payload);
-    handleRequest
-    .then(() => {
-      handleSuccess();
-    })
-    .catch((err) => {
-      const response = err.response;
-      handleErrors(response);
-    });
-  }
 
   useEffect(() => {
     getRoles()
     getServiceCenter()
     getBranchManager()
-  }, [])
-
-  useEffect(() => {
-    getRoles()
     if (props.show == false) {
       setUser({
         ...user,
@@ -188,7 +180,7 @@ export default function UserModal(props) {
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-              <Modal.Title>{id ? 'Update User' : 'Create User'}</Modal.Title>
+              <Modal.Title>{id ? 'Edit User' : 'Add User'}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -275,9 +267,7 @@ export default function UserModal(props) {
                 </Col>
                 <Col xs={12} md={6}>
                 { props.userRole == 2 &&
-
-                
-                <Autocomplete
+                  <Autocomplete
                     disableClearable
                     onChange={handleChangeServiceCenter}
                     options={service_center}
@@ -351,12 +341,10 @@ export default function UserModal(props) {
                 </Row>
               </Form.Group>
             }
-              
-         
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success"  type="submit">Save Changes</Button>
+                  <Button variant="success"  type="submit" disabled={isSubmitting}>Save Changes</Button>
                 </Col>
               </Row>
             </Form.Group>

@@ -20,7 +20,7 @@ import NotFound from "./views/NotFound"
 import Notification from "./views/pages/Notification"
 import Forgot_password from "./views/pages/Forgot_password"
 import OTP2 from "./views/otp verification/OTP2"
-import Sample from "./views/pages/Sample"
+import HighChart from "./views/graph/HighChart"
 
 const router = createBrowserRouter([
     {
@@ -30,11 +30,10 @@ const router = createBrowserRouter([
             {
                 path: '/',
                 element: <Navigate to="/dashboard" />,
-                
             },
             {
                 path: '/dashboard',
-                element: <Dashboard />
+                element: <HighChart />
             },
             {
                 path: '/services',
@@ -99,10 +98,10 @@ const router = createBrowserRouter([
                 path: '/otp2',
                 element: <OTP2 />
             },
-            {
-                path: '/changepassword',
-                element: <ChangePassword />
-            },
+            // {
+            //     path: '/changepassword',
+            //     element: <ChangePassword />
+            // },
             {
                 path: '/loader',
                 element: <Loader2 />
@@ -123,9 +122,9 @@ const router = createBrowserRouter([
         element: <NotFound />
     },
     {
-        path: 'loading',
-        element: <Sample />
-    },
+        path: '/chart',
+        element: <HighChart />
+    }
     
     
 

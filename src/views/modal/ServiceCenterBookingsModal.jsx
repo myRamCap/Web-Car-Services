@@ -14,6 +14,7 @@ import Swal from 'sweetalert2'
 import dayjs from 'dayjs';
 
 export default function ServiceCenterBookingsModal(props) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState(null)
   const [disabledVehicle, setDisabledVehicle] = useState(true)
   const [disabledTime, setDisabledTime] = useState(true)
@@ -42,47 +43,25 @@ export default function ServiceCenterBookingsModal(props) {
     notes: "",
   })
  
-  const getServices = () => {
-    axiosClient.get(`/service_center/services/${param.id}`)
-      .then(({ data }) => {
-        setServices(data.data)
-      })
-  }
-
-  const getClients = () => {
-    axiosClient.get('/client')
-    .then(({data}) => {
-      setClients(data.data)
-    })
-  }
-
-  useEffect(() => {
-    if (id) {
-      const [year, month, day] =  props.Data.booking_date.split('-')
-      const date = `${year}/${month}/${day}` 
-      setBooking({
-        ...booking,
-        id: props.Data.id,
-        client_id: props.Data.client_id,
-        client_name: props.Data.client_name,
-        vehicle_id: props.Data.vehicle_id,
-        vehicle_name: props.Data.vehicle_name,
-        services_id: props.Data.services_id,
-        service: props.Data.service,
-        estimated_time: props.Data.estimated_time,
-        contact_number: props.Data.contact_number,
-        status: props.Data.status,
-        booking_date: date,
-        time: props.Data.time,
-        estimated_time_desc: props.Data.estimated_time_desc,
-        notes: props.Data.notes,
-      })
-      setDisabledTime(false)
-      setDisabledVehicle(false)
+  const getServices = async () => {
+    try {
+      const response = await axiosClient.get(`/web/service_center/services/${param.id}`);
+      setServices(response.data.data);
+    } catch (error) {
+      // Handle error if needed
     }
-  }, [id])
+  }
 
-  const handleChangeCustomer = (event, newValue) => {
+  const getClients = async () => {
+    try {
+      const response = await axiosClient.get('/web/client');
+      setClients(response.data.data);
+    } catch (error) {
+      // Handle error if needed
+    }
+  }
+
+  const handleChangeCustomer = async (event, newValue) => {
     setDisabledVehicle(true)
     setBooking({
       ...booking,
@@ -92,30 +71,34 @@ export default function ServiceCenterBookingsModal(props) {
       vehicle_id: "",
     })
 
-    axiosClient.get(`/service_center/vehicle/${newValue.id}`)
-      .then(({ data }) => {
-        setVehicle(data)
-        setDisabledVehicle(false)
-      })
+    try {
+      const response = await axiosClient.get(`/web/service_center/vehicle/${newValue.id}`);
+      setVehicle(response.data);
+      setDisabledVehicle(false);
+    } catch (error) {
+      // Handle error if needed
+    }
   }
 
-  const handleChangeDate = (date) => {
+  const handleChangeDate = async (date) => {
     setDisabledTime(true)
     const d = new Date(date);
     const year = d.getFullYear();
     const month = ('0' + (d.getMonth() + 1)).slice(-2);
     const day = ('0' + d.getDate()).slice(-2);
-    const convertedDate = year + '/' + month + '/' + day;
+    const convertedDate = `${year}/${month}/${day}`;
     setBooking({
       ...booking,
       booking_date: convertedDate,
     })
 
-    axiosClient.get(`/service_center/timeslot/${param.id}/${convertedDate}`)
-    .then(({ data }) => {
-      setTimeSlot(data.data)
-      setDisabledTime(false)
-    })
+    try {
+      const response = await axiosClient.get(`/web/service_center/timeslot/${param.id}/${convertedDate}`);
+      setTimeSlot(response.data.data);
+      setDisabledTime(false);
+    } catch (error) {
+      // Handle error if needed
+    }
 
   }
 
@@ -130,12 +113,12 @@ export default function ServiceCenterBookingsModal(props) {
   }
   
   const handleChangeTime = (event, newValue) => {
-    
     setBooking({
       ...booking,
       time: newValue.time,
     })
   }
+
   const handleChangeVehicle = (event, newValue) => {
     console.log(newValue)
     setBooking({
@@ -184,45 +167,60 @@ export default function ServiceCenterBookingsModal(props) {
     };
   })
 
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
     ev.preventDefault()
+    setIsSubmitting(true);
     const payload = { ...booking }
-    if (id) {
-      axiosClient.put(`/service_center/booking/${id}`, payload)
-      .then(({}) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully Updated!",
-        }).then(() => {
-          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-        })
-      })
-      .catch(err => {
-        const response = err.response
-        if (response && response.status === 422) {
-          setErrors(response.data.errors)
-        }
-      }) 
-    } else {
-      axiosClient.post('/service_center/booking', payload)
-      .then(({}) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully saved!",
-        }).then(() => {
-          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-        })
-      })
-      .catch(err => {
-        const response = err.response
-        if (response && response.status === 422) {
-          setErrors(response.data.errors)
-        }
-      }) 
+
+    try {
+      const response = id
+      ? await axiosClient.put(`/web/service_center/booking/${id}`, payload)
+      : await axiosClient.post('/web/service_center/booking', payload);
+      response
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: id
+          ? 'Your data has been successfully updated!'
+          : 'Your data has been successfully saved!',
+      }).then(() => {
+        setIsSubmitting(false);
+        navigate(`/servicecenter/details/${param.name}/${param.id}`, { state: 'success' });
+      });
+    } catch (err) {
+      const response = err.response;
+      if (response && response.status === 422) {
+        setIsSubmitting(false);
+        setErrors(response.data.errors);
+      }
     }
   }
+
+  useEffect(() => {
+    if (id) {
+      const [year, month, day] =  props.Data.booking_date.split('-')
+      const date = `${year}/${month}/${day}` 
+      setBooking({
+        ...booking,
+        id: props.Data.id,
+        client_id: props.Data.client_id,
+        client_name: props.Data.client_name,
+        vehicle_id: props.Data.vehicle_id,
+        vehicle_name: props.Data.vehicle_name,
+        services_id: props.Data.services_id,
+        service: props.Data.service,
+        estimated_time: props.Data.estimated_time,
+        contact_number: props.Data.contact_number,
+        status: props.Data.status,
+        booking_date: date,
+        time: props.Data.time,
+        estimated_time_desc: props.Data.estimated_time_desc,
+        notes: props.Data.notes,
+      })
+      setDisabledTime(false)
+      setDisabledVehicle(false)
+    }
+  }, [id])
 
   useEffect(() => {
     getServices()
@@ -254,7 +252,7 @@ export default function ServiceCenterBookingsModal(props) {
     <div id="servicesModal">
       <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Create Booking</Modal.Title>
+          <Modal.Title>{id ? 'Edit Booking' : 'Add Booking'}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="modal-main">
         {errors && 
@@ -297,7 +295,6 @@ export default function ServiceCenterBookingsModal(props) {
                       className='datePicker' 
                       label="Date"
                       onChange={handleChangeDate}
-                      // renderInput={(params) => <TextField {...params} fullWidth />}
                     />
                   </LocalizationProvider>
                 </Col>
@@ -400,17 +397,39 @@ export default function ServiceCenterBookingsModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField value={param.name} disabled type="text" id="service_center" label="Service Center" variant="outlined" fullWidth />
+                  <TextField 
+                    value={param.name} 
+                    disabled 
+                    type="text" 
+                    id="service_center" 
+                    label="Service Center" 
+                    variant="outlined" 
+                    fullWidth 
+                  />
                 </Col>
                 <Col xs={12} md={6}>
-                  <TextField type="text" value={booking.notes} onChange={ev => setBooking({...booking, notes: ev.target.value})} id="notes" label="Notes.." variant="outlined" fullWidth />
+                  <TextField 
+                    type="text" 
+                    value={booking.notes} 
+                    onChange={ev => setBooking({...booking, notes: ev.target.value})} 
+                    id="notes" 
+                    label="Notes.." 
+                    variant="outlined" 
+                    fullWidth 
+                  />
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success" type="submit">Save Changes</Button>
+                  <Button 
+                    variant="success" 
+                    type="submit" 
+                    disabled={isSubmitting} 
+                  >
+                    Save Changes
+                  </Button>
                 </Col>
               </Row>
             </Form.Group>

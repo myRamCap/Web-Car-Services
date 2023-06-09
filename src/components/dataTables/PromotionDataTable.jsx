@@ -26,7 +26,7 @@ export default function PromotionDataTable() {
     const getPromotion = async () => {
       setLoading(true)
       try {
-        const { data } = await axiosClient.get('/promotion')
+        const { data } = await axiosClient.get('/web/promotion')
         setPromotion(data.data)
         setLoading(false)
       } catch (error) {
@@ -49,13 +49,12 @@ export default function PromotionDataTable() {
     const action = [
       {
         icon: () => <div className="btn btn-primary">Add New</div> ,
-        tooltip: 'Add User',
         isFreeAction: true,
         onClick: (event) => setShowModal(true)
       },
       {
         icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-        tooltip: 'Edit User',
+        tooltip: 'Edit',
         onClick: (event,rowData) => {
           setPromotionINfo({
               ...promotionInfo,

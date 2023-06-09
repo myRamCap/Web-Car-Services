@@ -7,13 +7,13 @@ import Button from 'react-bootstrap/Button';
 import { Autocomplete, Card, CardMedia, TextField } from '@mui/material';
 import axiosClient from '../../axios-client';
 import Swal from 'sweetalert2'
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import NoImage from '../../assets/images/No-Image.png';
 import EstimatedTime from '../../data/JSON/refHours.json'
 
 export default function ServiceCenterServiceModal(props) {
   const navigate = useNavigate()
-  const location = useLocation()
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState(null)
   const id = props.Data?.id ?? null
   const [services, setServices] = useState([])
@@ -31,25 +31,6 @@ export default function ServiceCenterServiceModal(props) {
     image_url: "",
   })
 
-  useEffect(() => {
-    getService()
-  }, [])
-
-  useEffect(() => {
-    if (id) { 
-      setService({
-        ...service,
-        id: props.Data.id,
-        service_id: props.Data.service_id,
-        estimated_time: props.Data.estimated_time,
-        estimated_time_desc: props.Data.estimated_time_desc,
-        name: props.Data.name,
-        details: props.Data.details,
-        image_url: props.Data.image_url,
-      })
-    }
-  }, [id])
-  
   const optionsEstimatedTime = EstimatedTime.RECORDS.map((option) => {
     const firstLetter = option.details[0].toUpperCase();
     return {
@@ -58,50 +39,42 @@ export default function ServiceCenterServiceModal(props) {
     };
   })
 
-  const getService = () => {
-    axiosClient.get('/services')
-    .then(({data}) => {
-      setServices(data.data)
-    })
+  const getService = async () => {
+    try {
+      const response = await axiosClient.get('/web/services');
+      setServices(response.data.data);
+    } catch (err) {
+      console.error(err);
+      // Handle error as needed
+    }
   }
 
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
       ev.preventDefault()
+      setIsSubmitting(true);
       const payload = {...service}
-      if (id) {
-        axiosClient.put(`/service_center/services/${id}`, payload)
-        .then(() => {
-          Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: "Your data has been successfully updated!",
-          }).then(() => {
-            navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-          })
-        })
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-              setErrors(response.data.errors)
-          }
-        }) 
-      } else {
-        axiosClient.post('/service_center/services', payload)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: "Your data has been successfully saved!",
-          }).then(() => {
-            navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-          })
-        })
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) { 
-            setErrors(response.data.errors)
-          }
-        }) 
+
+      try {
+        const response = id
+          ? await axiosClient.put(`/web/service_center/services/${id}`, payload)
+          : await axiosClient.post('/web/service_center/services', payload);
+        response
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: id
+            ? 'Your data has been successfully updated!'
+            : 'Your data has been successfully saved!',
+        }).then(() => {
+          setIsSubmitting(false);
+          navigate(`/servicecenter/details/${param.name}/${param.id}`, { state: 'success' });
+        });
+      } catch (err) {
+        const response = err.response;
+        if (response && response.status === 422) {
+          setIsSubmitting(false);
+          setErrors(response.data.errors);
+        }
       }
   }
 
@@ -126,6 +99,22 @@ export default function ServiceCenterServiceModal(props) {
   }
 
   useEffect(() => {
+    if (id) { 
+      setService({
+        ...service,
+        id: props.Data.id,
+        service_id: props.Data.service_id,
+        estimated_time: props.Data.estimated_time,
+        estimated_time_desc: props.Data.estimated_time_desc,
+        name: props.Data.name,
+        details: props.Data.details,
+        image_url: props.Data.image_url,
+      })
+    }
+  }, [id])
+
+  useEffect(() => {
+    getService()
     if (props.show == false) {
       setService({
         ...service,
@@ -141,13 +130,11 @@ export default function ServiceCenterServiceModal(props) {
     }
   },[props.show])
 
-  const [num, setNum] = React.useState();
-
   return (
     <div id="servicesModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Create Services for {param.name}</Modal.Title>
+              <Modal.Title>{id ? 'Edit Services' : 'Add Services'}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -182,11 +169,16 @@ export default function ServiceCenterServiceModal(props) {
                         />
                     </Col>
                     <Col xs={12} md={12} className="mt-4">
-                        <TextField type="text" value={service.details} id="description" label="Description" variant="outlined" fullWidth/>
+                        <TextField 
+                          type="text" 
+                          value={service.details} 
+                          id="description" 
+                          label="Description" 
+                          variant="outlined" 
+                          fullWidth
+                        />
                     </Col>
                     <Col xs={12} md={12} className="mt-4">
-                        {/* <TextField type="number" value={service.estimate_time} onChange={(e) => setNum(e.target.value)}
-          id="estimated_time" label="Estimated Time" variant="outlined" fullWidth/> */}
                       <Autocomplete
                         disableClearable
                         options={optionsEstimatedTime.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -207,7 +199,6 @@ export default function ServiceCenterServiceModal(props) {
                       />
                     </Col>
                 </Col>
-
                 <Col xs={12} md={6}> 
                     <Card raised >
                         <CardMedia src={service.image_url ? service.image_url : NoImage}
@@ -217,14 +208,19 @@ export default function ServiceCenterServiceModal(props) {
                             title={"titleasdasdsada"}
                             sx={{ padding: "1em 1em 0 1em", objectFit: "contain" }}/>
                     </Card>
-            
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success"  type="submit">Save Changes</Button>
+                  <Button 
+                    variant="success"  
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Save Changes
+                  </Button>
                 </Col>
               </Row>
             </Form.Group>

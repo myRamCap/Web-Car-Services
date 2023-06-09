@@ -37,7 +37,7 @@ export default function NotificationDataTable() {
       // }
 
       setLoading(true)
-      axiosClient.get('/notification')
+      axiosClient.get('/web/notification')
     .then(({data}) => {
       setNotification(data)
       setLoading(false)
@@ -60,13 +60,12 @@ export default function NotificationDataTable() {
     const action = [
         {
           icon: () => <div className="btn btn-primary">Add New</div> ,
-          tooltip: 'Add User',
           isFreeAction: true,
           onClick: (event) => setShowModal(true)
         },
         {
           icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-          tooltip: 'Edit User',
+          tooltip: 'Edit',
           onClick: (event,rowData) => {
             console.log(rowData)
             setNotificationInfo({

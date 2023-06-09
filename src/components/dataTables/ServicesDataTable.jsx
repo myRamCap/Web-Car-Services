@@ -24,7 +24,7 @@ export default function ServicesDataTable() {
 
   const getServices = () => {
     setLoading(true)
-    axiosClient.get('/services')
+    axiosClient.get('/web/services')
       .then(({data}) => {
         setServices(data)
         setLoading(false)
@@ -46,13 +46,12 @@ export default function ServicesDataTable() {
    const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
         setServicesInfo({
           ...servicesInfo,
@@ -101,6 +100,7 @@ export default function ServicesDataTable() {
     if (location.state){
       getServices()
       setShowModal(false)
+      setServicesInfo([])
       location.state = null
     }
   }, [location.state])

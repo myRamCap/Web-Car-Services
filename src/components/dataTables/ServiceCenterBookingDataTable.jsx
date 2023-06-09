@@ -35,7 +35,7 @@ export default function ServiceCenterBookingDataTable() {
 
   const getBooking = () => {
     setLoading(true)
-    axiosClient.get(`/service_center/booking/${param.id}`)
+    axiosClient.get(`/web/service_center/booking/${param.id}`)
     .then(({data}) => {
       setServiceCenterBooking(data)
       setLoading(false)
@@ -56,13 +56,12 @@ export default function ServiceCenterBookingDataTable() {
    const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit Booking',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
         setServiceCenterBookingInfo({
           ...serviceCenterBookingInfo,
@@ -123,6 +122,7 @@ export default function ServiceCenterBookingDataTable() {
     getBooking()
     if (location.state == 'success'){
       getBooking()
+      setServiceCenterBookingInfo([])
       setShowModal(false)
       location.state = null
     }

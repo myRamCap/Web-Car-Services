@@ -17,7 +17,7 @@ export default function CustomerDataTable() {
 
   const getClient = () => {
     setLoading(true)
-    axiosClient.get('/client')
+    axiosClient.get('/web/client')
     .then(({data}) => {
       setClient(data)
       setLoading(false)

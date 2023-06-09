@@ -55,7 +55,7 @@ export default function Navbar() {
             </i>
         </div>
         <ul className="nav">
-            { role == 1 || role == 2 ? 
+            { role == 1 || role == 2 || role == 3 ? 
                 (   
                     <li>
                         <Link className={splitLocation[1] === "dashboard" ? "isActive" : ""} to="/dashboard">

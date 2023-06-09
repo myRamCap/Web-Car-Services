@@ -20,6 +20,7 @@ export default function ServiceCenterModal(props) {
   const {user_ID} = useStateContext()
   const location = useLocation()
   const navigate = useNavigate()
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
@@ -47,26 +48,6 @@ export default function ServiceCenterModal(props) {
     image: "",
   }) 
  
-  useEffect(() => {
-    if (id) {
-      setServiceCenter({
-        ...serviceCenter,
-        id: props.Data.id,
-        name: props.Data.name,
-        category: props.Data.category,
-        country: props.Data.country,
-        house_number: props.Data.house_number,
-        barangay: props.Data.barangay,
-        municipality: props.Data.municipality,
-        province: props.Data.province,
-        longitude: props.Data.longitude,
-        latitude: props.Data.latitude,
-        facility: props.Data.facility,
-        image: props.Data.image,
-      })
-    }
-  }, [id])
-
   const handleChangeProvince = (event, newValue) => {
     const filterCity = City.RECORDS.filter((data) => data.provCode === newValue.provCode)
     setMunicipality(filterCity)
@@ -124,49 +105,41 @@ export default function ServiceCenterModal(props) {
     };
   })
 
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
     ev.preventDefault()
+    setIsSubmitting(true);
     const payload = {...serviceCenter}
- 
-    if (id) {
-      axiosClient.put(`/servicecenter/${id}`, payload)
-      .then(({}) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully updated!",
-        }).then(() => {
-          navigate('/servicecenter' , {state:  'success' })
-        })
-      })
-    .catch(err => {
-      const response = err.response
-      if (response && response.status === 422) {
-        console.log(response.data.errors)
-        setErrors(response.data.errors)
-      }
-    }) 
 
-    } else {
-      axiosClient.post('/servicecenter', payload)
-      .then(({}) => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully saved!",
-        }).then(() => {
-          navigate('/servicecenter' , {state:  'success' })
-        })
-      })
-      .catch(err => {
-        const response = err.response
-        if (response && response.status === 422) {
-          console.log(response.data.errors)
-          setErrors(response.data.errors)
+    try {
+      const response = id
+        ? await axiosClient.put(`/web/servicecenter/${id}`, payload)
+        : await axiosClient.post('/web/servicecenter', payload);
+      response 
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: id
+          ? 'Your data has been successfully updated!'
+          : 'Your data has been successfully saved!',
+      }).then(() => {
+        setIsSubmitting(false);
+        navigate('/servicecenter', { state: 'success' });
+      });
+    } catch (err) {
+      const response = err.response;
+      if (response && response.status === 422) {
+        setIsSubmitting(false);
+        if (response.data.errors['restriction']) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'You reached your limit, Please contact RamCap for support.',
+          })
+        } else {
+          setErrors(response.data.errors);
         }
-      }) 
+      }
     }
-    
   }
 
   const onclickMap = (ev) => {
@@ -204,6 +177,26 @@ export default function ServiceCenterModal(props) {
     }
     reader.readAsDataURL(file)
   }
+
+  useEffect(() => {
+    if (id) {
+      setServiceCenter({
+        ...serviceCenter,
+        id: props.Data.id,
+        name: props.Data.name,
+        category: props.Data.category,
+        country: props.Data.country,
+        house_number: props.Data.house_number,
+        barangay: props.Data.barangay,
+        municipality: props.Data.municipality,
+        province: props.Data.province,
+        longitude: props.Data.longitude,
+        latitude: props.Data.latitude,
+        facility: props.Data.facility,
+        image: props.Data.image,
+      })
+    }
+  }, [id])
 
   useEffect(() => {
     if (props.show == false) {
@@ -244,7 +237,7 @@ export default function ServiceCenterModal(props) {
     <div id="serviceCenterModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Create Service Center</Modal.Title>
+              <Modal.Title>{id ? 'Edit Service Center' : 'Add Service Center'}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -274,20 +267,44 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" value={serviceCenter.name} onChange={ev => setServiceCenter({...serviceCenter, name: ev.target.value})} id="name" label="Name" variant="outlined" fullWidth/>
+                  <TextField 
+                    type="text" 
+                    value={serviceCenter.name} 
+                    onChange={ev => setServiceCenter({...serviceCenter, name: ev.target.value})} 
+                    id="name" 
+                    label="Name" 
+                    variant="outlined" 
+                    fullWidth
+                  />
                 </Col>
 
                 <Col xs={12} md={6}> 
-                  <TextField type="text" onChange={ev => setServiceCenter({...serviceCenter, country: ev.target.value})} id="country" label="Country" variant="outlined" value={country} disabled fullWidth/>
+                  <TextField 
+                    type="text" 
+                    onChange={ev => setServiceCenter({...serviceCenter, country: ev.target.value})} 
+                    id="country" 
+                    label="Country"
+                    variant="outlined" 
+                    value={country} 
+                    disabled 
+                    fullWidth
+                  />
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" value={serviceCenter.house_number} onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} id="street" label="House Number / Street" variant="outlined" fullWidth/>
+                  <TextField 
+                    type="text" 
+                    value={serviceCenter.house_number} 
+                    onChange={ev => setServiceCenter({...serviceCenter, house_number: ev.target.value})} 
+                    id="street" 
+                    label="House Number / Street" 
+                    variant="outlined" 
+                    fullWidth
+                  />
                 </Col>
-
                 <Col xs={12} md={6}> 
                   <Autocomplete
                     disableClearable
@@ -332,7 +349,6 @@ export default function ServiceCenterModal(props) {
                     )}
                   />
                 </Col>
-
                 <Col xs={12} md={6}> 
                   <Autocomplete
                     disableClearable
@@ -358,10 +374,24 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="text" id="longitude" label="Longitude" value={serviceCenter.longitude} variant="outlined" fullWidth/>
+                  <TextField 
+                    type="text" 
+                    id="longitude" 
+                    label="Longitude" 
+                    value={serviceCenter.longitude} 
+                    variant="outlined" 
+                    fullWidth
+                  />
                 </Col>
                 <Col xs={12} md={5}> 
-                  <TextField type="text" id="latitude" label="Latitude" value={serviceCenter.latitude}  variant="outlined" fullWidth/>
+                  <TextField 
+                    type="text" 
+                    id="latitude" 
+                    label="Latitude" 
+                    value={serviceCenter.latitude}  
+                    variant="outlined" 
+                    fullWidth
+                  />
                 </Col>
                 <Col xs={12} md={1} > 
                   {/* <Link to="/data"> */}
@@ -375,34 +405,50 @@ export default function ServiceCenterModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6}>
-                  <TextField type="number" value={serviceCenter.facility}  onChange={ev => setServiceCenter({...serviceCenter, facility: ev.target.value})}  id="branchManager" label="Facility" variant="outlined" fullWidth/>
+                  <TextField 
+                    type="number" 
+                    value={serviceCenter.facility}  
+                    onChange={ev => setServiceCenter({...serviceCenter, facility: ev.target.value})}  
+                    id="branchManager" 
+                    label="Facility" 
+                    variant="outlined" 
+                    fullWidth
+                  />
                 </Col>
                 <Col xs={12} md={5}> 
-                    <input accept=".jpg, .jpeg, .png" onChange={onImageChoose} className="fileUpload" name="arquivo" id="arquivo" type="file" />
+                    <input 
+                      accept=".jpg, .jpeg, .png" 
+                      onChange={onImageChoose} 
+                      className="fileUpload" 
+                      name="arquivo" 
+                      id="arquivo" 
+                      type="file" 
+                    />
                 </Col>
                 <Col xs={12} md={1}> 
                     <Card raised className='sc-image' onClick={onclickImage}>
-                        <CardMedia className='sc-image' src={serviceCenter.image ? serviceCenter.image :  NoImage} 
-                            component="img"
-                            height="40"
-                            alt={"alt"}
-                            sx={{  objectFit: "contain" }}
-                            />
+                        <CardMedia 
+                          className='sc-image' 
+                          src={serviceCenter.image ? serviceCenter.image :  NoImage} 
+                          component="img"
+                          height="40"
+                          alt={"alt"}
+                          sx={{  objectFit: "contain" }}
+                        />
                     </Card>
                 </Col>
               </Row>
             </Form.Group>
-            {/* <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Row>
-                <Col xs={12} md={6}>
-                  <TextField type="text" value={serviceCenter.branch_manager_id}  onChange={ev => setServiceCenter({...serviceCenter, branch_manager_id: ev.target.value})}  id="branchManager" label="Branch Manager" variant="outlined" fullWidth/>
-                </Col>
-              </Row>
-            </Form.Group> */}
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success"  type="submit">Save Changes</Button>
+                  <Button 
+                    variant="success"  
+                    type="submit" 
+                    disabled={isSubmitting} 
+                  >
+                    Save Changes
+                  </Button>
                 </Col>
               </Row>
             </Form.Group>

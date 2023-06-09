@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 
 export default function NotificationsModal(props) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [checkbox1Checked, setCheckbox1Checked] = useState(false);
     const [checkbox2Checked, setCheckbox2Checked] = useState(false);
     const [errors, setErrors] = useState(null);
@@ -61,7 +62,7 @@ export default function NotificationsModal(props) {
 
     const getCorporate = async () => {
         try {
-            const { data } = await axiosClient.get('/corporate_account')
+            const { data } = await axiosClient.get('/web/corporate_account')
             setCorporate(data)
         } catch (error) {
 
@@ -70,7 +71,7 @@ export default function NotificationsModal(props) {
 
     const getServiceCenter = async () => {
         try {
-            const { data } = await axiosClient.get('/servicecenter')
+            const { data } = await axiosClient.get('/web/servicecenter')
             setServiceCenter(data.data)
         } catch (error) {
 
@@ -110,19 +111,17 @@ export default function NotificationsModal(props) {
     };
 
     const handleChangeDateRangePicker = (date) => {
-        
-
         if (date[1]) {
             const df = new Date(date[0]);
             const dt = new Date(date[1]);
             const dfyear = df.getFullYear();
             const dtyear = dt.getFullYear();
-            const dfonth = ('0' + (df.getMonth() + 1)).slice(-2);
+            const dfmonth = ('0' + (df.getMonth() + 1)).slice(-2);
             const dtmonth = ('0' + (dt.getMonth() + 1)).slice(-2);
             const dfday = ('0' + df.getDate()).slice(-2);
             const dtday = ('0' + dt.getDate()).slice(-2);
-            const datefrom = dfyear + '/' + dfonth + '/' + dfday;
-            const dateto = dtyear + '/' + dtmonth + '/' + dtday;
+            const datefrom = `${dfyear}/${dfmonth}/${dfday}`;
+            const dateto = `${dtyear}/${dtmonth}/${dtday}`;
 
             setNotification({
                 ...notification,
@@ -130,7 +129,6 @@ export default function NotificationsModal(props) {
                 dateto: dateto,
             })
         }
-        
     };
 
     const onImageChoose = (ev) => {
@@ -145,76 +143,61 @@ export default function NotificationsModal(props) {
         reader.readAsDataURL(file)
     }
 
-
-    const onSubmit = (ev) => {
+    const onSubmit = async (ev) => {
         ev.preventDefault()
+        setIsSubmitting(true);
         const payload = {...notification}
 
-        if (id) {
-            axiosClient.put(`/notification/${id}`, payload)
-            .then(({}) => {
+        try {
+            const response = id 
+            ? await axiosClient.put(`/web/notification/${id}`, payload) 
+            : await axiosClient.post('/web/notification', payload);
+            response
             Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: "Your data has been successfully updated!",
+            icon: 'success',
+            title: 'Success',
+            text: id
+                ? 'Your data has been successfully updated!'
+                : 'Your data has been successfully saved!',
             }).then(() => {
-                navigate('/notifications' , {state:  'success' })
-            })
-            })
-            .catch(err => {
-                const response = err.response
-                if (response && response.status === 422) {
-                    setErrors(response.data.errors)
-                }
-            }) 
-        } else {
-            axiosClient.post('/notification', payload)
-            .then(({}) => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: "Your data has been successfully saved!",
-            }).then(() => {
-                navigate('/notifications' , {state:  'success' })
-            })
-            })
-            .catch(err => {
-                const response = err.response
-                if (response && response.status === 422) {
-                    setErrors(response.data.errors)
-                }
-            }) 
+                setIsSubmitting(false);
+                navigate('/notifications', { state: 'success' });
+            });
+        } catch (err) {
+            const response = err.response;
+            if (response && response.status === 422) {
+                setIsSubmitting(false);
+                setErrors(response.data.errors);
+            }
         }
-
-        
     };
 
     useEffect(() => {
         if (id) {
-          setNotification({
-            ...notification,
-            id: props.Data.id,
-            corporate_id: props.Data.corporate_id,
-            first_name: props.Data.first_name,
-            last_name: props.Data.last_name,
-            service_center_id: props.Data.service_center_id,
-            service_center: props.Data.service_center,
-            datefrom: props.Data.datefrom,
-            dateto: props.Data.dateto,
-            title: props.Data.title,
-            content: props.Data.content,
-            image_url: props.Data.image_url,
-          })
-    
-          if (props.Data.corporate_id) {
-            setCheckbox1Checked(true)
-            setCheckbox2Checked(false)
-          } else {
-            setCheckbox2Checked(true)
-            setCheckbox1Checked(false)
-          }
+            setNotification({
+                ...notification,
+                id: props.Data.id,
+                corporate_id: props.Data.corporate_id,
+                first_name: props.Data.first_name,
+                last_name: props.Data.last_name,
+                service_center_id: props.Data.service_center_id,
+                service_center: props.Data.service_center,
+                datefrom: props.Data.datefrom,
+                dateto: props.Data.dateto,
+                title: props.Data.title,
+                content: props.Data.content,
+                image_url: props.Data.image_url,
+            })
+
+            if (props.Data.corporate_id) {
+                setCheckbox1Checked(true)
+                setCheckbox2Checked(false)
+            } else {
+                setCheckbox2Checked(true)
+                setCheckbox1Checked(false)
+            }
         }
-      }, [id])
+    }, [id])
 
     useEffect(() => {
         getCorporate()
@@ -240,12 +223,11 @@ export default function NotificationsModal(props) {
         }
     }, [props.show])
     
- 
     return (
         <div id='NotificationModal'>
             <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>Create Notification</Modal.Title>
+                    <Modal.Title>{id ? 'Edit Notification' : 'Add Notification'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="modal-main">
                 {errors && 
@@ -374,7 +356,6 @@ export default function NotificationsModal(props) {
                                     variant="outlined"
                                     multiline
                                     rows={4}
-                                    // maxRows={10}
                                     fullWidth
                                 />
                             </Col>
@@ -407,7 +388,7 @@ export default function NotificationsModal(props) {
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Row >
                             <Col xs={12} md={12}>
-                                <Button variant="success" type="submit">Save Changes</Button>
+                                <Button variant="success" type="submit" disabled={isSubmitting} >Save Changes</Button>
                             </Col>
                         </Row>
                     </Form.Group>

@@ -35,7 +35,7 @@ export default function UsersDataTable() {
   const getUsers = async () => {
     setLoading(true)
     try {
-      const response = await axiosClient.get(`/users/${user_ID}` )
+      const response = await axiosClient.get(`/web/users/${user_ID}` )
       setUsers(response.data)
     } catch (error) {
       // Handle error
@@ -77,13 +77,12 @@ export default function UsersDataTable() {
    const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: handleAddUser,
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: handleEditUser,
     }
   ]

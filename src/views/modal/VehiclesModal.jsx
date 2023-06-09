@@ -25,7 +25,7 @@ export default function VehicleModal(props) {
     client_name: "",
     vehicle_name: "",
     chassis_number: "",
-    contact_number: "",
+    // contact_number: "",
     make: "",
     model: "",
     year: "",
@@ -33,30 +33,14 @@ export default function VehicleModal(props) {
     notes: "",
   })
 
-  useEffect(() => {
-    if (id) {
-      setVehicle({
-        ...vehicle,
-        id: props.Data.id,
-        client_id: props.Data.client_id,
-        client_name: props.Data.client_name,
-        vehicle_name: props.Data.vehicle_name,
-        chassis_number: props.Data.chassis_number,
-        contact_number: props.Data.contact_number,
-        make: props.Data.make,
-        model: props.Data.model,
-        year: props.Data.year,
-        image: props.Data.image,
-        notes: props.Data.notes,
-      })
+  const getClients = async () => {
+    try {
+      const response = await axiosClient.get('/web/client');
+      setClients(response.data.data);
+    } catch (err) {
+      console.error(err);
+      // Handle error as needed
     }
-  }, [id])
-
-  const getClients = () => {
-    axiosClient.get('/client')
-    .then(({data}) => {
-      setClients(data.data)
-    })
   }
 
   const optionsCustomer = clients.map((option) => {
@@ -67,45 +51,30 @@ export default function VehicleModal(props) {
     };
   })
 
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
       ev.preventDefault()
       const payload = {...vehicle}
-      if (id) {
-        axiosClient.put(`/vehicles/${id}`, payload)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: "Your data has been successfully updated!",
-          }).then(() => {
-            navigate('/vehicles' , {state:  'success' })
-          })
-        }) 
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-            setErrors(response.data.errors)
-          }
-        }) 
-      } else {
-        axiosClient.post('/vehicles', payload)
-        .then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: "Your data has been successfully saved!",
-          }).then(() => {
-            navigate('/vehicles' , {state:  'success' })
-          })
-        }) 
-        .catch(err => {
-          const response = err.response
-          if (response && response.status === 422) {
-            setErrors(response.data.errors)
-          }
-        }) 
+
+      try {
+        const response = id
+          ? await axiosClient.put(`/web/vehicles/${id}`, payload)
+          : await axiosClient.post('/web/vehicles', payload);
+        response
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: id
+            ? 'Your data has been successfully updated!'
+            : 'Your data has been successfully saved!',
+        }).then(() => {
+          navigate('/vehicles', { state: 'success' });
+        });
+      } catch (err) {
+        const response = err.response;
+        if (response && response.status === 422) {
+          setErrors(response.data.errors);
+        }
       }
-      
   }
 
   const handleChangeCustomer = (event, newValue) => {
@@ -129,6 +98,25 @@ export default function VehicleModal(props) {
   }
 
   useEffect(() => {
+    if (id) {
+      setVehicle({
+        ...vehicle,
+        id: props.Data.id,
+        client_id: props.Data.client_id,
+        client_name: props.Data.client_name,
+        vehicle_name: props.Data.vehicle_name,
+        chassis_number: props.Data.chassis_number,
+        // contact_number: props.Data.contact_number,
+        make: props.Data.make,
+        model: props.Data.model,
+        year: props.Data.year,
+        image: props.Data.image,
+        notes: props.Data.notes,
+      })
+    }
+  }, [id])
+
+  useEffect(() => {
     getClients()
     if (props.show == false) {
       setVehicle({
@@ -138,7 +126,7 @@ export default function VehicleModal(props) {
         client_name: "",
         vehicle_name: "",
         chassis_number: "",
-        contact_number: "",
+        // contact_number: "",
         make: "",
         model: "",
         year: "",
@@ -153,7 +141,7 @@ export default function VehicleModal(props) {
     <div id="VehicleModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Create Vehicle</Modal.Title>
+              <Modal.Title>{id ? 'Edit Vehicle' : 'Add Vehicle'}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -171,7 +159,6 @@ export default function VehicleModal(props) {
                     disableClearable
                     value={ vehicle.client_name}
                     options={optionsCustomer.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                    // options={clients}
                     onChange={handleChangeCustomer}
                     getOptionLabel={(options) => options.fullname ? options.fullname.toString() : vehicle.client_name}
                     isOptionEqualToValue={(option, value) => option.fullname ?? "" === vehicle.client_name}
@@ -187,55 +174,113 @@ export default function VehicleModal(props) {
                     )}
                     />
                 </Col>
-
                 <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.vehicle_name} onChange={ev => setVehicle({...vehicle, vehicle_name: ev.target.value})} id="vehicle_name" label="Vehicle Name" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.vehicle_name} 
+                      onChange={ev => setVehicle({...vehicle, vehicle_name: ev.target.value})} 
+                      id="vehicle_name" 
+                      label="Vehicle Name" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>
-
               </Row>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
               <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.chassis_number} onChange={ev => setVehicle({...vehicle, chassis_number: ev.target.value})} id="chassis_number" label="Chassis Number" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.chassis_number} 
+                      onChange={ev => setVehicle({...vehicle, chassis_number: ev.target.value})} 
+                      id="chassis_number" 
+                      label="Chassis Number" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>
                 <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.make} onChange={ev => setVehicle({...vehicle, make: ev.target.value})} id="make" label="Make" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.make} 
+                      onChange={ev => setVehicle({...vehicle, make: ev.target.value})} 
+                      id="make" 
+                      label="Make" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>  
               </Row>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
               <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.model} onChange={ev => setVehicle({...vehicle, model: ev.target.value})} id="model" label="Model" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.model} 
+                      onChange={ev => setVehicle({...vehicle, model: ev.target.value})} 
+                      id="model" 
+                      label="Model" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>
                 <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.year} onChange={ev => setVehicle({...vehicle, year: ev.target.value})} id="year" label="Year" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.year} 
+                      onChange={ev => setVehicle({...vehicle, year: ev.target.value})} 
+                      id="year" 
+                      label="Year" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>
               </Row>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
-              <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.contact_number} onChange={ev => setVehicle({...vehicle, contact_number: ev.target.value})} id="contact_number" label="Contact Number" variant="outlined" fullWidth/>
-                </Col>
+              {/* <Col xs={12} md={6}>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.contact_number} 
+                      onChange={ev => setVehicle({...vehicle, contact_number: ev.target.value})} 
+                      id="contact_number" 
+                      label="Contact Number" 
+                      variant="outlined" 
+                      fullWidth
+                    />
+                </Col> */}
                 <Col xs={12} md={6}>
-                    <TextField type="text" value={vehicle.notes} onChange={ev => setVehicle({...vehicle, notes: ev.target.value})} id="notes" label="Notes" variant="outlined" fullWidth/>
+                    <TextField 
+                      type="text" 
+                      value={vehicle.notes} 
+                      onChange={ev => setVehicle({...vehicle, notes: ev.target.value})} 
+                      id="notes" 
+                      label="Notes" 
+                      variant="outlined" 
+                      fullWidth
+                    />
                 </Col>
               </Row>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={6} className="mt-1">
-                    <input accept=".jpg, .jpeg, .png" className="fileUpload" name="arquivo" id="arquivo" type="file"  onChange={onImageChoose} />
+                    <input 
+                      accept=".jpg, .jpeg, .png" 
+                      className="fileUpload" 
+                      name="arquivo" 
+                      id="arquivo" 
+                      type="file"  
+                      onChange={onImageChoose} 
+                    />
                 </Col>
                 <Col xs={12} md={6}> 
                   <Card raised >
-                    <CardMedia src={vehicle.image ? vehicle.image : NoImage}
+                    <CardMedia 
+                      src={vehicle.image ? vehicle.image : NoImage}
                       component="img"
                       height="250"
                       alt={"not found"} 

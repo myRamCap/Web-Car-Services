@@ -32,7 +32,7 @@ export default function NotificationsDatatable() {
     const getNotification = async () => {
         setLoading(true)
         try {
-            const {data} = await axiosClient.get('/notification')
+            const {data} = await axiosClient.get('/web/notification')
             setNotification(data.data)
             setLoading(false)
         } catch (error) {
@@ -54,13 +54,12 @@ export default function NotificationsDatatable() {
     const action = [
         {
             icon: () => <div className="btn btn-primary">Add New</div> ,
-            tooltip: 'Add User',
             isFreeAction: true,
             onClick: (event) => setShowModal(true)
         },
         {
             icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-            tooltip: 'Edit User',
+            tooltip: 'Edit',
             onClick: (event,rowData) => {
                 console.log(rowData)
                 // console.log(rowData)
@@ -119,13 +118,14 @@ export default function NotificationsDatatable() {
     useEffect(() => {
         getNotification()
         if (location.state == 'success'){
+            setNotificationInfo([])
             getNotification()
             setShowModal(false)
             location.state = null
         }
     }, [location.state])
 
-
+ 
   return (
     <div>
         <MaterialTable 

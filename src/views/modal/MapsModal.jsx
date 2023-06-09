@@ -13,38 +13,26 @@ export default function MapsModal(props) {
   const navigate = useNavigate()
   const [image, setImage] = useState('')
   const onSubmit = (ev) => {
-      alert('randy')
       ev.preventDefault()
-
-      // console.log(product)
   }
 
   const handleChange = (event, newValue) => {
-    // console.log(newValue.year)
-  //  if (newValue != null) {
-      //  console.log(newValue.year)
        setImage(newValue.image);
-    //  }
   }
 
   const handleSave = () => {
-    // props.close
-    // console.log(props.close)
-    // console.log(localStorage.latitude)
     localStorage.setItem('lati', localStorage.latitude)
     localStorage.setItem('longi', localStorage.longitude)
     navigate('/servicecenter',  {state:  'coordinates' })
   }
 
- 
-
   return (
     <div id="">
         <Modal
-        show={props.show}
-        onHide={props.close}
-        fullscreen={true}
-      >
+          show={props.show}
+          onHide={props.close}
+          fullscreen={true}
+        >
         <Modal.Header closeButton>
           <Modal.Title id="example-custom-modal-styling-title">
             Select Location

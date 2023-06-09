@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Wave from '../../assets/images/wave.png'
 import RC from '../../assets/images/Logo-RC.png'
 import Avatar from '../../assets/images/avatar.svg'
 import axiosClient from '../../axios-client' 
 import Spinner from '../../components/loader/Spinner'
 import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 
 export default function Login() {
     const [spinner, setSpinner] = useState(false)
@@ -18,7 +17,6 @@ export default function Login() {
     const inputPassRef = useRef()
     const [errors, setErrors] = useState(null)
     const navigate = useNavigate()
-    const MySwal = withReactContent(Swal) 
 
     const emailHandleChange = (e) => {
         if (emailRef == "") {
@@ -52,40 +50,39 @@ export default function Login() {
         }
     }
 
-    const onSubmit = (ev) => {
-        ev.preventDefault()
-        setSpinner(true)
-        setErrors(null)
+    const onSubmit = async (ev) => {
+        ev.preventDefault();
+        setSpinner(true);
+        setErrors(null);
         
+        try {
         const payload = {
             email: inputEmailRef.current.value,
-            password: inputPassRef.current.value
+            password: inputPassRef.current.value,
+        };
+    
+        const { data } = await axiosClient.post('/login', payload);
+        navigate('/otp', { state: { id: data.id, email: data.email } });
+        } catch (err) {
+        const response = err.response;
+        if (response && response.status === 422) {
+            if (response.data.errors) {
+            setErrors(response.data.errors);
+            } else if (response.data.blocked) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `Your account has been temporarily locked due to 3 consecutive ${response.data.description} attempts. Please try again in ${response.data.time} minutes or contact your Corporate Manager.`,
+            });
+            } else {
+            setErrors({
+                email: [response.data.message],
+            });
+            }
         }
-
-        axiosClient.post('/login', payload)
-            .then(({data}) => {
-                navigate('/otp', {state: { id: data.id, email: data.email }})
-                setSpinner(false) 
-            })
-            .catch(err => {
-                setSpinner(false)
-                const response = err.response
-                if (response && response.status === 422) {
-                    if (response.data.errors) {
-                        setErrors(response.data.errors)
-                    }else if(response.data.blocked) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: `Your account has been temporarily locked due to 3 consecutive ` + response.data.description + ` attempts. Please try again in ` + response.data.time + ` minutes or contact your Corporate Manager.`, 
-                        })
-                    }else{
-                        setErrors({
-                            email: [response.data.message]
-                        })
-                    }
-                }
-            })
+        } finally {
+        setSpinner(false);
+        }
     }
 
   return (
@@ -108,20 +105,36 @@ export default function Login() {
                     {spinner && <Spinner/> }
                     <div ref={emailRef} className="input-div one ">
                         <div className="i">
-                            <i><box-icon type='solid' name='user' /></i>
+                            <i>
+                                <box-icon type='solid' name='user' />
+                            </i>
                         </div>
                         <div className="div">
                             <h5>Email</h5>
-                            <input ref={inputEmailRef} type="email" className="input" onChange={emailHandleChange} onClick={emailHandleClick}  />
+                            <input 
+                                ref={inputEmailRef} 
+                                type="email" 
+                                className="input" 
+                                onChange={emailHandleChange} 
+                                onClick={emailHandleClick}  
+                            />
                         </div>
                     </div>
                     <div ref={passwordRef} className="input-div pass">
                         <div className="i">
-                            <i><box-icon name='lock' /></i>
+                            <i>
+                                <box-icon name='lock' />
+                            </i>
                         </div>
                         <div className="div">
                             <h5>Password</h5>
-                            <input ref={inputPassRef} type="password" className="input" onChange={passHandleChange} onClick={passHandleClick} />
+                            <input 
+                                ref={inputPassRef} 
+                                type="password" 
+                                className="input" 
+                                onChange={passHandleChange} 
+                                onClick={passHandleClick} 
+                            />
                         </div>
                     </div>
                     <a href="/forgot_password">Forgot Password?</a>

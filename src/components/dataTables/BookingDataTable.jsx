@@ -10,8 +10,6 @@ import Booking from '../../views/modal/Booking';
 import { useStateContext } from '../../contexts/ContextProvider';
 import { useLocation } from 'react-router-dom';
 
- 
-
 export default function BookingDataTable() {
   const location = useLocation()
   const {user_ID, role} = useStateContext()
@@ -31,7 +29,7 @@ export default function BookingDataTable() {
       service_center_id: "",
       service_center: "",
       estimated_time: "",
-      contact_number: null,
+      // contact_number: null,
       status: "",
       booking_date: "",
       time: "",
@@ -53,13 +51,18 @@ export default function BookingDataTable() {
   // const open = Boolean(anchorEl);
   // const id = open ? 'simple-popover' : undefined;
 
-  const getBooking = () => {
-    setLoading(true)
-    axiosClient.get(`/booking/${user_ID}`)
-    .then(({data}) => {
-      setBooking(data)
-      setLoading(false)
-    })
+  const getBooking = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axiosClient.get(`/web/booking/${user_ID}`);
+      const { data } = response;
+      setBooking(data);
+    } catch (error) {
+      // Handle error appropriately
+    } finally {
+      setLoading(false);
+    }
   }
  
 
@@ -67,7 +70,7 @@ export default function BookingDataTable() {
     { field: "client_name", title: "Client Name" },
     { field: "service", title: "Service" },
     { field: "service_center", title: "Service Center" },
-    { field: "contact_number", title: "Contact Number" },
+    // { field: "contact_number", title: "Contact Number" },
     { field: "status", title: "Status" },
     { field: "booking_date", title: "Booking Date" },
     { field: "created_at", title: "Date Created" },
@@ -77,13 +80,12 @@ export default function BookingDataTable() {
 
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Save User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
         setBookingInfo({
           ...bookingInfo,
@@ -97,7 +99,7 @@ export default function BookingDataTable() {
           service_center_id: rowData.service_center_id,
           service_center: rowData.service_center,
           estimated_time: rowData.estimated_time,
-          contact_number: rowData.contact_number,
+          // contact_number: rowData.contact_number,
           status: rowData.status,
           booking_date: rowData.booking_date,
           time: rowData.time,
@@ -152,9 +154,9 @@ export default function BookingDataTable() {
   useEffect(() => {
     getBooking()
     if (location.state == 'success'){
-      setShowModal(false)
       setBookingInfo([])
       getBooking()
+      setShowModal(false)
       location.state = null
     }
   }, [location.state])

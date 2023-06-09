@@ -13,8 +13,6 @@ export default function Customer() {
 
   return (
     <div>
-
- 
     <Autocomplete
         id="customerName"
         disableClearable

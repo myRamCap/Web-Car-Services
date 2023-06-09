@@ -24,7 +24,7 @@ export default function VehiclesDataTable() {
       client_name: "",
       vehicle_name: "",
       chassis_number: "",
-      contact_number: "",
+      // contact_number: "",
       make: "",
       model: "",
       year: "",
@@ -35,7 +35,7 @@ export default function VehiclesDataTable() {
 
   const getVehicle = () => {
     setLoading(true)
-    axiosClient.get('/vehicles')
+    axiosClient.get('/web/vehicles')
     .then(({data}) => {
       setVehicle(data)
       setLoading(false)
@@ -45,7 +45,7 @@ export default function VehiclesDataTable() {
   const columns = [
     { field: "client_name", title: "Client Name" },
     { field: "chassis_number", title: "Chassis Number" },
-    { field: "contact_number", title: "Contact Number" },
+    // { field: "contact_number", title: "Contact Number" },
     { field: "model", title: "Model" },
     { field: "year", title: "Year" },
     { field: "created_at", title: "Date Created" },
@@ -54,13 +54,12 @@ export default function VehiclesDataTable() {
   const action = [
     {
       icon: () => <div className="btn btn-primary">Add New</div> ,
-      tooltip: 'Add User',
       isFreeAction: true,
       onClick: (event) => setShowModal(true)
     },
     {
       icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
-      tooltip: 'Edit User',
+      tooltip: 'Edit',
       onClick: (event,rowData) => {
         setVehicleInfo({
           ...vehicleInfo,
@@ -69,7 +68,7 @@ export default function VehiclesDataTable() {
           client_name: rowData.client_name,
           vehicle_name: rowData.vehicle_name,
           chassis_number: rowData.chassis_number,
-          contact_number: rowData.contact_number,
+          // contact_number: rowData.contact_number,
           make: rowData.make,
           model: rowData.model,
           year: rowData.year,
@@ -133,6 +132,7 @@ export default function VehiclesDataTable() {
     if (location.state == 'success'){
       getVehicle()
       setShowModal(false)
+      setVehicleInfo([])
       location.state = null
     }
   }, [location.state])

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { Autocomplete, FormControlLabel, Input, Radio, RadioGroup, TextField } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import Timeslot from '../../data/JSON/dummy/refTimeslot.json'
 import MaxLimit from '../../data/JSON/dummy/refMaxLimit.json'
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,27 +14,16 @@ import Swal from 'sweetalert2'
 export default function TimeSlotModal(props) {
   const navigate = useNavigate()
   const param = useParams()
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const id = props.Data?.id ?? null;
   const [errors, setErrors] = useState(null)
   const [timeSlot, setTimeSlot] = useState({
     id: null,
     service_center_id: param.id,
     time: null,
-    max_limit: null
+    // max_limit: null
   })
 
-  useEffect(() => {
-    if (id) { 
-      setTimeSlot({
-        ...timeSlot,
-        id: props.Data.id,
-        service_center_id: props.Data.service_center_id,
-        time: props.Data.time,
-        max_limit: props.Data.max_limit,
-      })
-    }
-  }, [id])
- 
   const optionsTimeslot = Timeslot.RECORDS.map((option) => {
     const firstLetter = option.time[0].toUpperCase();
     return {
@@ -51,49 +40,34 @@ export default function TimeSlotModal(props) {
     };
   })
 
-   
-
-  const onSubmit = (ev) => {
+  const onSubmit = async (ev) => {
     ev.preventDefault()
+    setIsSubmitting(true);
     const payload = {...timeSlot}
     setErrors(null)
-    if (id) {
-      axiosClient.put(`/service_center/timeslot/${id}`, payload)
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully updated!",
-        }).then(() => {
-          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-        })
-      })
-      .catch(err => {
-        const response = err.response
-        if (response && response.status === 422) { 
-          setErrors(response.data.errors)
-        }
-      }) 
-    } else {
-      axiosClient.post('/service_center/timeslot', payload)
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: "Your data has been successfully saved!",
-        }).then(() => {
-          navigate(`/servicecenter/details/${param.name}/${param.id}` , {state:  'success' })
-        })
-      })
-      .catch(err => {
-        const response = err.response
-        if (response && response.status === 422) { 
-          setErrors(response.data.errors)
-        }
-      }) 
-    }
-    
 
+    try {
+      const response = id
+        ? await axiosClient.put(`/web/service_center/timeslot/${id}`, payload)
+        : await axiosClient.post('/web/service_center/timeslot', payload);
+      response
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: id
+          ? 'Your data has been successfully updated!'
+          : 'Your data has been successfully saved!',
+      }).then(() => {
+        setIsSubmitting(false);
+        navigate(`/servicecenter/details/${param.name}/${param.id}`, { state: 'success' });
+      });
+    } catch (err) {
+      const response = err.response;
+      if (response && response.status === 422) {
+        setErrors(response.data.errors);
+        setIsSubmitting(false);
+      }
+    }
   }
 
   const handleChangeTime = (event, newValue) => {
@@ -103,12 +77,24 @@ export default function TimeSlotModal(props) {
     })
   }
 
-  const handleChangeMaxLimit = (event, newValue) => {
-    setTimeSlot({
-      ...timeSlot,
-      max_limit: newValue.number
-    })
-  }
+  // const handleChangeMaxLimit = (event, newValue) => {
+  //   setTimeSlot({
+  //     ...timeSlot,
+  //     max_limit: newValue.number
+  //   })
+  // }
+
+  useEffect(() => {
+    if (id) { 
+      setTimeSlot({
+        ...timeSlot,
+        id: props.Data.id,
+        service_center_id: props.Data.service_center_id,
+        time: props.Data.time,
+        // max_limit: props.Data.max_limit,
+      })
+    }
+  }, [id])
 
   useEffect(() => {
     if (props.show == false) {
@@ -116,7 +102,7 @@ export default function TimeSlotModal(props) {
         ...timeSlot,
         id: null,
         time: null,
-        max_limit: null
+        // max_limit: null
       })
       setErrors(null)
     }
@@ -126,7 +112,7 @@ export default function TimeSlotModal(props) {
     <div id="TimeSlotModal">
         <Modal show={props.show} onHide={props.close} backdrop="static" size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Add Time Slot</Modal.Title>
+              <Modal.Title>{id ? 'Edit Time Slot' : 'Add Time Slot'}</Modal.Title> 
             </Modal.Header>
             <Modal.Body className="modal-main">
             {errors && 
@@ -165,7 +151,7 @@ export default function TimeSlotModal(props) {
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row>
                 <Col xs={12} md={12}> 
-                  <Autocomplete
+                  {/* <Autocomplete
                     disableClearable
                     onChange={handleChangeMaxLimit}
                     options={optionsMaxLimit.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
@@ -182,14 +168,20 @@ export default function TimeSlotModal(props) {
                         }}
                         />
                     )}
-                  />
+                  /> */}
                 </Col>
               </Row>
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Row >
                 <Col xs={12} md={12}>
-                  <Button variant="success"  type="submit">Save Changes</Button>
+                  <Button
+                    variant="success" 
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    Save Changes
+                  </Button>
                 </Col>
               </Row>
             </Form.Group>
