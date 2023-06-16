@@ -67,12 +67,30 @@ export default function BookingDataTable() {
  
 
   const columns = [
+    { field: "reference_number", title: "Reference #" },
     { field: "client_name", title: "Client Name" },
     { field: "service", title: "Service" },
     { field: "service_center", title: "Service Center" },
     // { field: "contact_number", title: "Contact Number" },
     { field: "status", title: "Status" },
     { field: "booking_date", title: "Booking Date" },
+    {
+      field: "time",
+      title: "Booking Time",
+      render: (rowData) => {
+        const currentTime = rowData.time; // Assuming rowData.time is in "HH:mm" format
+        const currentDate = new Date().toISOString().split("T")[0];
+        const dateTimeString = `${currentDate}T${currentTime}:00`;
+        const date = new Date(dateTimeString);
+        return date.toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        });
+      },
+    },
+    { field: "updated_by", title: "Updated by" },
+    { field: "updated_at", title: "Date Updated" },
     { field: "created_at", title: "Date Created" },
    ];
  

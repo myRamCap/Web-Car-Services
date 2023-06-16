@@ -43,6 +43,7 @@ export default function ServiceCenterDataTable(props) {
 
   const columns = [
     { field: "name", title: "Name", customSort: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }), render:rowData=><Link underline="hover" to={`/servicecenter/details/${rowData.name}/${rowData.id}`}>{rowData.name}</Link>},
+    { field: "reference_number", title: "Reference #", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
     { field: "category", title: "Category", customSort: (a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }) },
     { field: "barangay", title: "Barangay", customSort: (a, b) => a.barangay.localeCompare(b.barangay, undefined, { sensitivity: 'base' }) },
     { field: "municipality", title: "Municipality", customSort: (a, b) => a.municipality.localeCompare(b.municipality, undefined, { sensitivity: 'base' }) },

@@ -12,8 +12,10 @@ import axiosClient from '../../axios-client';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function Booking(props) {
+  const {user_ID} = useStateContext()
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState(null)
   const [disabledVehicle, setDisabledVehicle] = useState(true)
@@ -41,8 +43,9 @@ export default function Booking(props) {
     time: "",
     estimated_time_desc: "",
     notes: "",
+    updated_by: user_ID,
   })
-
+ 
   const getClients = async () => {
     try {
       const response = await axiosClient.get('/web/client');
@@ -192,7 +195,7 @@ export default function Booking(props) {
     ev.preventDefault()
     setIsSubmitting(true);
     const payload = { ...booking }
-    
+
     try {
       const response = id
       ? await axiosClient.put(`/web/booking/${id}`, payload)
@@ -240,6 +243,7 @@ export default function Booking(props) {
         time: props.Data.time,
         estimated_time_desc: props.Data.estimated_time_desc,
         notes: props.Data.notes,
+        updated_by: user_ID,
       })
       setDisabledTime(false)
       setDisabledVehicle(false)
@@ -273,10 +277,17 @@ export default function Booking(props) {
         time: "",
         estimated_time_desc: "",
         notes: "",
+        updated_by: "",
       })
       setErrors(null)
     } 
   },[props.show])
+
+  
+  const isWeekend = (date) => {
+    const day = new Date(date).getDay();
+    return day === 0 || day === 6 || day === 1; // 0 represents Sunday, 6 represents Saturday
+  };
 
   return (
     <div id="servicesModal">
@@ -324,6 +335,7 @@ export default function Booking(props) {
                       className='datePicker' 
                       label="Date"
                       onChange={handleChangeDate}
+                      shouldDisableDate={isWeekend} 
                     />
                   </LocalizationProvider>
                 </Col>

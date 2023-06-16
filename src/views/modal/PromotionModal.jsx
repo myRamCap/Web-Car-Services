@@ -14,8 +14,10 @@ import { DateRangePicker } from '@mui/x-date-pickers-pro'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo'
 import { useNavigate } from 'react-router-dom';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function PromotionModal(props) {
+    const {user_ID} = useStateContext()
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [checkbox1Checked, setCheckbox1Checked] = useState(false);
     const [checkbox2Checked, setCheckbox2Checked] = useState(false);
@@ -34,6 +36,7 @@ export default function PromotionModal(props) {
       title: "",
       content: "",
       image_url: "",
+      user_id: user_ID
     })
 
     const getClient = async () => {
@@ -195,6 +198,9 @@ export default function PromotionModal(props) {
               content: "",
               image_url: "",
           })
+          setValue([
+            ...fixedOptions
+          ])
           setErrors(null)
           setCheckbox2Checked(false)
           setCheckbox1Checked(false)

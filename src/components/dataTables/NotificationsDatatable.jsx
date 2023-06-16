@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react'
 import axiosClient from '../../axios-client'
 import EditIcon from '@mui/icons-material/Edit';
 import Loading from '../loader/Loading';
-import NotificationModal from '../../views/modal/NotificationModal';
 import { useLocation } from 'react-router-dom';
 import NotificationsModal from '../../views/modal/NotificationsModal';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function NotificationsDatatable() {
     const location = useLocation()
+    const { user_ID } = useStateContext() 
     const [showModal, setShowModal] = useState(false)
     const [loading, setLoading] = useState(true);
     const paginationAlignment = useState("center")
@@ -16,10 +17,7 @@ export default function NotificationsDatatable() {
     const [notificationInfo, setNotificationInfo] = useState([
         {
             id: null,
-            corporate_id: null,
-            first_name: null,
-            last_name: null,
-            service_center_id: null,
+            category: null,
             service_center: null,
             title: "",
             content: "",
@@ -32,7 +30,7 @@ export default function NotificationsDatatable() {
     const getNotification = async () => {
         setLoading(true)
         try {
-            const {data} = await axiosClient.get('/web/notification')
+            const {data} = await axiosClient.get(`/web/notification/${user_ID}`)
             setNotification(data.data)
             setLoading(false)
         } catch (error) {
@@ -61,15 +59,10 @@ export default function NotificationsDatatable() {
             icon: () => <div className="btn btn-success btn-sm"><EditIcon  /></div> ,
             tooltip: 'Edit',
             onClick: (event,rowData) => {
-                console.log(rowData)
-                // console.log(rowData)
                 setNotificationInfo({
                     ...notificationInfo,
                     id: rowData.id,
-                    corporate_id: rowData.corporate_id,
-                    first_name: rowData.first_name,
-                    last_name: rowData.last_name,
-                    service_center_id: rowData.service_center_id,
+                    category: rowData.category,
                     service_center: rowData.service_center,
                     title: rowData.title,
                     content: rowData.content,

@@ -1,6 +1,6 @@
 {
   "name": "admin-panel",
-  "homepage": "https://portal.myramcap.com",
+  "homepage": "https://portal.mangpogs.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -25,6 +25,7 @@
     "bootstrap": "^5.2.3",
     "boxicons": "^2.1.4",
     "chart.js": "^4.2.1",
+    "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
     "highcharts": "^11.1.0",
     "highcharts-exporting": "^0.1.7",

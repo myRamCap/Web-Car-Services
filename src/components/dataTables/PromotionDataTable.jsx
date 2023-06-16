@@ -5,8 +5,10 @@ import PromotionModal from '../../views/modal/PromotionModal';
 import Loading from '../loader/Loading';
 import axiosClient from '../../axios-client';
 import { useLocation } from 'react-router-dom';
+import { useStateContext } from '../../contexts/ContextProvider';
 
 export default function PromotionDataTable() {
+  const { user_ID } = useStateContext() 
     const location = useLocation()
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false)
@@ -26,7 +28,7 @@ export default function PromotionDataTable() {
     const getPromotion = async () => {
       setLoading(true)
       try {
-        const { data } = await axiosClient.get('/web/promotion')
+        const { data } = await axiosClient.get(`/web/promotion/${user_ID}`)
         setPromotion(data.data)
         setLoading(false)
       } catch (error) {

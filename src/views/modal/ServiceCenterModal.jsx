@@ -45,6 +45,7 @@ export default function ServiceCenterModal(props) {
     latitude: "",
     facility: "",
     corporate_manager_id: user_ID,
+    municipality_code: "",
     image: "",
   }) 
  
@@ -57,11 +58,13 @@ export default function ServiceCenterModal(props) {
       ...serviceCenter,
       province: newValue.provDesc,
       municipality: null,
+      municipality_code: null,
       barangay: null,
     })
   }
  
   const handleChangeMunicipality = (event, newValue) => {
+    console.log(newValue)
     setValCityMun(newValue);
     const filterBrgy = Barangay.RECORDS.filter((data) => data.citymunCode === newValue.citymunCode)
     setBrgy(filterBrgy) 
@@ -69,6 +72,7 @@ export default function ServiceCenterModal(props) {
     setServiceCenter({
       ...serviceCenter,
       municipality: newValue.citymunDesc,
+      municipality_code: newValue.citymunCode,
       barangay: null,
     })
   }
@@ -213,6 +217,7 @@ export default function ServiceCenterModal(props) {
         longitude: "",
         latitude: "",
         facility: "",
+        municipality_code: "",
         image: "",
       })
       setValBrgy(null);

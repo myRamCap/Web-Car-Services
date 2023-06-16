@@ -10,28 +10,34 @@ import axiosClient from '../../axios-client'
 import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
+import { useStateContext } from '../../contexts/ContextProvider'
 
 export default function NotificationsModal(props) {
+    const {user_ID, role} = useStateContext()
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [checkbox1Checked, setCheckbox1Checked] = useState(false);
     const [checkbox2Checked, setCheckbox2Checked] = useState(false);
     const [errors, setErrors] = useState(null);
     const navigate = useNavigate()
     const id = props.Data?.id ?? null
+    const fixedOptions = [];
     const [corporate, setCorporate] = useState([])
     const [serviceCenter, setServiceCenter] = useState([])
+    const [value, setValue] = useState([...fixedOptions]);
     const [notification, setNotification] = useState({
         id: null,
-        corporate_id: "",
-        first_name: "",
-        last_name: "",
-        service_center_id: "",
+        category: "",
+        // corporate_id: "",
+        // first_name: "",
+        // last_name: "",
+        // service_center_id: "",
         service_center: "",
         datefrom: "",
         dateto: "",
         title: "",
         content: "",
         image_url: "",
+        user_id: user_ID
     })
 
     const handleCheckbox1Change = (event) => {
@@ -41,9 +47,13 @@ export default function NotificationsModal(props) {
             setCheckbox2Checked(false);
             setNotification({
                 ...notification,
-                service_center_id: null,
+                category: 'ALL',
+                // service_center_id: null,
                 service_center: null,
             })
+            setValue([
+                ...fixedOptions
+            ])
         }
     };
 
@@ -54,8 +64,9 @@ export default function NotificationsModal(props) {
             setCheckbox1Checked(false);
             setNotification({
                 ...notification,
-                corporate_id: null,
-                corporate_name: null,
+                category: 'SELECTED',
+                // corporate_id: null,
+                // corporate_name: null,
             })
         } 
     };
@@ -71,42 +82,59 @@ export default function NotificationsModal(props) {
 
     const getServiceCenter = async () => {
         try {
-            const { data } = await axiosClient.get('/web/servicecenter')
+            // const { data } = await axiosClient.get(`/web/servicecenter/${user_ID}`)
+            const { data } = await axiosClient.get(`/web/service_center_name/${user_ID}`)
             setServiceCenter(data.data)
         } catch (error) {
 
         }
     };
 
-    const optionsCorporateAccount = corporate.map((option) => {
-        const firstLetter = option.first_name[0].toUpperCase();
-        return {
-            firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-            ...option,
-        };
-    });
+    // const optionsCorporateAccount = corporate.map((option) => {
+    //     const firstLetter = option.first_name[0].toUpperCase();
+    //     return {
+    //         firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+    //         ...option,
+    //     };
+    // });
 
-    const optionsSC = serviceCenter.map((option) => {
-        const firstLetter = option.name[0].toUpperCase();
-        return {
-            firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-            ...option,
-        };
-    });
+    // const optionsSC = serviceCenter.map((option) => {
+    //     const firstLetter = option.name[0].toUpperCase();
+    //     return {
+    //         firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+    //         ...option,
+    //     };
+    // });
 
-    const handleChangeCorporate = (event, newValue) => {
-        setNotification({
-            ...notification,
-            corporate_id: newValue.id,
-            corporate_name: newValue.first_name+' '+newValue.last_name,
-        })
-    };
+    // const handleChangeCorporate = (event, newValue) => {
+    //     setNotification({
+    //         ...notification,
+    //         corporate_id: newValue.id,
+    //         corporate_name: newValue.first_name+' '+newValue.last_name,
+    //     })
+    // };
 
     const handleChangeServiceCenter = (event, newValue) => {
+        // setValue([
+        //     ...fixedOptions,
+        //     ...newValue.filter((option) => fixedOptions.indexOf(option) === -1)
+        // ])
+        // setNotification({
+        //     ...notification,
+        //     service_center_id: newValue.id,
+        //     service_center: newValue.name,
+        // })
+console.log(newValue)
+        setValue([
+            ...fixedOptions,
+            ...newValue.filter((option) => fixedOptions.indexOf(option) === -1)
+        ])
         setNotification({
-            ...notification,
-            service_center_id: newValue.id,
-            service_center: newValue.name,
+        ...notification,
+        service_center: [
+            ...fixedOptions,
+            ...newValue.filter((option) => fixedOptions.indexOf(option) === -1)
+        ]
         })
     };
 
@@ -177,10 +205,11 @@ export default function NotificationsModal(props) {
             setNotification({
                 ...notification,
                 id: props.Data.id,
-                corporate_id: props.Data.corporate_id,
-                first_name: props.Data.first_name,
-                last_name: props.Data.last_name,
-                service_center_id: props.Data.service_center_id,
+                // corporate_id: props.Data.corporate_id,
+                // first_name: props.Data.first_name,
+                // last_name: props.Data.last_name,
+                // service_center_id: props.Data.service_center_id,
+                category: props.Data.category,
                 service_center: props.Data.service_center,
                 datefrom: props.Data.datefrom,
                 dateto: props.Data.dateto,
@@ -189,12 +218,20 @@ export default function NotificationsModal(props) {
                 image_url: props.Data.image_url,
             })
 
-            if (props.Data.corporate_id) {
+            if (props.Data.service_center == null) {
+                setValue([
+                    ...fixedOptions
+                ])
+            } else {
+                setValue(props.Data.service_center)
+            }
+
+            if (props.Data.category == "ALL") {
                 setCheckbox1Checked(true)
                 setCheckbox2Checked(false)
-            } else {
-                setCheckbox2Checked(true)
-                setCheckbox1Checked(false)
+            } else if (props.Data.category == "SELECTED") {
+            setCheckbox2Checked(true)
+            setCheckbox1Checked(false)
             }
         }
     }, [id])
@@ -206,10 +243,10 @@ export default function NotificationsModal(props) {
             setNotification({
                 ...notification,
                 id: null,
-                corporate_id: null,
-                first_name: null,
-                last_name: null,
-                service_center_id: null,
+                // corporate_id: null,
+                // first_name: null,
+                // last_name: null,
+                // service_center: null,
                 service_center: null,
                 datefrom: null,
                 dateto: null,
@@ -217,6 +254,9 @@ export default function NotificationsModal(props) {
                 content: null,
                 image_url: null,
             })
+            setValue([
+                ...fixedOptions
+            ])
             setErrors(null)
             setCheckbox2Checked(false)
             setCheckbox1Checked(false)
@@ -242,13 +282,15 @@ export default function NotificationsModal(props) {
                         <Row>
                             <Col xs={12} md={6}>
                                 <FormControlLabel
+                               
                                     control={
                                         <Checkbox
                                             checked={checkbox1Checked}
                                             onChange={handleCheckbox1Change}
                                         />
                                     }
-                                    label="CORPORATE ACCOUNT"
+                                    label="ALL SERVICE CENTER"
+                                    disabled={role == 2 ? false : true}
                                 />
                             </Col>
                             <Col xs={12} md={6}>
@@ -259,14 +301,14 @@ export default function NotificationsModal(props) {
                                             onChange={handleCheckbox2Change}
                                         />
                                     }
-                                    label="SERVICE CENTER"
+                                    label="CHOOSE SERVICE CENTER"
                                 />
                             </Col>
                         </Row>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Row>
-                            <Col xs={12} md={6}>
+                            {/* <Col xs={12} md={6}>
                                 <Autocomplete
                                     disableClearable
                                     id="corporate-account-autocomplete"
@@ -287,17 +329,20 @@ export default function NotificationsModal(props) {
                                     />
                                     )}
                                 />
-                            </Col>
-                            <Col xs={12} md={6}>
-                                <Autocomplete
+                            </Col> */}
+                            <Col xs={12} md={12}>
+                                {/* <Autocomplete
+                                    multiple
                                     disableClearable
                                     id="service-center-autocomplete"
                                     onChange={handleChangeServiceCenter}
                                     value={notification.service_center ?? null}
                                     options={optionsSC}
-                                    disabled={!checkbox2Checked}
-                                    getOptionLabel={(option) => option.name ? option.name : notification.service_center}
-                                    isOptionEqualToValue={(option, value) => option.name ?? "" === notification.service_center}
+                                    // disabled={!checkbox2Checked}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                                    // getOptionLabel={(option) => option.name ? option.name : notification.service_center}
+                                    // isOptionEqualToValue={(option, value) => option.name ?? "" === notification.service_center}
                                     renderInput={(params) => (
                                     <TextField
                                         {...params}
@@ -305,6 +350,25 @@ export default function NotificationsModal(props) {
                                         InputProps={{
                                         ...params.InputProps,
                                         type: 'search',
+                                        }}
+                                    />
+                                    )}
+                                /> */}
+                                <Autocomplete
+                                    disabled={!checkbox2Checked}
+                                    multiple
+                                    value={value}
+                                    onChange={handleChangeServiceCenter} 
+                                    options={serviceCenter}
+                                    getOptionLabel={(option) => option.name}
+                                    isOptionEqualToValue={(option, value) => option.name === value.name}
+                                    renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Service Center"
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            type: 'search',
                                         }}
                                     />
                                     )}

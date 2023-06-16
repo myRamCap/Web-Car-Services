@@ -94,7 +94,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 1 || role == 4 ? 
+            { role == 1 ? 
                 (   
                     <li>
                         <Link className={splitLocation[1] === "vehicles" ? "isActive" : ""} to="/vehicles">
@@ -136,7 +136,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 1 || role == 2 || role == 3 || role == 4 ? 
+            { role == 1 || role == 2 || role == 3 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "notifications" ? "isActive" : ""} to="/notifications">
@@ -150,7 +150,7 @@ export default function Navbar() {
                     </li>
                 ) : null
             }
-            { role == 1 || role == 2 || role == 3 || role == 4 ? 
+            { role == 1 || role == 2 || role == 3 ? 
                 ( 
                     <li>
                         <Link className={splitLocation[1] === "promotions" ? "isActive" : ""} to="/promotions">

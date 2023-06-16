@@ -491,89 +491,108 @@ export default function HighChart() {
       }
       
     } else {
- 
-      const options = {
-        // Enable the menu options
-        // legend:{ enabled:false },
-        chart: {
-          type: 'spline'
-        },
-        title: {
-          text: 'AS OF TODAY'
-        },
-        xAxis: {
-          categories: [
-            "08:00",
-            "08:30",
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-            "17:00",
-            "17:30",
-            "18:00",
-            "18:30",
-            "19:00"
-          ]
-        },
-        yAxis: {
+      if (today && today.length > 0) {
+        const options = {
+          // Enable the menu options
+          // legend:{ enabled:false },
+          chart: {
+            type: 'spline'
+          },
           title: {
-            text: 'Quantity' // Modify the y-axis label here
-          }
-        },
-        series: []
-      };
+            text: 'AS OF TODAY'
+          },
+          xAxis: {
+            categories: [
+              "08:00",
+              "08:30",
+              "09:00",
+              "09:30",
+              "10:00",
+              "10:30",
+              "11:00",
+              "11:30",
+              "12:00",
+              "12:30",
+              "13:00",
+              "13:30",
+              "14:00",
+              "14:30",
+              "15:00",
+              "15:30",
+              "16:00",
+              "16:30",
+              "17:00",
+              "17:30",
+              "18:00",
+              "18:30",
+              "19:00"
+            ]
+          },
+          yAxis: {
+            title: {
+              text: 'Quantity' // Modify the y-axis label here
+            }
+          },
+          series: []
+        };
 
-      // Convert fetched data into Highcharts compatible series format
-      const seriesData = today.map(item => ({
-        name: item.services,
-        data: [
-          item.qty_08_00,
-          item.qty_08_30,
-          item.qty_09_00,
-          item.qty_09_30,
-          item.qty_10_00,
-          item.qty_10_30,
-          item.qty_11_00,
-          item.qty_11_30,
-          item.qty_12_00,
-          item.qty_12_30,
-          item.qty_13_00,
-          item.qty_13_30,
-          item.qty_14_00,
-          item.qty_14_30,
-          item.qty_15_00,
-          item.qty_15_30,
-          item.qty_16_00,
-          item.qty_16_30,
-          item.qty_17_00,
-          item.qty_17_30,
-          item.qty_18_00,
-          item.qty_18_30,
-          item.qty_19_00
-        ]
-      }));
+        // Convert fetched data into Highcharts compatible series format
+        const seriesData = today.map(item => ({
+          name: item.services,
+          data: [
+            item.qty_08_00,
+            item.qty_08_30,
+            item.qty_09_00,
+            item.qty_09_30,
+            item.qty_10_00,
+            item.qty_10_30,
+            item.qty_11_00,
+            item.qty_11_30,
+            item.qty_12_00,
+            item.qty_12_30,
+            item.qty_13_00,
+            item.qty_13_30,
+            item.qty_14_00,
+            item.qty_14_30,
+            item.qty_15_00,
+            item.qty_15_30,
+            item.qty_16_00,
+            item.qty_16_30,
+            item.qty_17_00,
+            item.qty_17_30,
+            item.qty_18_00,
+            item.qty_18_30,
+            item.qty_19_00
+          ]
+        }));
 
-      options.series = seriesData;
+        options.series = seriesData;
 
-      // Render the chart with updated options
-      Highcharts.chart('chart-container', options);
+        // Render the chart with updated options
+        Highcharts.chart('chart-container', options);
+      } else {
+        Highcharts.chart('chart-container', {
+          chart: {
+            type: 'spline',
+          },
+          title: {
+            text: 'NO DATA TO DISPLAY',
+          }, 
+          yAxis: {
+            title: {
+              text: 'Quantity',
+            },
+          },
+          series: [{
+              name: 'NO DATA',
+              data: []
+          }]
+        });
+      }
     }
     
   }, [filter, today, monthly, yearly]);
-  
+ 
   
   return(
     <div>
@@ -590,7 +609,7 @@ export default function HighChart() {
                 >
                   <MenuItem value="monthly">Monthly</MenuItem>
                   <MenuItem value="yearly">Yearly</MenuItem>
-                  <MenuItem value="datrange">Date Range</MenuItem>
+                  {/* <MenuItem value="datrange">Date Range</MenuItem> */}
                 </Select>
               </FormControl>
             </Col>

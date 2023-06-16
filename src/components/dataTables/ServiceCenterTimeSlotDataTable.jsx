@@ -5,6 +5,8 @@ import TimeSlotModal from '../../views/modal/TimeSlotModal';
 import axiosClient from '../../axios-client';
 import { useLocation, useParams } from 'react-router-dom';
 import Loading from '../loader/Loading';
+import { format } from 'date-fns';
+import { Checkbox } from '@mui/material';
 
 export default function ServiceCenterTimeSlotDataTable() {
   const location = useLocation()
@@ -16,15 +18,23 @@ export default function ServiceCenterTimeSlotDataTable() {
   const [serviceCenterTimeSLotInfo, setServiceCenterTimeSLotInfo] = useState([
     {
       id: null,
-      service_center_id: null,
-      time: null,
-      // max_limit: null
+      service_center_id: param.id,
+      category: "",
+      opening_time: "",
+      closing_time: "",
+      monday: "",
+      tuesday: "",
+      wednesday: "",
+      thursday: "",
+      friday: "",
+      saturday: "",
+      sunday: "",
     }
   ])
 
   const getServiceCenterTimeSlot = () => {
     setLoading(true)
-    axiosClient.get(`/web/service_center/timeslot/${param.id}`)
+    axiosClient.get(`/web/service_center/operationtime/${param.id}`)
     .then(({data}) => {
       setServiceCenterTimeSLot(data)
       setLoading(false)
@@ -32,9 +42,81 @@ export default function ServiceCenterTimeSlotDataTable() {
   }
 
   const columns = [
-    { field: "time", title: "Time Slot" },
-    // { field: "max_limit", title: "Max Limit" },
-    { field: "date_created", title: "Date Created" },
+    { field: "category", title: "Category" },
+    { field: "opening_time", title: "Opening Time" },
+    { field: "closing_time", title: "Closing Time" },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Monday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.monday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Tuesday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.tuesday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Wednesday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.wednesday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Thursday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.thursday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Friday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.friday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Saturday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.saturday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    {
+      field: "selected",  // New column for the checkbox
+      title: "Sunday",
+      render: (rowData) => (
+        <Checkbox
+          checked={rowData.sunday == 1}  // Check if `monday` is equal to 1
+          disabled
+        />
+      ),
+    },
+    { field: "created_at", title: "Date Created" },
+    // { field: "date_created", title: "Date Created", render: (rowData) => format(new Date(rowData.date_created), 'yyyy-MM-dd HH:mm:ss'),},
 
    ];
 
@@ -52,8 +134,16 @@ export default function ServiceCenterTimeSlotDataTable() {
           ...serviceCenterTimeSLotInfo,
           id: rowData.id,
           service_center_id: rowData.service_center_id,
-          time: rowData.time,
-          // max_limit: rowData.max_limit,
+          category: rowData.category,
+          opening_time: rowData.opening_time,
+          closing_time: rowData.closing_time,
+          monday: rowData.monday,
+          tuesday: rowData.tuesday,
+          wednesday: rowData.wednesday,
+          thursday: rowData.thursday,
+          friday: rowData.friday,
+          saturday: rowData.saturday,
+          sunday: rowData.sunday,
         })
         setShowModal(true)
       }
